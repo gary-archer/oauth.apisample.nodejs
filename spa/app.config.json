@@ -1,0 +1,12 @@
+{
+    "app": {
+        "dataUrl":          "http://api.mycompany.com/api"
+    },
+    "oauth": {
+        "authority":        "https://dev-843469-admin.oktapreview.com",
+        "client_id":        "0oac5m78icnW3C06L0h7",
+        "app_uri":          "http://web.mycompany.com/spa/",
+        "post_logout_path": "#loggedout",
+        "scope":            "openid profile email"
+    }
+}

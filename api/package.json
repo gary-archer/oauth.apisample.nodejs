@@ -1,0 +1,24 @@
+{
+  "name": "httpserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "httpserver.js",
+  "scripts": {
+    "start": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nodemon src/httpserver.js",
+    "httpDebug": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 https_proxy=http://127.0.0.1:8888 nodemon src/httpserver.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cors": "^2.8.4",
+    "cross-env": "^5.0.5",
+    "express": "^4.15.4",
+    "js-sha256": "^0.6.0",
+    "memory-cache": "^0.2.0",
+    "nodemon": "^1.12.1",
+    "request": "^2.82.0",
+    "request-promise-native": "^1.0.5",
+    "winston": "^2.3.1"
+  }
+}

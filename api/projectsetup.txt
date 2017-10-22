@@ -1,0 +1,30 @@
+Step 1 - Install dependencies
+-----------------------------
+I created the package.json like this:
+* npm init -y
+
+I installed core dependencies like this:
+* npm install nodemon express cors --save-dev
+
+I installed the request object to make token introspection easier:
+* npm install request request-promise-native --save-dev
+
+I installed environment variable and logger utilities
+* npm cross-env winston --save-dev
+
+Step 2 - Execution
+--------------------
+I added the scripts section to package.json to reference the API entry point file httpserver.js
+Run 'npm start' so that after any changes to the above file or its dependencies, nodemon restarts the API
+
+When using the default Okta developer certificate we set this environment variable to bypass warnings:
+* NODE_TLS_REJECT_UNAUTHORIZED=0
+
+Use 'npm run httpDebug' to use Fiddler https debugging which sets this environment variable:
+* https_proxy=http://127.0.0.1:8888
+
+Step 3 - Deployment
+-------------------
+Deploy all files except node_modules to your node server
+Then run npm install to install dependencies
+Typically in production the API will be hosted behind a load balancer
