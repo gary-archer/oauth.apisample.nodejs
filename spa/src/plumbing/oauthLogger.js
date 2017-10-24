@@ -1,6 +1,7 @@
 'use strict';
 import UrlHelper from 'urlHelper';
 import IFrameWindowHelper from 'iframeWindowHelper';
+import {Log as OidcLog} from 'oidc-client';
 
 /*
  * Capture OIDC log output
@@ -11,7 +12,7 @@ export default class OAuthLogger {
      * Initialize logging and set the initial log level
      */
     static initialize() {
-        Oidc.Log.logger = OAuthLogger;
+        OidcLog.logger = OAuthLogger;
         OAuthLogger.setLevel(OAuthLogger._getUrlLogLevel());
     }
 
@@ -21,7 +22,7 @@ export default class OAuthLogger {
     static setLevel(level) {
 
         // Set the log level in the session so that it is inherited on page reloads and by the renewal iframe
-        Oidc.Log.level = level;
+        OidcLog.level = level;
         sessionStorage.setItem('basicSpa.logLevel', level);
 
         // Clear the log if setting the level on the main window
@@ -31,7 +32,7 @@ export default class OAuthLogger {
         
         // Hide or show trace details
         let traceContainer = IFrameWindowHelper.getMainWindowElement('#traceContainer');
-        if (level === Oidc.Log.NONE) {
+        if (level === OidcLog.NONE) {
             traceContainer.addClass('hide');
         }
         else {
@@ -98,21 +99,21 @@ export default class OAuthLogger {
         
         // Valid values
         let validLevels = {
-            'none':  Oidc.Log.NONE,
-            'debug': Oidc.Log.DEBUG,
-            'info':  Oidc.Log.INFO,
-            'warn':  Oidc.Log.WARN,
-            'error': Oidc.Log.ERROR
+            'none':  OidcLog.NONE,
+            'debug': OidcLog.DEBUG,
+            'info':  OidcLog.INFO,
+            'warn':  OidcLog.WARN,
+            'error': OidcLog.ERROR
         };
 
         // If a value like log=debug is present in the URL then return it
         let hashData = UrlHelper.getLocationHashData();
-        if (validLevels[hashData.log] >= Oidc.Log.NONE) {
+        if (validLevels[hashData.log] >= OidcLog.NONE) {
             return validLevels[hashData.log];
         }
 
         // Otherwise return the stored value or default to no logging
-        return parseInt(sessionStorage.getItem('basicSpa.logLevel')) | Oidc.Log.None;
+        return parseInt(sessionStorage.getItem('basicSpa.logLevel')) | OidcLog.None;
     }
 
     /*

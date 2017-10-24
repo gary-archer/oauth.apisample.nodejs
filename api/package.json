@@ -1,6 +1,6 @@
 {
-  "name": "httpserver",
-  "version": "1.0.0",
+  "name": "basicapi",
+  "version": "3.0.0",
   "description": "",
   "main": "httpserver.js",
   "scripts": {
@@ -10,15 +10,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "cors": "^2.8.4",
     "cross-env": "^5.0.5",
     "express": "^4.15.4",
     "js-sha256": "^0.6.0",
     "memory-cache": "^0.2.0",
-    "nodemon": "^1.12.1",
     "request": "^2.82.0",
     "request-promise-native": "^1.0.5",
     "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
   }
 }

@@ -1,6 +1,7 @@
 'use strict';
 import HttpClient from 'httpClient';
 import ErrorHandler from 'errorHandler';
+import {UserManager as OidcUserManager} from 'oidc-client';
 
 /*
  * The entry point for initiating login and token requests
@@ -27,7 +28,7 @@ export default class Authenticator {
         };
         
         // Create the OIDC class
-        this.userManager = new Oidc.UserManager(settings);
+        this.userManager = new OidcUserManager(settings);
         this.userManager.events.addSilentRenewError(this._onSilentTokenRenewalError);
         this._setupCallbacks();
     }
