@@ -62,7 +62,7 @@ export default class Authenticator {
                     return Promise.resolve(); 
                 }
 
-                // Set the stored value to expired and also corrupt the token so that it returns a 401
+                // Set the stored value to expired and also corrupt the token so that there is a 401 if it is sent to an API
                 user.expires_at = parseInt(Date.now() / 1000) + 30;
                 user.access_token = 'x' + user.access_token + 'x';
                 
@@ -150,9 +150,12 @@ export default class Authenticator {
      * Report any silent token renewal errors
      */
     _onSilentTokenRenewalError(e) {
-        
-        let error = ErrorHandler.getFromOAuthResponse(e);
-        ErrorHandler.reportError(error);
+
+        // Login required is not a real error - we will just redirect the user on the next API 401 call
+        if (e.error !== 'login_required') {
+            let error = ErrorHandler.getFromOAuthResponse(e);
+            ErrorHandler.reportError(error);
+        }
     }
 
     /*
@@ -161,14 +164,13 @@ export default class Authenticator {
     startLogout() {
         
         // Redirect in order to log out at the authorization server and remove vendor cookies
-        return this.userManager.signoutRedirect()
+        this.userManager.signoutRedirect()
             .then(request => {
                return Promise.resolve();
             })
             .catch(e => {
-            
-                // Handle OAuth specific errors here, such as those calling the metadata endpoint
-                return Promise.reject(ErrorHandler.getFromOAuthRequest(e));
+                ErrorHandler.reportError(ErrorHandler.getFromOAuthRequest(e));
+                return Promise.resolve();
             });
     }
 
