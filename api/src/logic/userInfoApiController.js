@@ -17,8 +17,14 @@ class UserInfoApiController {
      * Return summary data for our golfer entities
      */
     getUserClaims() {
-        let claims = this.response.locals.claims;
-        this.response.end(JSON.stringify(claims));
+        let serverClaims = this.response.locals.claims;
+        let uiClaims = {
+            given_name: serverClaims.given_name,
+            family_name: serverClaims.family_name,
+            email: serverClaims.email
+        };
+
+        this.response.end(JSON.stringify(uiClaims));
     }
 }
 

@@ -95,6 +95,7 @@ class ClaimsHandler {
                     exp: data.exp,
                     claims: {
                         userId: data.sub,
+                        applicationId: data.cid,
                         scope: data.scope
                     }
                 };
