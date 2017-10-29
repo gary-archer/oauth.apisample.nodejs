@@ -67,7 +67,7 @@ export default class Router {
             return Promise.resolve();
         }
 
-        let view = new UserInfoView(this.authenticator, this.appConfig.app.dataUrl);
+        let view = new UserInfoView(this.authenticator);
         return view.execute();
     }
 }

@@ -15,7 +15,6 @@ const appConfig = require('../app.config.json');
 
 // Import our class definitions
 const GolfApiController = require('./logic/golfApiController');
-const UserInfoApiController = require('./logic/userInfoApiController');
 const TokenValidator = require('./plumbing/tokenValidator');
 const ErrorHandler = require('./plumbing/errorHandler');
 const ApiLogger = require('./plumbing/apiLogger');
@@ -86,17 +85,9 @@ app.get('/api/golfers/:id([0-9]+)', function (request, response, next) {
     controller.getDetails(id);
 });
 
-app.get('/api/userclaims/current', function (request, response, next) {
-    
-    ApiLogger.info('API call', 'Request for current user info');
-    let controller = new UserInfoApiController(request, response);
-    controller.getUserClaims();
-});
-
 app.use('/api/*', function (unhandledException, request, response, next) {
     ErrorHandler.reportError(response, unhandledException);
 });
-
 
 /*
  * START LISTENING FOR HTTP REQUESTS

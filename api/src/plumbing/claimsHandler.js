@@ -28,9 +28,7 @@ class ClaimsHandler {
     lookupClaims() {
         
         return this._getMetadata()
-            .then(this._readTokenData)
-            .then(this._readCentralUserData)
-            .then(this._readProductClaims)
+            .then(this._readTokenData);
     }
 
     /*
@@ -107,51 +105,10 @@ class ClaimsHandler {
     }
     
     /*
-     * We will read central user data by calling the Open Id Connect endpoint, but a custom API could also be used
-     */
-    _readCentralUserData(tokenData) {
-        
-        let options = {
-            uri: metadata.userinfo_endpoint,
-            method: 'GET',
-            json: true,
-            headers: {
-                'Authorization': 'Bearer ' + this.accessToken
-            },
-        };
-        
-        return new RequestPromise(options)
-            .then(userInfo => {
-                
-                // Extend token data with central user info
-                tokenData.claims.given_name = userInfo.given_name;
-                tokenData.claims.family_name = userInfo.family_name;
-                tokenData.claims.email = userInfo.email;
-            
-                // Return the result
-                return Promise.resolve(tokenData);
-            })
-            .catch(e => {
-                return Promise.reject(ErrorHandler.fromUserInfoError(e, metadata.userinfo_endpoint));
-            });
-        
-        return Promise.resolve(); 
-    }
-    
-    /*
-     * We could read product claims here if needed, and include them in the claims cache
-     */
-    _readProductClaims(userData) {
-        return Promise.resolve(userData); 
-    }
-    
-    /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
     _setupCallbacks() {
         this._readTokenData = this._readTokenData.bind(this);
-        this._readCentralUserData = this._readCentralUserData.bind(this);
-        this._readProductClaims = this._readProductClaims.bind(this);
     }
 }
 

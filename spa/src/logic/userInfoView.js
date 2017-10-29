@@ -9,9 +9,8 @@ export default class UserInfoView {
     /*
      * Construction
      */
-    constructor(authenticator, baseUrl) {
+    constructor(authenticator) {
         this.authenticator = authenticator;
-        this.baseUrl = baseUrl;
     }
     
     /*
@@ -22,17 +21,18 @@ export default class UserInfoView {
         // Hide UI elements while loading
         $('#loginNameContainer').addClass('hide');
 
-        // Get the data
-        return HttpClient.callApi(`${this.baseUrl}/userclaims/current`, 'GET', null, this.authenticator)
-            .then(claims => {
-                
-                // Render it once received
-                if(claims.given_name && claims.family_name) {
+        // Get the data we received from the id token
+        let userProfile = this.authenticator.getOpenIdConnectUserClaims()
+            .then(userProfile => {
+
+                /*for(var x in userProfile) {
+                    alert(`key: ${x}, Value: ${userProfile[x]}`);
+                }*/
+
+                if(userProfile.given_name && userProfile.family_name) {
                     $('#loginNameContainer').removeClass('hide');
-                    $('#userName').text(`${claims.given_name} ${claims.family_name}`);
+                    $('#userName').text(`${userProfile.given_name} ${userProfile.family_name}`);
                 }
-                
-                return Promise.resolve();
             });
     }
 }

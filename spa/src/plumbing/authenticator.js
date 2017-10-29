@@ -21,9 +21,9 @@ export default class Authenticator {
             silent_redirect_uri: config.app_uri,
             post_logout_redirect_uri: `${config.app_uri}${config.post_logout_path}`,
             scope: config.scope,
-            response_type: 'id_token token',
+            response_type: 'token id_token',
+            loadUserInfo: true,
             automaticSilentRenew: true,
-            loadUserInfo: false,
             monitorSession: false
         };
         
@@ -70,6 +70,22 @@ export default class Authenticator {
                 this.userManager.storeUser(user);
                 this.userManager.stopSilentRenew();
                 this.userManager.startSilentRenew();
+            });
+    }
+
+    /*
+     * Get Open Id Connect claims
+     */
+    getOpenIdConnectUserClaims() {
+
+        return this.userManager.getUser()
+            .then(user => {
+
+                if (user && user.profile) {
+                    return user.profile;
+                }
+
+                return null;
             });
     }
 
