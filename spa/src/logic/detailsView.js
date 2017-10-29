@@ -73,7 +73,6 @@ export default class DetailsView {
         // Render summary details
         let golferDiv = $(`<div class='col-xs-6'>
                              <div>Name : <b>${golfer.name}</b></div>
-                             <div>Handicap : <b>${golfer.handicap}</b></div>
                              <div>Tour Wins : <b>${golfer.tour_wins}</b></div>
                            </div>`);
         golferDiv.append(golferImage);

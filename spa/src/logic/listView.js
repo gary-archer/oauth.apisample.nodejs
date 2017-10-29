@@ -59,7 +59,6 @@ export default class ListView {
             // Set text properties
             let golferDiv = $(`<div class='col-xs-3'>
                                  <div>Name : <b>${golfer.name}</b></div>
-                                 <div>Handicap : <b>${golfer.handicap}</b></div>
                                  <div>Tour Wins : <b>${golfer.tour_wins}</b></div>
                                </div>`);
             

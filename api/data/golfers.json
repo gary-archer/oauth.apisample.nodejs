@@ -3,50 +3,42 @@
         {
             "id":             1,
             "name":           "Dustin",
-            "tour_wins":      16,
-            "handicap":       0
+            "tour_wins":      16
         },
         {
             "id":             2,
             "name":           "Phil",
-            "tour_wins":      42,
-            "handicap":       0
+            "tour_wins":      42
         },
         {
             "id":             3,
             "name":           "Rickie",
-            "tour_wins":      4,
-            "handicap":       0
+            "tour_wins":      4
         },
         {
             "id":             4,
             "name":           "Bubba",
-            "tour_wins":      9,
-            "handicap":       0
+            "tour_wins":      9
         },
         {
             "id":             5,
             "name":           "Tiger",
-            "tour_wins":      79,
-            "handicap":       0
+            "tour_wins":      79
         },
         {
             "id":             6,
             "name":           "Jordan",
-            "tour_wins":      11,
-            "handicap":       0
+            "tour_wins":      11
         },
         {
             "id":             7,
             "name":           "KJ",
-            "tour_wins":      8,
-            "handicap":       0
+            "tour_wins":      8
         },
         {
             "id":             8,
             "name":           "Freddy",
-            "tour_wins":      15,
-            "handicap":       0
+            "tour_wins":      15
         }
     ]
 }
