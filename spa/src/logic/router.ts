@@ -4,15 +4,22 @@ import ListView from 'listView';
 import DetailsView from 'detailsView';
 import LogoutView from 'logoutView';
 import UserInfoView from 'userInfoView';
-import UrlHelper from 'urlHelper';
-import OAuthLogger from 'oauthLogger';
-import $ from 'jquery';
+import UrlHelper from '../plumbing/urlHelper';
+import OAuthLogger from '../plumbing/oauthLogger';
+import * as $ from 'jquery';
 
 /*
  * A very primitive router to deal with switching views
  */
 export default class Router {
 
+    /*
+     * Fields
+     */
+    appConfig: any;
+    authenticator: any;
+    currentView: any;
+    
     /*
      * Initialize the current view
      */

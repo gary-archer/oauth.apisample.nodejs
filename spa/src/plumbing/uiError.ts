@@ -6,6 +6,16 @@
 export default class UIError {
 
     /*
+     * Fields
+     */
+    _message: string;
+    _statusCode: number;
+    _area: string;
+    _url: string;
+    _details: string;
+    _nonError: boolean;
+
+    /*
      * Let callers supply a subset of named parameters via object destructuring
      */
     constructor({

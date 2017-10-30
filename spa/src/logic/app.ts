@@ -1,11 +1,10 @@
 'use strict';
-import Authenticator from 'authenticator';
-import HttpClient from 'httpClient';
+import Authenticator from '../plumbing/authenticator';
+import HttpClient from '../plumbing/httpClient';
+import OAuthLogger from '../plumbing/oauthLogger';
+import ErrorHandler from '../plumbing/errorHandler';
 import Router from 'router';
-import OAuthLogger from 'oauthLogger';
-import ErrorHandler from 'errorHandler';
-import $ from 'jquery';
-window.$ = $;
+import * as $ from 'jquery';
 
 /*
  * The application class
@@ -13,15 +12,23 @@ window.$ = $;
 class App {
     
     /*
+     * Fields
+     */
+    appConfig: any;
+    authenticator: any;
+    router: any;
+    
+    /*
      * Class setup
      */
     constructor() {
         // Create members
         this.appConfig = null;
-        this.authenticator = null;
-        this.router = null;
+        this.authenticator = Authenticator;
+        this.router = Router;
         
-        // Initialize logging
+        // Initialize Javascript
+        (<any>window).$ = $;
         this._setupCallbacks();
     }
     

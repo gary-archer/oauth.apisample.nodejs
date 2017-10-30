@@ -1,5 +1,5 @@
 'use strict';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /*
  * A helper class to ensure that any OAuth trace or error messages are routed to the main window and not the frame
@@ -11,7 +11,7 @@ export default class IFrameWindowHelper {
      */
     static getMainWindowElement(itemName) {
         if (IFrameWindowHelper.isIFrameOperation()) {
-            return window.parent.$(itemName);
+            return (<any>window.parent).$(itemName);
         }
         else {
             return $(itemName);

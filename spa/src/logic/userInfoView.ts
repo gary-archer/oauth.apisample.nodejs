@@ -1,11 +1,15 @@
 'use strict';
-import HttpClient from 'httpClient';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /*
  * Logic related to user info
  */
 export default class UserInfoView {
+    
+    /*
+     * Fields
+     */
+    authenticator: any;
     
     /*
      * Class setup

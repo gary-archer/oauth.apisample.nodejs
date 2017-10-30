@@ -1,9 +1,10 @@
-const webpack = require('webpack')
-const path = require('path')
+const path = require('path');
+const nodeModulesPath = path.resolve(__dirname, 'node_modules');
+const webpack = require('webpack');
 
-const config = {
+module.exports = {
   context: path.resolve(__dirname, 'src'),
-  entry: ['babel-polyfill', './logic/app.js'],
+  entry: ['babel-polyfill', './logic/app.ts'],
   output: {
     
     // Build our code into our SPA bundle file
@@ -11,21 +12,16 @@ const config = {
     filename: 'spa.bundle.min.js'
   },
   resolve: {
-    modules: ['node_modules', 'logic', 'plumbing']
+    'modules': ['node_modules', 'logic', 'plumbing']
   },
   module: {
-    rules: [{
-      test: /\.js$/,
-      include: path.resolve(__dirname, 'src'),
-      use: [{
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            ['es2015', { modules: false }]
-          ]
-        }
-      }]
-    }]
+    rules: [
+      // All files with a '.ts' extension will be handled by the Typescript loader
+      { test: /\.ts$/, loader: "ts-loader" },
+
+      // All output '.js' files will be polyfilled babelified.
+      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+    ]
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
@@ -39,5 +35,3 @@ const config = {
     })
   ]
 }
-
-module.exports = config

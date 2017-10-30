@@ -1,8 +1,8 @@
 'use strict';
 import UrlHelper from 'urlHelper';
 import IFrameWindowHelper from 'iframeWindowHelper';
-import {Log as OidcLog} from 'oidc-client';
-import $ from 'jquery';
+import * as Oidc from "oidc-client";
+import * as $ from 'jquery';
 
 /*
  * Capture OIDC log output

@@ -1,11 +1,18 @@
 'use strict';
-import HttpClient from 'httpClient';
-import $ from 'jquery';
+import HttpClient from '../plumbing/httpClient';
+import * as $ from 'jquery';
 
 /*
  * Logic related to the list view
  */
 export default class DetailsView {
+    
+    /*
+     * Fields
+     */
+    authenticator: any;
+    baseUrl: string;
+    id: number;
     
     /*
      * Class setup

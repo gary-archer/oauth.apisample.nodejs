@@ -1,8 +1,7 @@
 'use strict';
-import Authenticator from 'authenticator';
 import ErrorHandler from 'errorHandler';
 import UIError from 'uiError';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /*
  * Logic related to making HTTP calls
@@ -23,8 +22,6 @@ export default class HttpClient {
                 let error = ErrorHandler.getFromAjaxError(xhr, filePath);
                 return Promise.reject(error);
             });
-        
-        return Promise.resolve();
     }
     
     /*
@@ -86,7 +83,7 @@ export default class HttpClient {
         
         return $.ajax({
                     url: url,
-                    data: dataToSend | {},
+                    //data: dataToSend | {},
                     dataType: 'json',
                     contentType: 'application/json',
                     type: method,

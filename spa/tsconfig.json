@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist/",
+      "target": "es5",
+      "lib": ["es2015", "dom"],
+      "allowSyntheticDefaultImports": true
+    },
+    "include": [
+      "index.ts",
+      "src/**/*"
+  ],
+  "exclude": [
+      "node_modules"
+  ]
+}

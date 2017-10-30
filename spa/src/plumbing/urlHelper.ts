@@ -8,7 +8,7 @@ export default class UrlHelper {
     /*
      * Parse the hash fragment into an object
      */
-    static getLocationHashData() {
+    static getLocationHashData(): any {
 
         let params = {}
 
