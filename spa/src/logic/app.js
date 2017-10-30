@@ -4,6 +4,8 @@ import HttpClient from 'httpClient';
 import Router from 'router';
 import OAuthLogger from 'oauthLogger';
 import ErrorHandler from 'errorHandler';
+import $ from 'jquery';
+window.$ = $;
 
 /*
  * The application class

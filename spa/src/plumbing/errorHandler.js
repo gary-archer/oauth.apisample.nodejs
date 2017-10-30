@@ -1,6 +1,7 @@
 'use strict';
 import UIError from 'uiError';
 import IFrameWindowHelper from 'iframeWindowHelper'
+import $ from 'jquery';
 
 /*
  * A class to handle composing and reporting errors

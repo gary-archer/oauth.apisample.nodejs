@@ -1,4 +1,5 @@
 'use strict';
+import $ from 'jquery';
 
 /*
  * A helper class to ensure that any OAuth trace or error messages are routed to the main window and not the frame

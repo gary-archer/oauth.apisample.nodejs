@@ -1,6 +1,7 @@
 'use strict';
 import HttpClient from 'httpClient';
 import DetailsView from 'detailsView';
+import $ from 'jquery';
 
 /*
  * Logic related to the list view
@@ -8,7 +9,7 @@ import DetailsView from 'detailsView';
 export default class ListView {
     
     /*
-     * Construction
+     * Class setup
      */
     constructor(authenticator, baseUrl) {
         this.authenticator = authenticator;

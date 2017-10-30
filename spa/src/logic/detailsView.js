@@ -1,5 +1,6 @@
 'use strict';
 import HttpClient from 'httpClient';
+import $ from 'jquery';
 
 /*
  * Logic related to the list view
@@ -7,7 +8,7 @@ import HttpClient from 'httpClient';
 export default class DetailsView {
     
     /*
-     * Construction
+     * Class setup
      */
     constructor(authenticator, baseUrl, id) {
         this.authenticator = authenticator;

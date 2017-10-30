@@ -21,7 +21,7 @@ div.row
 .trace
 {
     color:blue;
-    max-height: 200px;
+    max-height: 600px;
     overflow-y: auto
 }
 .hide

@@ -2,6 +2,7 @@
 import Authenticator from 'authenticator';
 import ErrorHandler from 'errorHandler';
 import UIError from 'uiError';
+import $ from 'jquery';
 
 /*
  * Logic related to making HTTP calls

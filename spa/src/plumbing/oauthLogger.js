@@ -2,6 +2,7 @@
 import UrlHelper from 'urlHelper';
 import IFrameWindowHelper from 'iframeWindowHelper';
 import {Log as OidcLog} from 'oidc-client';
+import $ from 'jquery';
 
 /*
  * Capture OIDC log output

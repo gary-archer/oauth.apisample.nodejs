@@ -6,6 +6,7 @@ import LogoutView from 'logoutView';
 import UserInfoView from 'userInfoView';
 import UrlHelper from 'urlHelper';
 import OAuthLogger from 'oauthLogger';
+import $ from 'jquery';
 
 /*
  * A very primitive router to deal with switching views
