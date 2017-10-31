@@ -1,6 +1,5 @@
-const dataRoot = '../../data'
-const summaryData = require(`${dataRoot}/golfers.json`);
-const detailsData = require(`${dataRoot}/golferTourWins.json`);
+import * as summaryData from '../../data/golfers.json';
+import * as detailsData from '../../data/golferTourWins.json';
 
 /*
  * An API controller for golf operations
@@ -34,7 +33,7 @@ export default class GolfApiController {
     public getDetails(id: number) {
 
         // Find the golfer by id
-        let foundGolfer = summaryData.golfers.find(g => g.id === id);
+        let foundGolfer = (<any>summaryData).golfers.find(g => g.id === id);
         if (!foundGolfer) {
             
             // Report errors
@@ -42,7 +41,7 @@ export default class GolfApiController {
         }
         else {
             
-            let foundGolferDetails = detailsData.golfers.find(g => g.id === id);
+            let foundGolferDetails = (<any>detailsData).golfers.find(g => g.id === id);
             foundGolfer.wins = foundGolferDetails.wins;
             this._response.end(JSON.stringify(foundGolfer));
         }
