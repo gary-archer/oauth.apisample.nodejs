@@ -21,7 +21,7 @@ module.exports = {
   },
   module: {
     rules: [
-      // Files with a .js extension are loaded by the typescript loader
+      // Files with a .js extension are loaded by the babel loader
       {test: /\.js$/, loader: 'babel-loader'},
 
       // Files with a .ts extension are loaded by the typescript loader

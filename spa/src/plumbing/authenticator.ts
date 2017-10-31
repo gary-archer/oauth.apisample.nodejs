@@ -1,4 +1,3 @@
-'use strict';
 import HttpClient from './httpClient';
 import ErrorHandler from './errorHandler';
 import * as Oidc from "oidc-client";

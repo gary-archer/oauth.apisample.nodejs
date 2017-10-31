@@ -1,11 +1,10 @@
-'use strict';
-const ApiError = require('./apiError');
-const ApiLogger = require('./apiLogger');
+import ApiLogger from './apiLogger';
+import ApiError from './apiError';
 
 /*
  * A class to handle composing and reporting errors
  */
-class ErrorHandler {
+export default class ErrorHandler {
     
     /*
      * Handle logging the error server side and returning an error object to the client
@@ -185,5 +184,3 @@ class ErrorHandler {
         });
     }
 }
-
-module.exports = ErrorHandler;

@@ -1,5 +1,3 @@
-'use strict';
-
 /*
  * A simple error class for the UI
  */

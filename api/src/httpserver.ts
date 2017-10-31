@@ -1,29 +1,31 @@
 /*
- * A primitive HTTP server whose main role is a REST API
+ * Web server imports
  */
+import express from 'express';
+import * as cors from 'cors';
+import * as path from 'path';
 
-'use strict';
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
+/*
+ * Our modules
+ */
+import GolfApiController from './logic/golfApiController';
+import TokenValidator from './plumbing/tokenValidator';
+import ErrorHandler from './plumbing/errorHandler';
+import ApiLogger from './plumbing/apiLogger';
+
+/*
+ * Web parameters
+ */
 const webDomain = 'http://web.mycompany.com';
 const webFilesRoot = '../../';
 const port = 80;
 
-// Read configuration
-const appConfig = require('../app.config.json');
-
-// Import our class definitions
-const GolfApiController = require('./logic/golfApiController');
-const TokenValidator = require('./plumbing/tokenValidator');
-const ErrorHandler = require('./plumbing/errorHandler');
-const ApiLogger = require('./plumbing/apiLogger');
-
 /*
- * INITIAL SETUP
+ * Create the express instance
  */
+const appConfig = require('../app.config.json');
 const app = express();
-ApiLogger.setLevel('info');
+ApiLogger.initialize('info');
 
 /*
  * PRIMITIVE WEB SERVER (http://mycompanyweb.com)
@@ -73,7 +75,7 @@ app.get('/api/*', function (request, response, next) {
 app.get('/api/golfers', function (request, response, next) {
     
     ApiLogger.info('API call', 'Request for golfer list');
-    let controller = new GolfApiController(request, response, next);
+    let controller = new GolfApiController(request, response);
     controller.getList();
 });
 
@@ -81,7 +83,7 @@ app.get('/api/golfers/:id([0-9]+)', function (request, response, next) {
     
     let id = parseInt(request.params.id);
     ApiLogger.info('API call', `Request for golfer details for id: ${id}`);
-    let controller = new GolfApiController(request, response, next);
+    let controller = new GolfApiController(request, response);
     controller.getDetails(id);
 });
 

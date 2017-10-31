@@ -1,33 +1,35 @@
-/*
- * Token validation
- */
-
-'use strict';
-const ClaimsHandler = require('./claimsHandler');
-const ClaimsCache = require('./claimsCache');
-const ErrorHandler = require('./errorHandler');
+import ClaimsHandler from './claimsHandler';
+import ClaimsCache from './claimsCache';
+import ErrorHandler from './errorHandler';
 
 /*
  * A class to handle validating tokens received by the API
  */
-class TokenValidator {
+export default class TokenValidator {
+
+    /*
+     * Fields
+     */
+    private _request: any;
+    private _response: any;
+    private _oauthConfig: any;
     
     /*
      * Receive the request and response
      */
-    constructor(request, response, oauthConfig) {
-        this.request = request;
-        this.response = response;
-        this.oauthConfig = oauthConfig;
+    public constructor(request, response, oauthConfig) {
+        this._request = request;
+        this._response = response;
+        this._oauthConfig = oauthConfig;
     }
 
     /*
      * Handle validating an access token and updating the claims cache
      */
-    validate() {
+    public validate() {
         
         // Read the access token from the header
-        let accessToken = this._readBearerToken(this.request);
+        let accessToken = this._readBearerToken();
         if (!accessToken) {
             return Promise.reject(ErrorHandler.getNoTokenError());
         }
@@ -35,18 +37,18 @@ class TokenValidator {
         // Bypass validation and use cached results if they exist
         let cachedClaims = ClaimsCache.getClaimsForToken(accessToken);
         if (cachedClaims !== null) {
-            this.response.locals.claims = cachedClaims;
+            this._response.locals.claims = cachedClaims;
             return Promise.resolve();
         }
 
         // Otherwise create a class to do claims processing for the received token
-        let handler = new ClaimsHandler(this.oauthConfig, accessToken);
+        let handler = new ClaimsHandler(this._oauthConfig, accessToken);
         return handler.lookupClaims()
             .then(data => {
             
                 // Save claims to the cache until the token expiry time
                 ClaimsCache.addClaimsForToken(accessToken, data.exp, data.claims);
-                this.response.locals.claims = data.claims;
+                this._response.locals.claims = data.claims;
                 return Promise.resolve();
             });
     }
@@ -54,10 +56,10 @@ class TokenValidator {
     /*
      * Try to read the token from the authorization header
      */
-    _readBearerToken() {
+    private _readBearerToken(): string {
     
-        if (this.request.headers && this.request.headers.authorization) {
-            let parts = this.request.headers.authorization.split(' ');
+        if (this._request.headers && this._request.headers.authorization) {
+            let parts = this._request.headers.authorization.split(' ');
             if (parts.length === 2 && parts[0] === 'Bearer') {
                 return parts[1];
             }
@@ -66,5 +68,3 @@ class TokenValidator {
         return null;
     }
 }
-
-module.exports = TokenValidator;
