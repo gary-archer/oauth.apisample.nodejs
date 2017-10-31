@@ -1,14 +1,15 @@
 {
   "name": "basicapi",
   "version": "3.0.0",
-  "description": "",
-  "main": "httpserver.js",
+  "description": "A Basic OAuth secured API",
+  "main": "./httpserver.js",
   "scripts": {
-    "start": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nodemon src/httpserver.js",
-    "httpDebug": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 https_proxy=http://127.0.0.1:8888 nodemon src/httpserver.js"
+    "build": "tsc && node tsbuild/httpServer.js",
+    "start": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nodemon -e ts --exec \"npm run build\"",
+    "httpDebug": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 https_proxy=http://127.0.0.1:8888 nodemon -e ts --exec \"npm run build\""
   },
   "keywords": [],
-  "author": "",
+  "author": "Gary Archer",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.4",
@@ -18,9 +19,11 @@
     "memory-cache": "^0.2.0",
     "request": "^2.82.0",
     "request-promise-native": "^1.0.5",
-    "winston": "^2.3.1"
+    "winston": "^2.4.0"
   },
   "devDependencies": {
-    "nodemon": "^1.12.1"
+    "@types/express": "^4.0.39",
+    "nodemon": "^1.12.1",
+    "typescript": "^2.5.3"
   }
 }

@@ -1,4 +1,3 @@
-'use strict';
 import Authenticator from '../plumbing/authenticator';
 import HttpClient from '../plumbing/httpClient';
 import OAuthLogger from '../plumbing/oauthLogger';

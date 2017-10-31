@@ -1,4 +1,3 @@
-'use strict';
 import UrlHelper from './urlHelper';
 import IFrameWindowHelper from './iframeWindowHelper';
 import * as Oidc from "oidc-client";

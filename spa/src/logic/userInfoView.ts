@@ -1,4 +1,3 @@
-'use strict';
 import * as $ from 'jquery';
 
 /*
@@ -27,13 +26,10 @@ export default class UserInfoView {
         $('#loginNameContainer').addClass('hide');
 
         // Get the data we received from the id token
-        let userProfile = this._authenticator.getOpenIdConnectUserClaims()
-            .then(userProfile => {
-
-                if (userProfile.given_name && userProfile.family_name) {
-                    $('#loginNameContainer').removeClass('hide');
-                    $('#userName').text(`${userProfile.given_name} ${userProfile.family_name}`);
-                }
-            });
+        let userProfile = await this._authenticator.getOpenIdConnectUserClaims();
+        if (userProfile && userProfile.given_name && userProfile.family_name) {
+            $('#loginNameContainer').removeClass('hide');
+            $('#userName').text(`${userProfile.given_name} ${userProfile.family_name}`);
+        }
     }
 }

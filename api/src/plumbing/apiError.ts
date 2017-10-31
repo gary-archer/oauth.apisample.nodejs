@@ -1,14 +1,21 @@
-'use strict';
-
 /*
  * A simple error class for the API
  */
-class ApiError {
+export default class ApiError {
+
+    /*
+     * Fields
+     */
+    private _message: string;
+    private _statusCode: number;
+    private _area: string;
+    private _url: string;
+    private _details: string;
 
     /*
      * Let callers supply a subset of named parameters via object destructuring
      */
-    constructor({
+    public constructor({
         message = '',
         statusCode = 500,
         area = '',
@@ -22,33 +29,35 @@ class ApiError {
         this._details = details;
     }
     
-    get message() {
+    public get message(): string {
         return this._message;
     }
     
-    set message(message) {
+    public set message(message) {
         this._message = message;
     }
     
-    get statusCode() {
+    public get statusCode(): number {
         return this._statusCode;
     }
     
-    get area() {
+    public get area(): string {
         return this._area;
     }
+
+    public set area(area) {
+        this._area = area;
+    }
     
-    get url() {
+    public get url(): string {
         return this._url;
     }
 
-    get details() {
+    public get details(): string {
         return this._details;
     }
     
-    set details(details) {
+    public set details(details) {
         this._details = details;
     }
 }
-
-module.exports = ApiError;

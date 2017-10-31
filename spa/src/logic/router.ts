@@ -1,5 +1,3 @@
-
-'use strict';
 import ListView from './listView';
 import DetailsView from './detailsView';
 import LogoutView from './logoutView';

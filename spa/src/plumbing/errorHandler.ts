@@ -1,4 +1,3 @@
-'use strict';
 import UIError from './uiError';
 import IFrameWindowHelper from './iframeWindowHelper'
 import * as $ from 'jquery';

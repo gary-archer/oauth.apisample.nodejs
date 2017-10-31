@@ -1,4 +1,3 @@
-'use strict';
 import HttpClient from '../plumbing/httpClient';
 import * as $ from 'jquery';
 

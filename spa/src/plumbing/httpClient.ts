@@ -1,4 +1,3 @@
-'use strict';
 import ErrorHandler from './errorHandler';
 import UIError from './uiError';
 import * as $ from 'jquery';
