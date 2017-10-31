@@ -1,7 +1,7 @@
 /*
  * Web server imports
  */
-import express from 'express';
+import * as express from 'express';
 import * as cors from 'cors';
 import * as path from 'path';
 
@@ -54,7 +54,7 @@ app.get('/favicon.ico', function (request, response) {
 
 /*
  * REST API (http://mycompanyapi.com)
- * A REST API called across domains by the SPA using a CORS request, with OAuth access tokens
+ * An  API called across domains by the SPA using a CORS request, with OAuth access tokens
  */
 const corsOptions = { origin: webDomain };
 app.use('/api/*', cors(corsOptions));
@@ -92,7 +92,7 @@ app.use('/api/*', function (unhandledException, request, response, next) {
 });
 
 /*
- * START LISTENING FOR HTTP REQUESTS
+ * Start listening for HTTP requests
  */
 app.listen(port, function () {
     ApiLogger.info('HTTP server', `Listening on port ${port}`);

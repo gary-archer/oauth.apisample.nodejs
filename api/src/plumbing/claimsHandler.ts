@@ -14,13 +14,13 @@ export default class ClaimsHandler {
     /*
      * Fields
      */
-    _oauthConfig: any;
-    _accessToken: string;
+    private _oauthConfig: any;
+    private _accessToken: string;
     
     /*
      * Receive configuration and request metadata
      */
-    public constructor(oauthConfig, accessToken) {
+    public constructor(oauthConfig: any, accessToken: string) {
         
         this._oauthConfig = oauthConfig;
         this._accessToken = accessToken;
@@ -39,7 +39,7 @@ export default class ClaimsHandler {
     /*
      * Make a call to the metadata endpoint for the first API request
      */
-    private _getMetadata() {
+    private _getMetadata(): any {
         
         if (metadata !== null) {
             return Promise.resolve(metadata);
@@ -64,7 +64,7 @@ export default class ClaimsHandler {
     /*
      * Make a call to the introspection endpoint to read our token
      */
-    private _readTokenData() {
+    private _readTokenData(): any {
         
         // First set the client id and secret in the authorization header
         let credentials = `${this._oauthConfig.client_id}:${this._oauthConfig.client_secret}`;
@@ -112,7 +112,7 @@ export default class ClaimsHandler {
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    private _setupCallbacks() {
+    private _setupCallbacks(): void {
         this._readTokenData = this._readTokenData.bind(this);
     }
 }

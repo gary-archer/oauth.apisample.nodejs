@@ -1,7 +1,7 @@
 {
     "oauth": {
-        "authority":          "https://dev-843469-admin.oktapreview.com",
-        "client_id":          "0oac5s69rjXE0HcZO0h7",
-        "client_secret":      "VEEe9m9WDneeUSUJUOMKZiso_X6xwKvAqRInT2kg"
+        "authority":     "https://dev-843469-admin.oktapreview.com",
+        "client_id":     "0oac5s69rjXE0HcZO0h7",
+        "client_secret": "xxxVEEe9m9WDneeUSUJUOMKZiso_X6xwKvAqRInT2kg"
     }
 }

@@ -23,7 +23,7 @@ export default class ApiLogger {
      * Initialize and set the logging level
      */
     public static initialize(level: string): void {
-        logger.remove(winston.transports.Console);
+        
         logger.add(winston.transports.Console, {
           level: level,
           colorize: true
@@ -54,7 +54,7 @@ export default class ApiLogger {
     /*
      * Get the text to output
      */
-    private static _getText(args): string {
+    private static _getText(args: any): string {
         let text = Array.prototype.slice.call(args).join(' : ');
         return text;
     }

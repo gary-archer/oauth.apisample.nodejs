@@ -9,7 +9,7 @@ export default class ErrorHandler {
     /*
      * Handle logging the error server side and returning an error object to the client
      */
-    static reportError(response, exception) {
+    public static reportError(response: any, exception: any): void {
        
         try {
             // Ensure that the error is of type ApiError
@@ -56,7 +56,7 @@ export default class ErrorHandler {
     /*
      * Get an error object for a missing token
      */
-    static getNoTokenError() {
+    public static getNoTokenError(): ApiError {
         
         return new ApiError({
             statusCode: 401,
@@ -68,7 +68,7 @@ export default class ErrorHandler {
     /*
      * Get an error object for token expired / revoked
      */
-    static getTokenExpiredError() {
+    public static getTokenExpiredError(): ApiError {
         
         return new ApiError({
             statusCode: 401,
@@ -80,7 +80,7 @@ export default class ErrorHandler {
     /*
      * Handle the request promise error for metadata lookup failures
      */
-    static fromMetadataError(responseError, url) {
+    public static fromMetadataError(responseError: any, url: string): ApiError {
         
         let apiError = new ApiError({
             statusCode: 500,
@@ -95,7 +95,7 @@ export default class ErrorHandler {
     /*
      * Handle the request promise error for introspection failures
      */
-    static fromIntrospectionError(responseError, url) {
+    public static fromIntrospectionError(responseError: any, url: string): ApiError {
         
         // Already handled expired errors
         if (responseError instanceof ApiError) {
@@ -113,27 +113,12 @@ export default class ErrorHandler {
     }
     
     /*
-     * Handle the request promise error for user info failures
-     */
-    static fromUserInfoError(responseError, url) {
-        
-        let apiError = new ApiError({
-            statusCode: 500,
-            area: 'UserDataLookup',
-            url: url,
-            message: 'User data lookup failed'
-        });
-        ErrorHandler._updateErrorFromHttpResponse(apiError, responseError);
-        return apiError;
-    }
-    
-    /*
      * Update error fields with response details
      */
-    static _updateErrorFromHttpResponse(apiError, responseError) {
+    private static _updateErrorFromHttpResponse(apiError: ApiError, responseError: any): void {
         
         if (responseError.name) {
-            apiError.errorCode = responseError.name;
+            apiError.area = responseError.name;
         }
         
         if (responseError.error && responseError.error.error && responseError.error.error_description) {
@@ -157,7 +142,7 @@ export default class ErrorHandler {
     /*
      * Ensure that all errors are of ApiError exception type
      */
-    static _fromException(exception) {
+    private static _fromException(exception: any): ApiError {
         
         // Already handled
         if (exception instanceof ApiError) {
@@ -174,7 +159,7 @@ export default class ErrorHandler {
     /*
      * Handle Javascript exceptions as strings
      */
-    static _fromStringError(e) {
+    private static _fromStringError(e: string): ApiError {
         
         return new ApiError({
             statusCode: 500,

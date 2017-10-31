@@ -44,6 +44,10 @@ export default class ApiError {
     public get area(): string {
         return this._area;
     }
+
+    public set area(area) {
+        this._area = area;
+    }
     
     public get url(): string {
         return this._url;

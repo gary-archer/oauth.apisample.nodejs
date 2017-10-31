@@ -26,7 +26,7 @@ export default class TokenValidator {
     /*
      * Handle validating an access token and updating the claims cache
      */
-    public validate() {
+    public validate(): any {
         
         // Read the access token from the header
         let accessToken = this._readBearerToken();
