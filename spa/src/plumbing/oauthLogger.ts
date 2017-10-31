@@ -1,6 +1,6 @@
 'use strict';
-import UrlHelper from 'urlHelper';
-import IFrameWindowHelper from 'iframeWindowHelper';
+import UrlHelper from './urlHelper';
+import IFrameWindowHelper from './iframeWindowHelper';
 import * as Oidc from "oidc-client";
 import * as $ from 'jquery';
 
@@ -12,19 +12,19 @@ export default class OAuthLogger {
     /*
      * Initialize logging and set the initial log level
      */
-    static initialize() {
-        OidcLog.logger = OAuthLogger;
+    static initialize(): void {
+        Oidc.Log.logger = OAuthLogger;
         OAuthLogger.setLevel(OAuthLogger._getUrlLogLevel());
     }
 
     /*
      * Set the OIDC log level and update the UI
      */
-    static setLevel(level) {
+    static setLevel(level: number) {
 
         // Set the log level in the session so that it is inherited on page reloads and by the renewal iframe
-        OidcLog.level = level;
-        sessionStorage.setItem('basicSpa.logLevel', level);
+        Oidc.Log.level = level;
+        sessionStorage.setItem('basicSpa.logLevel', level.toString());
 
         // Clear the log if setting the level on the main window
         if (!IFrameWindowHelper.isIFrameOperation()) {
@@ -33,7 +33,7 @@ export default class OAuthLogger {
         
         // Hide or show trace details
         let traceContainer = IFrameWindowHelper.getMainWindowElement('#traceContainer');
-        if (level === OidcLog.NONE) {
+        if (level === Oidc.Log.NONE) {
             traceContainer.addClass('hide');
         }
         else {
@@ -48,7 +48,7 @@ export default class OAuthLogger {
     /*
      * Update the OIDC log level if the hash log parameter has changed
      */
-    static updateLevelIfRequired() {
+    static updateLevelIfRequired(): void {
         
         // Get old and new levels
         let oldLevel = parseInt(sessionStorage.getItem('basicSpa.logLevel'));
@@ -63,7 +63,7 @@ export default class OAuthLogger {
     /*
      * Clear trace output
      */
-    static clear() {
+    static clear(): void {
 
         // Remove output
         let traceList = IFrameWindowHelper.getMainWindowElement('#trace');
@@ -77,50 +77,50 @@ export default class OAuthLogger {
     /*
      * Uncomment to see OIDC messages
      */
-    static debug() {
+    static debug(): void {
         OAuthLogger._output('Oidc.Debug', arguments);
     }
     
-    static info() {
+    static info(): void {
         OAuthLogger._output('Oidc.Info', arguments);
     }
     
-    static warn() {
+    static warn(): void {
         OAuthLogger._output('Oidc.Warn', arguments);
     }
     
-    static error() {
+    static error(): void {
         OAuthLogger._output('Oidc.Error', arguments);
     }
 
     /*
      * Get the log level from the URL's hash parameter, such as #log=info
      */
-    static _getUrlLogLevel() {
-        
+    static _getUrlLogLevel(): number {
+       
         // Valid values
         let validLevels = {
-            'none':  OidcLog.NONE,
-            'debug': OidcLog.DEBUG,
-            'info':  OidcLog.INFO,
-            'warn':  OidcLog.WARN,
-            'error': OidcLog.ERROR
+            'none':  Oidc.Log.NONE,
+            'debug': Oidc.Log.DEBUG,
+            'info':  Oidc.Log.INFO,
+            'warn':  Oidc.Log.WARN,
+            'error': Oidc.Log.ERROR
         };
 
         // If a value like log=debug is present in the URL then return it
         let hashData = UrlHelper.getLocationHashData();
-        if (validLevels[hashData.log] >= OidcLog.NONE) {
+        if (validLevels[hashData.log] >= Oidc.Log.NONE) {
             return validLevels[hashData.log];
         }
 
         // Otherwise return the stored value or default to no logging
-        return parseInt(sessionStorage.getItem('basicSpa.logLevel')) | OidcLog.None;
+        return parseInt(sessionStorage.getItem('basicSpa.logLevel')) | Oidc.Log.NONE;
     }
 
     /*
      * Handle log output
      */
-    static _output(prefix, args) {
+    static _output(prefix, args): void {
 
         // Get the output
         let text = Array.prototype.slice.call(args).join(' : ');

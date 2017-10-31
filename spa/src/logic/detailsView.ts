@@ -17,7 +17,7 @@ export default class DetailsView {
     /*
      * Class setup
      */
-    constructor(authenticator, baseUrl, id) {
+    constructor(authenticator: any, baseUrl: string, id: number) {
         this.authenticator = authenticator;
         this.baseUrl = baseUrl;
         this.id = id;
@@ -27,7 +27,7 @@ export default class DetailsView {
     /*
      * Run the view
      */
-    execute() {
+    execute(): any {
 
         // Set UI content while loading
         $('#detailsContainer').removeClass('hide');
@@ -57,14 +57,14 @@ export default class DetailsView {
     /*
      * Hide UI elements when the view unloads
      */
-    unload() {
+    unload(): void {
         $('#detailsContainer').addClass('hide');
     }
     
     /*
      * Render data
      */
-    _renderData(golfer) {
+    _renderData(golfer: any): any {
 
         // Clear loading content
         $('#detailsContainer').text('');

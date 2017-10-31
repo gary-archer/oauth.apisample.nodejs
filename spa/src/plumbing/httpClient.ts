@@ -1,6 +1,6 @@
 'use strict';
-import ErrorHandler from 'errorHandler';
-import UIError from 'uiError';
+import ErrorHandler from './errorHandler';
+import UIError from './uiError';
 import * as $ from 'jquery';
 
 /*
@@ -11,7 +11,7 @@ export default class HttpClient {
     /*
      * Download JSON data from the app config file
      */
-    static loadAppConfiguration(filePath) {
+    static loadAppConfiguration(filePath: string): any {
         
         return $.ajax({
                 url: filePath,
@@ -27,7 +27,7 @@ export default class HttpClient {
     /*
      * Get data from an API URL and handle retries if needed
      */
-    static callApi(url, method, dataToSend, authenticator) {
+    static callApi(url: string, method: string, dataToSend: any, authenticator: any): any {
         
         // Get a token if required
         return authenticator
@@ -79,11 +79,12 @@ export default class HttpClient {
     /*
      * Do the work of calling the API
      */
-    static _callApiWithToken(url, method, dataToSend, authenticator, accessToken) {
+    static _callApiWithToken(url: string, method: string, dataToSend: any, authenticator: any, accessToken: string): any {
         
+        let dataToSendText = JSON.stringify(dataToSend | <any>{});
         return $.ajax({
                     url: url,
-                    //data: dataToSend | {},
+                    data: dataToSendText,
                     dataType: 'json',
                     contentType: 'application/json',
                     type: method,

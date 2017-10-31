@@ -37,7 +37,7 @@ export default class UIError {
     /*
      * Return properties for display
      */
-    get message() {
+    get message():string {
         return this._message;
     }
     
@@ -45,7 +45,7 @@ export default class UIError {
         this._message = message;
     }
     
-    get statusCode() {
+    get statusCode():number {
         return this._statusCode;
     }
     
@@ -53,7 +53,7 @@ export default class UIError {
         this._statusCode = statusCode;
     }
     
-    get area() {
+    get area():string {
         return this._area;
     }
     
@@ -61,11 +61,11 @@ export default class UIError {
         this._area = area;
     }
 
-    get url() {
+    get url():string {
         return this._url;
     }
 
-    get details() {
+    get details():string {
         return this._details;
     }
     
@@ -73,7 +73,7 @@ export default class UIError {
         this._details = details;
     }
     
-    get nonError() {
+    get nonError():boolean {
         return this._nonError;
     }
 }

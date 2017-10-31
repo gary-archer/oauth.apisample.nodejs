@@ -1,8 +1,7 @@
 'use strict';
-import HttpClient from 'httpClient';
-import ErrorHandler from 'errorHandler';
+import HttpClient from './httpClient';
+import ErrorHandler from './errorHandler';
 import * as Oidc from "oidc-client";
-//import {UserManager as OidcUserManager} from 'oidc-client';
 
 /*
  * The entry point for initiating login and token requests
@@ -17,8 +16,8 @@ export default class Authenticator {
     /*
      * Class setup
      */
-    constructor(config) {
-        
+    constructor(config: any) {
+
         // Create OIDC settings from our application configuration
         let settings = {
             authority: config.authority,
@@ -42,7 +41,7 @@ export default class Authenticator {
     /*
      * Clear the current access token from storage to force a login
      */
-    clearAccessToken() {
+    clearAccessToken(): any {
 
         return this.userManager.getUser()
             .then(user => {
@@ -59,7 +58,7 @@ export default class Authenticator {
     /*
      * Make the current access token in storage act like it has expired
      */
-    expireAccessToken() {
+    expireAccessToken(): any {
         
         return this.userManager.getUser()
             .then(user => {
@@ -69,7 +68,7 @@ export default class Authenticator {
                 }
 
                 // Set the stored value to expired and also corrupt the token so that there is a 401 if it is sent to an API
-                user.expires_at = parseInt(Date.now() / 1000) + 30;
+                user.expires_at = Date.now() / 1000 + 30;
                 user.access_token = 'x' + user.access_token + 'x';
                 
                 // Update OIDC so that it silently renews the token almost immediately
@@ -82,7 +81,7 @@ export default class Authenticator {
     /*
      * Get Open Id Connect claims
      */
-    getOpenIdConnectUserClaims() {
+    getOpenIdConnectUserClaims(): any {
 
         return this.userManager.getUser()
             .then(user => {
@@ -98,7 +97,7 @@ export default class Authenticator {
     /*
      * Get an access token and login if required
      */
-    getAccessToken() {
+    getAccessToken(): any {
 
         return this.userManager.getUser()
             .then(user => {
@@ -131,7 +130,7 @@ export default class Authenticator {
     /*
      * Handle the response from the authorization server
      */
-    handleLoginResponse() {
+    handleLoginResponse(): any {
         
         // See if there is anything to do
         if (location.hash.indexOf('state') === -1) {
@@ -171,7 +170,7 @@ export default class Authenticator {
     /*
      * Report any silent token renewal errors
      */
-    _onSilentTokenRenewalError(e) {
+    _onSilentTokenRenewalError(e: any): void {
 
         // Login required is not a real error - we will just redirect the user on the next API 401 call
         if (e.error !== 'login_required') {
@@ -183,7 +182,7 @@ export default class Authenticator {
     /*
      * Start logout processing to remove tokens and vendor cookies
      */
-    startLogout() {
+    startLogout(): void {
         
         // Redirect in order to log out at the authorization server and remove vendor cookies
         this.userManager.signoutRedirect()
@@ -199,7 +198,7 @@ export default class Authenticator {
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks() {
+    _setupCallbacks(): void {
         this.clearAccessToken = this.clearAccessToken.bind(this);
         this.getAccessToken = this.getAccessToken.bind(this);
         this._onSilentTokenRenewalError = this._onSilentTokenRenewalError.bind(this);

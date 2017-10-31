@@ -1,6 +1,6 @@
 'use strict';
-import UIError from 'uiError';
-import IFrameWindowHelper from 'iframeWindowHelper'
+import UIError from './uiError';
+import IFrameWindowHelper from './iframeWindowHelper'
 import * as $ from 'jquery';
 
 /*
@@ -11,7 +11,7 @@ export default class ErrorHandler {
     /*
      * Output fields from an AppError object, depending on what is populated
      */
-    static reportError(exception) {
+    static reportError(exception: any): void {
         
         // Ensure that the error is of type UIError
         let error = ErrorHandler.getFromException(exception);
@@ -57,7 +57,7 @@ export default class ErrorHandler {
     /*
      * Clear trace output
      */
-    static clear() {
+    static clear(): void {
         
         // Remove output
         let errorList = IFrameWindowHelper.getMainWindowElement('#error');
@@ -71,7 +71,7 @@ export default class ErrorHandler {
     /*
      * A non error is used to short circuit execution without displaying an error
      */
-    static getNonError() {
+    static getNonError(): UIError {
         
         return new UIError({
             nonError: true
@@ -81,7 +81,7 @@ export default class ErrorHandler {
     /*
      * Sign in request errors most commonly 
      */
-    static getFromOAuthRequest(e) {
+    static getFromOAuthRequest(e: any): UIError {
         
         // Already handled errors
         if (e instanceof UIError) {
@@ -102,7 +102,7 @@ export default class ErrorHandler {
     /*
      * Sign in request errors most commonly 
      */
-    static getFromOAuthResponse(e) {
+    static getFromOAuthResponse(e: any): UIError {
         
         // Already handled errors
         if (e instanceof UIError) {
@@ -130,7 +130,7 @@ export default class ErrorHandler {
     /*
      * Return an object for Ajax errors
      */
-    static getFromAjaxError(xhr, url) {
+    static getFromAjaxError(xhr: any, url: string): UIError {
         
         // Already handled errors
         if (xhr instanceof UIError) {
@@ -170,7 +170,7 @@ export default class ErrorHandler {
     /*
      * Return an error based on the exception type or properties
      */
-    static getFromException(e) {
+    static getFromException(e: any): UIError {
         
         // Already handled errors
         if (e instanceof UIError) {
@@ -187,7 +187,7 @@ export default class ErrorHandler {
     /*
      * Try to deserialize an API error object
      */
-    static _getApiErrorFromResponse(responseText) {
+    static _getApiErrorFromResponse(responseText: string): any {
 
         try {
             return JSON.parse(responseText);
@@ -200,7 +200,7 @@ export default class ErrorHandler {
     /*
      * Handle Javascript exceptions as strings
      */
-    static _getFromString(message) {
+    static _getFromString(message: string): UIError {
         
         return new UIError({
             message: 'Problem encountered',

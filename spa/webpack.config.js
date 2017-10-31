@@ -1,9 +1,12 @@
 const path = require('path');
-const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const webpack = require('webpack');
 
 module.exports = {
+  
+  // The working folder
   context: path.resolve(__dirname, 'src'),
+
+  // The compiler will pull in all Javascript dependencies starting from our entry point source file
   entry: ['babel-polyfill', './logic/app.ts'],
   output: {
     
@@ -12,22 +15,24 @@ module.exports = {
     filename: 'spa.bundle.min.js'
   },
   resolve: {
-    'modules': ['node_modules', 'logic', 'plumbing']
+
+    // Tell import statements which file extensions to look for
+    extensions: ['.js', '.ts']
   },
   module: {
     rules: [
-      // All files with a '.ts' extension will be handled by the Typescript loader
-      { test: /\.ts$/, loader: "ts-loader" },
+      // Files with a .js extension are loaded by the typescript loader
+      {test: /\.js$/, loader: 'babel-loader'},
 
-      // All output '.js' files will be polyfilled babelified.
-      { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+      // Files with a .ts extension are loaded by the typescript loader
+      {test: /\.ts$/, loader: 'ts-loader'}
     ]
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       
       // Build 3rd party code into a Vendor bundle file
-      name: 'Oidc',
+      name: 'vendor',
       filename: '../dist/vendor.bundle.min.js',
       minChunks (module) {
           return module.context && module.context.indexOf('node_modules') !== -1;

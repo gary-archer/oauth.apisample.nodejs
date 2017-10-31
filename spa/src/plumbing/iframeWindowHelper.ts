@@ -9,7 +9,7 @@ export default class IFrameWindowHelper {
     /*
      * Get the main window item
      */
-    static getMainWindowElement(itemName) {
+    static getMainWindowElement(itemName: string): any {
         if (IFrameWindowHelper.isIFrameOperation()) {
             return (<any>window.parent).$(itemName);
         }
@@ -21,7 +21,7 @@ export default class IFrameWindowHelper {
     /*
      * Detect whether a particular operation is running on the silent renew iframe
      */
-    static isIFrameOperation() {
+    static isIFrameOperation(): boolean {
         return (window.parent && window !== window.parent);
     }
 }
