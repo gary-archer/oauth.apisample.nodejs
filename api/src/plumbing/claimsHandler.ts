@@ -30,16 +30,16 @@ export default class ClaimsHandler {
     /*
      * When we receive a new token, look up the data
      */
-    public lookupClaims(): any {
+    public async lookupClaims() {
         
-        return this._getMetadata()
-            .then(this._readTokenData);
+        await this._getMetadata();
+        return await this._readTokenData();
     }
 
     /*
      * Make a call to the metadata endpoint for the first API request
      */
-    private _getMetadata(): any {
+    private async _getMetadata() {
         
         if (metadata !== null) {
             return Promise.resolve(metadata);
@@ -52,19 +52,21 @@ export default class ClaimsHandler {
             json: true
         };
         
-        return new RequestPromise(options)
-            .then(data => {
-                metadata = data;
-            })
-            .catch(e => {
-                return Promise.reject(ErrorHandler.fromMetadataError(e, metadataEndpoint));
-            });
+        try {
+            // Get data
+            metadata = await new RequestPromise(options);
+        }
+        catch(e) {
+            
+            // Report metadata errors clearly
+            throw ErrorHandler.fromMetadataError(e, metadataEndpoint);
+        }
     }
     
     /*
      * Make a call to the introspection endpoint to read our token
      */
-    private _readTokenData(): any {
+    private async _readTokenData() {
         
         // First set the client id and secret in the authorization header
         let credentials = `${this._oauthConfig.client_id}:${this._oauthConfig.client_secret}`;
@@ -84,29 +86,30 @@ export default class ClaimsHandler {
             }
         };
 
-        // Return a promise
-        return new RequestPromise(options)
-            .then(data => {
-                
-                // Return a token expired error if required
-                if (!data.active) {
-                    return Promise.reject(ErrorHandler.getTokenExpiredError());
+        try {
+            // Get data
+            let data = await new RequestPromise(options);
+            
+            // Return a token expired error if required
+            if (!data.active) {
+                throw ErrorHandler.getTokenExpiredError();
+            }
+                    
+            // Otherwise return the data from the token needed for authorization
+            return {
+                exp: data.exp,
+                claims: {
+                    userId: data.sub,
+                    applicationId: data.cid,
+                    scope: data.scope
                 }
-                
-                // Otherwise return the data from the token with protocol claims removed
-                let tokenData = {
-                    exp: data.exp,
-                    claims: {
-                        userId: data.sub,
-                        applicationId: data.cid,
-                        scope: data.scope
-                    }
-                };
-                return Promise.resolve(tokenData);
-            })
-            .catch(e => {
-                return Promise.reject(ErrorHandler.fromIntrospectionError(e, metadata.introspection_endpoint));
-            });
+            };
+        }
+        catch(e) {
+            
+            // Report introspection errors clearly
+            throw ErrorHandler.fromIntrospectionError(e, metadata.introspection_endpoint);
+        }
     }
     
     /*

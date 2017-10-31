@@ -59,32 +59,37 @@ app.get('/favicon.ico', (request, response) => {
 const corsOptions = { origin: webDomain };
 app.use('/api/*', cors(corsOptions));
 
-app.get('/api/*', (request, response, next) => {
+app.get('/api/*', async(request, response, next) => {
     
     // Both success and error responses return JSON data
     response.setHeader('Content-Type', 'application/json');
     
     // Always validate tokens before accessing business logic
     ApiLogger.info('API call', 'Validating token');
-    let validator = new TokenValidator(request, response, (<any>appConfig).oauth);
-    validator.validate()
-        .then(next)
-        .catch(error => { ErrorHandler.reportError(response, error); });
+    
+    try {
+        let validator = new TokenValidator(request, response, (<any>appConfig).oauth);
+        await validator.validate();
+        next();
+    }
+    catch(e) {
+        ErrorHandler.reportError(response, e);
+    }
 });
 
-app.get('/api/golfers', (request, response, next) => {
+app.get('/api/golfers', async(request, response, next) => {
     
     ApiLogger.info('API call', 'Request for golfer list');
     let controller = new GolfApiController(request, response);
-    controller.getList();
+    await controller.getList();
 });
 
-app.get('/api/golfers/:id([0-9]+)', (request, response, next) => {
+app.get('/api/golfers/:id([0-9]+)', async(request, response, next) => {
     
     let id = parseInt(request.params.id);
     ApiLogger.info('API call', `Request for golfer details for id: ${id}`);
     let controller = new GolfApiController(request, response);
-    controller.getDetails(id);
+    await controller.getDetails(id);
 });
 
 app.use('/api/*', (unhandledException, request, response, next) => {

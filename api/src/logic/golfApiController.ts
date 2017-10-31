@@ -23,14 +23,14 @@ export default class GolfApiController {
     /*
      * Return summary data for our golfer entities
      */
-    public getList(): any {
+    public async getList() {
         this._response.end(JSON.stringify(summaryData));
     }
     
     /*
      * Return details for a golfer entity by id
      */
-    public getDetails(id: number) {
+    public async getDetails(id: number) {
 
         // Find the golfer by id
         let foundGolfer = (<any>summaryData).golfers.find(g => g.id === id);
@@ -41,6 +41,7 @@ export default class GolfApiController {
         }
         else {
             
+            // Return details
             let foundGolferDetails = (<any>detailsData).golfers.find(g => g.id === id);
             foundGolfer.wins = foundGolferDetails.wins;
             this._response.end(JSON.stringify(foundGolfer));

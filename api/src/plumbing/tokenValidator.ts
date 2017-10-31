@@ -26,31 +26,28 @@ export default class TokenValidator {
     /*
      * Handle validating an access token and updating the claims cache
      */
-    public validate(): any {
+    public async validate() {
         
         // Read the access token from the header
         let accessToken = this._readBearerToken();
         if (!accessToken) {
-            return Promise.reject(ErrorHandler.getNoTokenError());
+            throw ErrorHandler.getNoTokenError();
         }
         
         // Bypass validation and use cached results if they exist
         let cachedClaims = ClaimsCache.getClaimsForToken(accessToken);
         if (cachedClaims !== null) {
             this._response.locals.claims = cachedClaims;
-            return Promise.resolve();
+            return;
         }
 
-        // Otherwise create a class to do claims processing for the received token
+        // Otherwise do claims processing for the received token
         let handler = new ClaimsHandler(this._oauthConfig, accessToken);
-        return handler.lookupClaims()
-            .then(data => {
-            
-                // Save claims to the cache until the token expiry time
-                ClaimsCache.addClaimsForToken(accessToken, data.exp, data.claims);
-                this._response.locals.claims = data.claims;
-                return Promise.resolve();
-            });
+        let data = await handler.lookupClaims();
+
+        // Save claims to the cache until the token expiry time
+        ClaimsCache.addClaimsForToken(accessToken, data.exp, data.claims);
+        this._response.locals.claims = data.claims;
     }
     
     /*
