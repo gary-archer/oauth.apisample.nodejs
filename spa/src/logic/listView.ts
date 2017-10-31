@@ -10,43 +10,43 @@ export default class ListView {
     /*
      * Fields
      */
-    authenticator: any;
-    baseUrl: string;
+    private _authenticator: any;
+    private _baseUrl: string;
     
     /*
      * Class setup
      */
-    constructor(authenticator: any, baseUrl: string) {
-        this.authenticator = authenticator;
-        this.baseUrl = baseUrl;
+    public constructor(authenticator: any, baseUrl: string) {
+        this._authenticator = authenticator;
+        this._baseUrl = baseUrl;
         this._setupCallbacks();
     }
     
     /*
      * Run the view
      */
-    async execute() {
+    public async execute() {
         
         // Set UI content while loading
         $('#listContainer').removeClass('hide');
         $('#listContainer').text('Calling API to get golfers list ...');
 
         // Get data and render it
-        let data = await HttpClient.callApi(`${this.baseUrl}/golfers`, 'GET', null, this.authenticator);
+        let data = await HttpClient.callApi(`${this._baseUrl}/golfers`, 'GET', null, this._authenticator);
         this._renderData(data);
     }
 
     /*
      * Hide UI elements when the view unloads
      */
-    unload(): void {
+    public unload(): void {
         $('#listContainer').addClass('hide');
     }
     
     /*
      * Render data
      */
-    _renderData(data: any): any {
+    private _renderData(data: any): any {
 
         // Clear loading content
         $('#listContainer').text('');
@@ -81,7 +81,7 @@ export default class ListView {
     /*
      * When a thumbnail is clicked we will request details data and then update the view
      */
-    _selectGolferDetails(e: any): void {
+    private _selectGolferDetails(e: any): void {
         let golferId = $(e.target).attr('data-id');
         location.hash = `#golfer=${golferId}`;
         e.preventDefault();
@@ -90,7 +90,7 @@ export default class ListView {
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks(): void {
+    private _setupCallbacks(): void {
         this._renderData = this._renderData.bind(this);
         this._selectGolferDetails = this._selectGolferDetails.bind(this);
    }

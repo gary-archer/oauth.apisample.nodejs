@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "./tsdist/",
     "target": "es5"
   },
   "include": [

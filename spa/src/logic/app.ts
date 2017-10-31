@@ -14,18 +14,14 @@ class App {
     /*
      * Fields
      */
-    appConfig: any;
-    authenticator: any;
-    router: any;
+    private _appConfig: any;
+    private _authenticator: any;
+    private _router: any;
     
     /*
      * Class setup
      */
-    constructor() {
-        // Create members
-        this.appConfig = null;
-        this.authenticator = Authenticator;
-        this.router = Router;
+    public constructor() {
         
         // Initialize Javascript
         (<any>window).$ = $;
@@ -35,7 +31,7 @@ class App {
     /*
      * The entry point for the SPA
      */
-    async execute() {
+    public async execute() {
 
         // Set up click handlers
         $('#btnHome').click(this._onHome);
@@ -64,49 +60,49 @@ class App {
     /*
      * Download application configuration
      */
-    async _getAppConfig() {
-        this.appConfig = await HttpClient.loadAppConfiguration('app.config.json');
+    private async _getAppConfig() {
+        this._appConfig = await HttpClient.loadAppConfiguration('app.config.json');
     }
     
     /*
      * Point OIDC logging to our application logger and then supply OAuth settings
      */
-    _configureAuthentication(): void {
-        this.authenticator = new Authenticator(this.appConfig.oauth);
+    private _configureAuthentication(): void {
+        this._authenticator = new Authenticator(this._appConfig.oauth);
         OAuthLogger.initialize();
-        this.router = new Router(this.appConfig, this.authenticator);
+        this._router = new Router(this._appConfig, this._authenticator);
     }
     
     /*
      * Handle login responses on page load so that we have tokens and can call APIs
      */
-    async _handleLoginResponse() {
-        await this.authenticator.handleLoginResponse();
+    private async _handleLoginResponse() {
+        await this._authenticator.handleLoginResponse();
     }
     
     /*
      * Download user claims from the API, which can contain any data we like
      */
-    async _getUserClaims() {
-        await this.router.executeUserInfoView();
+    private async _getUserClaims() {
+        await this._router.executeUserInfoView();
     }
 
     /*
      * Once login startup login processing has completed, start listening for hash changes
      */
-    async _runPage() {
+    private async _runPage() {
         $(window).on('hashchange', this._onHashChange);
-        await this.router.executeView();
+        await this._router.executeView();
     }
             
     /*
      * Change the view based on the hash URL and catch errors
      */
-    async _onHashChange() {
+    private async _onHashChange() {
         OAuthLogger.updateLevelIfRequired();
         
         try {
-            await this.router.executeView();
+            await this._router.executeView();
         }
         catch(e) {
             ErrorHandler.reportError(e);
@@ -116,7 +112,7 @@ class App {
     /*
      * Button handler to reset the hash location to the list view and refresh
      */
-    _onHome(): void {
+    private _onHome(): void {
         if (location.hash === '#' || location.hash.length === 0) {
             this._onHashChange();    
         }
@@ -128,9 +124,9 @@ class App {
     /*
      * Force a page reload
      */
-    async _onRefreshData() {
+    private async _onRefreshData() {
         try {
-            await this.router.executeView();
+            await this._router.executeView();
         }
         catch(e) {
             ErrorHandler.reportError(e);
@@ -140,35 +136,35 @@ class App {
     /*
      * Force a new access token to be retrieved
      */
-    async _onExpireToken() {
-        await this.authenticator.expireAccessToken();
+    private async _onExpireToken() {
+        await this._authenticator.expireAccessToken();
     }
 
     /*
      * Start a logout request
      */
-    async _onLogout() {
-        await this.authenticator.startLogout();
+    private async _onLogout() {
+        await this._authenticator.startLogout();
     }
 
     /*
      * Clear error output
      */
-    _onClearError(): void {
+    private _onClearError(): void {
         ErrorHandler.clear();
     }
 
     /*
      * Clear trace output
      */
-    _onClearTrace(): void {
+    private _onClearTrace(): void {
         OAuthLogger.clear();
     }
     
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks(): void {
+    private _setupCallbacks(): void {
         this._configureAuthentication = this._configureAuthentication.bind(this);
         this._handleLoginResponse = this._handleLoginResponse.bind(this);
         this._getUserClaims = this._getUserClaims.bind(this);

@@ -11,7 +11,7 @@ export default class HttpClient {
     /*
      * Download JSON data from the app config file
      */
-    static async loadAppConfiguration(filePath: string) {
+    public static async loadAppConfiguration(filePath: string) {
         
         try {
             // Make the call
@@ -30,7 +30,7 @@ export default class HttpClient {
     /*
      * Get data from an API URL and handle retries if needed
      */
-    static async callApi(url: string, method: string, dataToSend: any, authenticator: any) {
+    public static async callApi(url: string, method: string, dataToSend: any, authenticator: any) {
         
         // Get a token, which will log the user in if needed
         let token = await authenticator.getAccessToken();
@@ -60,7 +60,7 @@ export default class HttpClient {
     /*
      * Do the work of calling the API
      */
-    static async _callApiWithToken(url: string, method: string, dataToSend: any, authenticator: any, accessToken: string) {
+    private static async _callApiWithToken(url: string, method: string, dataToSend: any, authenticator: any, accessToken: string) {
         
         let dataToSendText = JSON.stringify(dataToSend | <any>{});
         

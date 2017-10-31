@@ -9,25 +9,25 @@ export default class UserInfoView {
     /*
      * Fields
      */
-    authenticator: any;
+    private _authenticator: any;
     
     /*
      * Class setup
      */
-    constructor(authenticator) {
-        this.authenticator = authenticator;
+    public constructor(authenticator) {
+        this._authenticator = authenticator;
     }
     
     /*
      * Run the view
      */
-    async execute() {
+    public async execute() {
         
         // Hide UI elements while loading
         $('#loginNameContainer').addClass('hide');
 
         // Get the data we received from the id token
-        let userProfile = this.authenticator.getOpenIdConnectUserClaims()
+        let userProfile = this._authenticator.getOpenIdConnectUserClaims()
             .then(userProfile => {
 
                 if (userProfile.given_name && userProfile.family_name) {

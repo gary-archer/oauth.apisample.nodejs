@@ -16,38 +16,37 @@ export default class Router {
     /*
      * Fields
      */
-    appConfig: any;
-    authenticator: any;
-    currentView: any;
+    private _appConfig: any;
+    private _authenticator: any;
+    private _currentView: any;
     
     /*
      * Initialize the current view
      */
-    constructor(appConfig, authenticator) {
-        this.appConfig = appConfig;
-        this.authenticator = authenticator;
-        this.currentView = null;
+    public constructor(appConfig, authenticator) {
+        this._appConfig = appConfig;
+        this._authenticator = authenticator;
     }
     
     /*
      * Execute a view based on the hash URL data
      */
-    async executeView() {
+    public async executeView() {
         
         // Get URL details
-        let oldView = this.currentView;
+        let oldView = this._currentView;
         let hashData = UrlHelper.getLocationHashData();
 
         // Work out which view to show
         if (hashData.loggedout) {
-            this.currentView = new LogoutView();
+            this._currentView = new LogoutView();
         }
         else {
             if (hashData.golfer) {
-                this.currentView = new DetailsView(this.authenticator, this.appConfig.app.dataUrl, hashData.golfer);
+                this._currentView = new DetailsView(this._authenticator, this._appConfig.app.dataUrl, hashData.golfer);
             }
             else {
-                this.currentView = new ListView(this.authenticator, this.appConfig.app.dataUrl);
+                this._currentView = new ListView(this._authenticator, this._appConfig.app.dataUrl);
             }
         }
 
@@ -62,17 +61,17 @@ export default class Router {
         }
 
         // Run the new view
-        return await this.currentView.execute();
+        return await this._currentView.execute();
     }
 
     /*
      * Show the user info child view unless we are logged out
      */
-    async executeUserInfoView() {
+    public async executeUserInfoView() {
 
         let hashData = UrlHelper.getLocationHashData();
         if (!hashData.loggedout) {
-            let view = new UserInfoView(this.authenticator);
+            let view = new UserInfoView(this._authenticator);
             await view.execute();
         }
     }

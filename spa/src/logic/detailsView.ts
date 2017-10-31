@@ -10,24 +10,24 @@ export default class DetailsView {
     /*
      * Fields
      */
-    authenticator: any;
-    baseUrl: string;
-    id: number;
+    private _authenticator: any;
+    private _baseUrl: string;
+    private _id: number;
     
     /*
      * Class setup
      */
-    constructor(authenticator: any, baseUrl: string, id: number) {
-        this.authenticator = authenticator;
-        this.baseUrl = baseUrl;
-        this.id = id;
+    public constructor(authenticator: any, baseUrl: string, id: number) {
+        this._authenticator = authenticator;
+        this._baseUrl = baseUrl;
+        this._id = id;
         this._setupCallbacks();
     }
     
     /*
      * Run the view
      */
-    async execute() {
+    public async execute() {
 
         // Set UI content while loading
         $('#detailsContainer').removeClass('hide');
@@ -35,8 +35,8 @@ export default class DetailsView {
         
         try {
             // Get data and render it
-            let url = `${this.baseUrl}/golfers/${this.id}`;
-            let data = await HttpClient.callApi(url, 'GET', null, this.authenticator);
+            let url = `${this._baseUrl}/golfers/${this._id}`;
+            let data = await HttpClient.callApi(url, 'GET', null, this._authenticator);
             return this._renderData(data);
         }
         catch (uiError) {
@@ -53,14 +53,14 @@ export default class DetailsView {
     /*
      * Hide UI elements when the view unloads
      */
-    unload(): void {
+    public unload(): void {
         $('#detailsContainer').addClass('hide');
     }
     
     /*
      * Render data
      */
-    _renderData(golfer: any): any {
+    private  _renderData(golfer: any): any {
 
         // Clear loading content
         $('#detailsContainer').text('');
@@ -101,7 +101,7 @@ export default class DetailsView {
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks() {
+    private _setupCallbacks() {
         this._renderData = this._renderData.bind(this);
    }
 }

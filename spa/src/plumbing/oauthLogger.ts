@@ -12,7 +12,7 @@ export default class OAuthLogger {
     /*
      * Initialize logging and set the initial log level
      */
-    static initialize(): void {
+    public static initialize(): void {
         Oidc.Log.logger = OAuthLogger;
         OAuthLogger.setLevel(OAuthLogger._getUrlLogLevel());
     }
@@ -20,7 +20,7 @@ export default class OAuthLogger {
     /*
      * Set the OIDC log level and update the UI
      */
-    static setLevel(level: number) {
+    public static setLevel(level: number) {
 
         // Set the log level in the session so that it is inherited on page reloads and by the renewal iframe
         Oidc.Log.level = level;
@@ -48,7 +48,7 @@ export default class OAuthLogger {
     /*
      * Update the OIDC log level if the hash log parameter has changed
      */
-    static updateLevelIfRequired(): void {
+    public static updateLevelIfRequired(): void {
         
         // Get old and new levels
         let oldLevel = parseInt(sessionStorage.getItem('basicSpa.logLevel'));
@@ -63,7 +63,7 @@ export default class OAuthLogger {
     /*
      * Clear trace output
      */
-    static clear(): void {
+    public static clear(): void {
 
         // Remove output
         let traceList = IFrameWindowHelper.getMainWindowElement('#trace');
@@ -77,26 +77,26 @@ export default class OAuthLogger {
     /*
      * Uncomment to see OIDC messages
      */
-    static debug(): void {
+    public static debug(): void {
         OAuthLogger._output('Oidc.Debug', arguments);
     }
     
-    static info(): void {
+    public static info(): void {
         OAuthLogger._output('Oidc.Info', arguments);
     }
     
-    static warn(): void {
+    public static warn(): void {
         OAuthLogger._output('Oidc.Warn', arguments);
     }
     
-    static error(): void {
+    public static error(): void {
         OAuthLogger._output('Oidc.Error', arguments);
     }
 
     /*
      * Get the log level from the URL's hash parameter, such as #log=info
      */
-    static _getUrlLogLevel(): number {
+    private static _getUrlLogLevel(): number {
        
         // Valid values
         let validLevels = {
@@ -120,7 +120,7 @@ export default class OAuthLogger {
     /*
      * Handle log output
      */
-    static _output(prefix, args): void {
+    private static _output(prefix, args): void {
 
         // Get the output
         let text = Array.prototype.slice.call(args).join(' : ');

@@ -11,12 +11,12 @@ export default class Authenticator {
     /*
      * Fields
      */
-    userManager: any;
+    private _userManager: any;
 
     /*
      * Class setup
      */
-    constructor(config: any) {
+    public constructor(config: any) {
 
         // Create OIDC settings from our application configuration
         let settings = {
@@ -33,29 +33,29 @@ export default class Authenticator {
         };
         
         // Create the user manager
-        this.userManager = new Oidc.UserManager(settings);
-        this.userManager.events.addSilentRenewError(this._onSilentTokenRenewalError);
+        this._userManager = new Oidc.UserManager(settings);
+        this._userManager.events.addSilentRenewError(this._onSilentTokenRenewalError);
         this._setupCallbacks();
     }
     
     /*
      * Clear the current access token from storage to force a login
      */
-    async clearAccessToken() {
+    public async clearAccessToken() {
 
-        var user = await this.userManager.getUser();
+        var user = await this._userManager.getUser();
         if (user) {
             user.access_token = null;
-            this.userManager.storeUser(user);
+            this._userManager.storeUser(user);
         }
     }
 
     /*
      * Make the current access token in storage act like it has expired
      */
-    async expireAccessToken() {
+    public async expireAccessToken() {
         
-        let user = await this.userManager.getUser();
+        let user = await this._userManager.getUser();
         if (user) {
 
             // Set the stored value to expired and also corrupt the token so that there is a 401 if it is sent to an API
@@ -63,18 +63,18 @@ export default class Authenticator {
             user.access_token = 'x' + user.access_token + 'x';
             
             // Update OIDC so that it silently renews the token almost immediately
-            this.userManager.storeUser(user);
-            this.userManager.stopSilentRenew();
-            this.userManager.startSilentRenew();
+            this._userManager.storeUser(user);
+            this._userManager.stopSilentRenew();
+            this._userManager.startSilentRenew();
         }
     }
 
     /*
      * Get Open Id Connect claims
      */
-    async getOpenIdConnectUserClaims() {
+    public async getOpenIdConnectUserClaims() {
 
-        var user = await this.userManager.getUser();
+        var user = await this._userManager.getUser();
         if (user && user.profile) {
             return user.profile;
         }
@@ -85,10 +85,10 @@ export default class Authenticator {
     /*
      * Get an access token and login if required
      */
-    async getAccessToken() {
+    public async getAccessToken() {
 
         // On most calls we just return the existing token from HTML5 storage
-        var user = await this.userManager.getUser();
+        var user = await this._userManager.getUser();
         if (user && user.access_token) {
             return user.access_token;
         }
@@ -100,7 +100,7 @@ export default class Authenticator {
         
         try {
             // Start a login redirect
-            await this.userManager.signinRedirect({state: JSON.stringify(data)});
+            await this._userManager.signinRedirect({state: JSON.stringify(data)});
 
             // Short circuit SPA page execution
             throw ErrorHandler.getNonError();
@@ -114,7 +114,7 @@ export default class Authenticator {
     /*
      * Handle the response from the authorization server
      */
-    async handleLoginResponse() {
+    public async handleLoginResponse() {
         
         // See if there is anything to do
         if (location.hash.indexOf('state') === -1) {
@@ -126,7 +126,7 @@ export default class Authenticator {
 
             try {
                 // Handle the response
-                let user = await this.userManager.signinRedirectCallback();
+                let user = await this._userManager.signinRedirectCallback();
                 let data = JSON.parse(user.state);
                 location.replace(location.pathname + data.hash);
             }
@@ -137,7 +137,7 @@ export default class Authenticator {
         }
         else {
             // Handle silent token renewal responses and note that errors are swallowed by OIDC
-            let user = await this.userManager.signinSilentCallback();
+            let user = await this._userManager.signinSilentCallback();
 
             // Short circuit SPA page execution
             throw ErrorHandler.getNonError();
@@ -145,24 +145,12 @@ export default class Authenticator {
     }
 
     /*
-     * Report any silent token renewal errors
-     */
-    _onSilentTokenRenewalError(e: any): void {
-
-        // Login required is not a real error - we will just redirect the user to login when the API returns 401
-        if (e.error !== 'login_required') {
-            let error = ErrorHandler.getFromOAuthResponse(e);
-            ErrorHandler.reportError(error);
-        }
-    }
-
-    /*
      * Redirect in order to log out at the authorization server and remove vendor cookies
      */
-    async startLogout() {
+    public async startLogout() {
         
         try {
-            await this.userManager.signoutRedirect();
+            await this._userManager.signoutRedirect();
         }
         catch(e) {
             ErrorHandler.reportError(ErrorHandler.getFromOAuthRequest(e));
@@ -170,9 +158,21 @@ export default class Authenticator {
     }
 
     /*
+     * Report any silent token renewal errors
+     */
+    private _onSilentTokenRenewalError(e: any): void {
+        
+        // Login required is not a real error - we will just redirect the user to login when the API returns 401
+        if (e.error !== 'login_required') {
+            let error = ErrorHandler.getFromOAuthResponse(e);
+            ErrorHandler.reportError(error);
+        }
+    }
+        
+            /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks(): void {
+    private _setupCallbacks(): void {
         this.clearAccessToken = this.clearAccessToken.bind(this);
         this.getAccessToken = this.getAccessToken.bind(this);
         this._onSilentTokenRenewalError = this._onSilentTokenRenewalError.bind(this);

@@ -8,17 +8,17 @@ export default class UIError {
     /*
      * Fields
      */
-    _message: string;
-    _statusCode: number;
-    _area: string;
-    _url: string;
-    _details: string;
-    _nonError: boolean;
+    private _message: string;
+    private _statusCode: number;
+    private _area: string;
+    private _url: string;
+    private _details: string;
+    private _nonError: boolean;
 
     /*
      * Let callers supply a subset of named parameters via object destructuring
      */
-    constructor({
+    public constructor({
         message = '',
         statusCode = -1,
         area = '',
@@ -37,43 +37,43 @@ export default class UIError {
     /*
      * Return properties for display
      */
-    get message():string {
+    public get message():string {
         return this._message;
     }
     
-    set message(message) {
+    public set message(message) {
         this._message = message;
     }
     
-    get statusCode():number {
+    public get statusCode():number {
         return this._statusCode;
     }
     
-    set statusCode(statusCode) {
+    public set statusCode(statusCode) {
         this._statusCode = statusCode;
     }
     
-    get area():string {
+    public get area():string {
         return this._area;
     }
     
-    set area(area) {
+    public set area(area) {
         this._area = area;
     }
 
-    get url():string {
+    public get url():string {
         return this._url;
     }
 
-    get details():string {
+    public get details():string {
         return this._details;
     }
     
-    set details(details) {
+    public set details(details) {
         this._details = details;
     }
     
-    get nonError():boolean {
+    public get nonError():boolean {
         return this._nonError;
     }
 }
