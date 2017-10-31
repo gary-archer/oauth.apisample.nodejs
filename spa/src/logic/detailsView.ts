@@ -27,31 +27,27 @@ export default class DetailsView {
     /*
      * Run the view
      */
-    execute(): any {
+    async execute() {
 
         // Set UI content while loading
         $('#detailsContainer').removeClass('hide');
         $('#detailsContainer').text('Calling API to get golfer details ...');
         
-        // Call the API
-        let url = `${this.baseUrl}/golfers/${this.id}`;
-        return HttpClient.callApi(url, 'GET', null, this.authenticator)
-            .then(data => {
-                
-                // Render results
-                return this._renderData(data);
-            })
-            .catch(uiError => {
-                
-                // If an invalid id is typed in the browser then return to the list page
-                if (uiError.statusCode === 404) {
-                   location.hash ='#';
-                   return Promise.resolve();
-                }
-            
-                // Otherwise propagate the error
-                return Promise.reject(uiError);
-            });
+        try {
+            // Get data and render it
+            let url = `${this.baseUrl}/golfers/${this.id}`;
+            let data = await HttpClient.callApi(url, 'GET', null, this.authenticator);
+            return this._renderData(data);
+        }
+        catch (uiError) {
+            // If an invalid id is typed in the browser then return to the list page
+            if (uiError.statusCode === 404) {
+                location.hash ='#';
+                return Promise.resolve();
+             }
+
+             throw uiError;
+        }
     }
 
     /*

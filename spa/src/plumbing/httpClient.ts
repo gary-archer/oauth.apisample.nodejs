@@ -11,86 +11,81 @@ export default class HttpClient {
     /*
      * Download JSON data from the app config file
      */
-    static loadAppConfiguration(filePath: string): any {
+    static async loadAppConfiguration(filePath: string) {
         
-        return $.ajax({
-                url: filePath,
-                type: 'GET',
-                dataType: 'json'
-            })
-            .catch(xhr => {
-                let error = ErrorHandler.getFromAjaxError(xhr, filePath);
-                return Promise.reject(error);
-            });
+        try {
+            // Make the call
+            return await $.ajax({
+                    url: filePath,
+                    type: 'GET',
+                    dataType: 'json'
+                });
+        }
+        catch(xhr) {
+            // Improve the default error message
+            throw ErrorHandler.getFromAjaxError(xhr, filePath);
+        }
     }
     
     /*
      * Get data from an API URL and handle retries if needed
      */
-    static callApi(url: string, method: string, dataToSend: any, authenticator: any): any {
+    static async callApi(url: string, method: string, dataToSend: any, authenticator: any) {
         
-        // Get a token if required
-        return authenticator
-            .getAccessToken()
-            .then(at => {
-            
-                // Call the API
-                return HttpClient._callApiWithToken(url, method, dataToSend, authenticator, at);
-            })
-            .catch(e => {
+        // Get a token, which will log the user in if needed
+        let token = await authenticator.getAccessToken();
+        
+        try {
+            // Call the API
+            return await HttpClient._callApiWithToken(url, method, dataToSend, authenticator, token);
+        }
+        catch (xhr) {
+            // Non 401 errors are already handled so rethrow them
+            if (xhr instanceof UIError) {
+                throw xhr;
+            }
 
-                // Already handled errors
-                if (e instanceof UIError) {
-                    return Promise.reject(e);
-                }
+            if (xhr.status === 401) {
 
-                // Non Ajax errors
-                if (!e.status) {
-                    throw e;
-                }
-                    
-                // Ajax errors
-                let xhr = e;
-                if (xhr.status === 401) {
+                // Clear the failing access token from storage and get a new one
+                await authenticator.clearAccessToken();
+                let token = await authenticator.getAccessToken();
 
-                    // Handle 401s by clearing the failing access token from storage
-                    return authenticator.clearAccessToken()
-                        .then(() => {
-                            
-                            // Get a new access token
-                            return authenticator
-                                .getAccessToken()
-                                .then(at => {
-
-                                    // Call the API again
-                                    return HttpClient._callApiWithToken(url, method, dataToSend, authenticator, at);
-                                });
-                        });
-                }
-                else {
-                    
-                    // Report Ajax errors
-                    let ajaxError = ErrorHandler.getFromAjaxError(xhr, url);
-                    return Promise.reject(ajaxError);
-                }
-            });
+                // Call the API again
+                return await HttpClient._callApiWithToken(url, method, dataToSend, authenticator, token);
+            }
+        }
     }
     
     /*
      * Do the work of calling the API
      */
-    static _callApiWithToken(url: string, method: string, dataToSend: any, authenticator: any, accessToken: string): any {
+    static async _callApiWithToken(url: string, method: string, dataToSend: any, authenticator: any, accessToken: string) {
         
         let dataToSendText = JSON.stringify(dataToSend | <any>{});
-        return $.ajax({
-                    url: url,
-                    data: dataToSendText,
-                    dataType: 'json',
-                    contentType: 'application/json',
-                    type: method,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader ('Authorization', 'Bearer ' + accessToken);
-                    }
-            })
+        
+        try {
+            return await $.ajax({
+                        url: url,
+                        data: dataToSendText,
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        type: method,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader ('Authorization', 'Bearer ' + accessToken);
+                        }
+                });
+        }
+        catch(xhr) {
+
+            // Rethrow 401s to the caller
+            if (xhr.status === 401) {
+                throw xhr;
+            }
+
+            // Report Ajax errors
+            let ajaxError = ErrorHandler.getFromAjaxError(xhr, url);
+            throw ajaxError;
+        }
     }
 }

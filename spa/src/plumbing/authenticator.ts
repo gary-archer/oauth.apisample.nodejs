@@ -32,7 +32,7 @@ export default class Authenticator {
             monitorSession: false
         };
         
-        // Create the OIDC class
+        // Create the user manager
         this.userManager = new Oidc.UserManager(settings);
         this.userManager.events.addSilentRenewError(this._onSilentTokenRenewalError);
         this._setupCallbacks();
@@ -41,96 +41,80 @@ export default class Authenticator {
     /*
      * Clear the current access token from storage to force a login
      */
-    clearAccessToken(): any {
+    async clearAccessToken() {
 
-        return this.userManager.getUser()
-            .then(user => {
-
-                if (!user) {
-                    return Promise.resolve(); 
-                }
-
-                user.access_token = null;
-                this.userManager.storeUser(user);
-            });
+        var user = await this.userManager.getUser();
+        if (user) {
+            user.access_token = null;
+            this.userManager.storeUser(user);
+        }
     }
 
     /*
      * Make the current access token in storage act like it has expired
      */
-    expireAccessToken(): any {
+    async expireAccessToken() {
         
-        return this.userManager.getUser()
-            .then(user => {
+        let user = await this.userManager.getUser();
+        if (user) {
 
-                if (!user) {
-                    return Promise.resolve(); 
-                }
-
-                // Set the stored value to expired and also corrupt the token so that there is a 401 if it is sent to an API
-                user.expires_at = Date.now() / 1000 + 30;
-                user.access_token = 'x' + user.access_token + 'x';
-                
-                // Update OIDC so that it silently renews the token almost immediately
-                this.userManager.storeUser(user);
-                this.userManager.stopSilentRenew();
-                this.userManager.startSilentRenew();
-            });
+            // Set the stored value to expired and also corrupt the token so that there is a 401 if it is sent to an API
+            user.expires_at = Date.now() / 1000 + 30;
+            user.access_token = 'x' + user.access_token + 'x';
+            
+            // Update OIDC so that it silently renews the token almost immediately
+            this.userManager.storeUser(user);
+            this.userManager.stopSilentRenew();
+            this.userManager.startSilentRenew();
+        }
     }
 
     /*
      * Get Open Id Connect claims
      */
-    getOpenIdConnectUserClaims(): any {
+    async getOpenIdConnectUserClaims() {
 
-        return this.userManager.getUser()
-            .then(user => {
+        var user = await this.userManager.getUser();
+        if (user && user.profile) {
+            return user.profile;
+        }
 
-                if (user && user.profile) {
-                    return user.profile;
-                }
-
-                return null;
-            });
+        return null;
     }
 
     /*
      * Get an access token and login if required
      */
-    getAccessToken(): any {
+    async getAccessToken() {
 
-        return this.userManager.getUser()
-            .then(user => {
+        // On most calls we just return the existing token from HTML5 storage
+        var user = await this.userManager.getUser();
+        if (user && user.access_token) {
+            return user.access_token;
+        }
 
-                // On most calls we just return the existing token from HTML5 storage
-                if (user && user.access_token) {
-                    return user.access_token;
-                }
+        // Store the SPA's client side location
+        let data = {
+            hash: location.hash.length > 0 ? location.hash : '#'
+        };
+        
+        try {
+            // Start a login redirect
+            await this.userManager.signinRedirect({state: JSON.stringify(data)});
 
-                // Store the SPA's client side location
-                let data = {
-                    hash: location.hash.length > 0 ? location.hash : '#'
-                };
-
-                // Start a login redirect
-                return this.userManager.signinRedirect({state: JSON.stringify(data)})
-                    .then(() => {
-
-                        // Short circuit SPA page execution
-                        return Promise.reject(ErrorHandler.getNonError());
-                    })
-                    .catch(e => {
-                        
-                        // Handle OAuth specific errors here, such as those calling the metadata endpoint
-                        return Promise.reject(ErrorHandler.getFromOAuthRequest(e));
-                    });
-                });
+            // Short circuit SPA page execution
+            throw ErrorHandler.getNonError();
+        }
+        catch(e) {
+            // Handle OAuth specific errors, such as those calling the metadata endpoint
+            throw ErrorHandler.getFromOAuthRequest(e);
+        }
     }
 
     /*
      * Handle the response from the authorization server
      */
-    handleLoginResponse(): any {
+    async handleLoginResponse() {
         
         // See if there is anything to do
         if (location.hash.indexOf('state') === -1) {
@@ -140,30 +124,23 @@ export default class Authenticator {
         // See if this is the main window
         if (window.top === window.self) {
 
-            // Handle login responses
-            return this.userManager.signinRedirectCallback()
-                .then(user => {
-
-                    // Restore the SPA's client side location
-                    let data = JSON.parse(user.state);
-                    location.replace(location.pathname + data.hash);
-                    return Promise.resolve();
-                })
-                .catch(e => {
-
-                    // Handle OAuth specific errors here
-                    return Promise.reject(ErrorHandler.getFromOAuthResponse(e));
-                });
+            try {
+                // Handle the response
+                let user = await this.userManager.signinRedirectCallback();
+                let data = JSON.parse(user.state);
+                location.replace(location.pathname + data.hash);
+            }
+            catch(e) {
+                // Handle OAuth response errors
+                throw ErrorHandler.getFromOAuthResponse(e);
+            }
         }
         else {
-
             // Handle silent token renewal responses and note that errors are swallowed by OIDC
-            return this.userManager.signinSilentCallback()
-                .then(user => {
+            let user = await this.userManager.signinSilentCallback();
 
-                    // Avoid rendering the whole page on the hidden iframe by short circuiting execution
-                    return Promise.reject(ErrorHandler.getNonError());
-                });
+            // Short circuit SPA page execution
+            throw ErrorHandler.getNonError();
         }
     }
 
@@ -172,7 +149,7 @@ export default class Authenticator {
      */
     _onSilentTokenRenewalError(e: any): void {
 
-        // Login required is not a real error - we will just redirect the user on the next API 401 call
+        // Login required is not a real error - we will just redirect the user to login when the API returns 401
         if (e.error !== 'login_required') {
             let error = ErrorHandler.getFromOAuthResponse(e);
             ErrorHandler.reportError(error);
@@ -180,19 +157,16 @@ export default class Authenticator {
     }
 
     /*
-     * Start logout processing to remove tokens and vendor cookies
+     * Redirect in order to log out at the authorization server and remove vendor cookies
      */
-    startLogout(): void {
+    async startLogout() {
         
-        // Redirect in order to log out at the authorization server and remove vendor cookies
-        this.userManager.signoutRedirect()
-            .then(request => {
-               return Promise.resolve();
-            })
-            .catch(e => {
-                ErrorHandler.reportError(ErrorHandler.getFromOAuthRequest(e));
-                return Promise.resolve();
-            });
+        try {
+            await this.userManager.signoutRedirect();
+        }
+        catch(e) {
+            ErrorHandler.reportError(ErrorHandler.getFromOAuthRequest(e));
+        }
     }
 
     /*

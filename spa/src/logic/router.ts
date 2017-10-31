@@ -32,7 +32,7 @@ export default class Router {
     /*
      * Execute a view based on the hash URL data
      */
-    executeView(): any {
+    async executeView() {
         
         // Get URL details
         let oldView = this.currentView;
@@ -62,20 +62,18 @@ export default class Router {
         }
 
         // Run the new view
-        return this.currentView.execute();
+        return await this.currentView.execute();
     }
 
     /*
      * Show the user info child view unless we are logged out
      */
-    executeUserInfoView(): any {
+    async executeUserInfoView() {
 
         let hashData = UrlHelper.getLocationHashData();
-        if (hashData.loggedout) {
-            return Promise.resolve();
+        if (!hashData.loggedout) {
+            let view = new UserInfoView(this.authenticator);
+            await view.execute();
         }
-
-        let view = new UserInfoView(this.authenticator);
-        return view.execute();
     }
 }

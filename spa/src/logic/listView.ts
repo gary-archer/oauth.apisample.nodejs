@@ -25,15 +25,15 @@ export default class ListView {
     /*
      * Run the view
      */
-    execute(): any {
+    async execute() {
         
         // Set UI content while loading
         $('#listContainer').removeClass('hide');
         $('#listContainer').text('Calling API to get golfers list ...');
 
-        // Do the work
-        return HttpClient.callApi(`${this.baseUrl}/golfers`, 'GET', null, this.authenticator)
-            .then(this._renderData);
+        // Get data and render it
+        let data = await HttpClient.callApi(`${this.baseUrl}/golfers`, 'GET', null, this.authenticator);
+        this._renderData(data);
     }
 
     /*

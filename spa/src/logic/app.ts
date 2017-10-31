@@ -35,8 +35,8 @@ class App {
     /*
      * The entry point for the SPA
      */
-    execute(): void {
-        
+    async execute() {
+
         // Set up click handlers
         $('#btnHome').click(this._onHome);
         $('#btnRefreshData').click(this._onRefreshData);
@@ -49,23 +49,23 @@ class App {
         $('.initiallyDisabled').prop('disabled', true);
         
         // Download configuration, then handle login, then handle login responses
-        this._getAppConfig()
-            .then(this._configureAuthentication)
-            .then(this._handleLoginResponse)
-            .then(this._getUserClaims)
-            .then(this._runPage)
-            .catch(e => { ErrorHandler.reportError(e); });
+        try {
+            await this._getAppConfig();
+            await this._configureAuthentication();
+            await this._handleLoginResponse();
+            await this._getUserClaims();
+            await this._runPage();
+        }
+        catch(e) {
+            ErrorHandler.reportError(e);
+        }
     }
     
     /*
      * Download application configuration
      */
-    _getAppConfig(): any  {
-        return HttpClient.loadAppConfiguration('app.config.json')
-        .then(config => {
-            this.appConfig = config;
-            return Promise.resolve();
-        });
+    async _getAppConfig() {
+        this.appConfig = await HttpClient.loadAppConfiguration('app.config.json');
     }
     
     /*
@@ -80,32 +80,37 @@ class App {
     /*
      * Handle login responses on page load so that we have tokens and can call APIs
      */
-    _handleLoginResponse(): any {
-        return this.authenticator.handleLoginResponse();
+    async _handleLoginResponse() {
+        await this.authenticator.handleLoginResponse();
     }
     
     /*
      * Download user claims from the API, which can contain any data we like
      */
-    _getUserClaims() {
-        return this.router.executeUserInfoView();
+    async _getUserClaims() {
+        await this.router.executeUserInfoView();
     }
 
     /*
      * Once login startup login processing has completed, start listening for hash changes
      */
-    _runPage(): void {
+    async _runPage() {
         $(window).on('hashchange', this._onHashChange);
-        return this.router.executeView();
+        await this.router.executeView();
     }
             
     /*
      * Change the view based on the hash URL and catch errors
      */
-    _onHashChange(): void {
+    async _onHashChange() {
         OAuthLogger.updateLevelIfRequired();
-        this.router.executeView()
-            .catch(e => { ErrorHandler.reportError(e); });
+        
+        try {
+            await this.router.executeView();
+        }
+        catch(e) {
+            ErrorHandler.reportError(e);
+        }
     }
     
     /*
@@ -123,23 +128,27 @@ class App {
     /*
      * Force a page reload
      */
-    _onRefreshData(): void {
-        this.router.executeView()
-            .catch(e => { ErrorHandler.reportError(e); });
+    async _onRefreshData() {
+        try {
+            await this.router.executeView();
+        }
+        catch(e) {
+            ErrorHandler.reportError(e);
+        }
     }
     
     /*
      * Force a new access token to be retrieved
      */
-    _onExpireToken(): void {
-        this.authenticator.expireAccessToken();
+    async _onExpireToken() {
+        await this.authenticator.expireAccessToken();
     }
 
     /*
      * Start a logout request
      */
-    _onLogout(): void {
-        this.authenticator.startLogout();
+    async _onLogout() {
+        await this.authenticator.startLogout();
     }
 
     /*

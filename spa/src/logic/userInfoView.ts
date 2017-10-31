@@ -21,7 +21,7 @@ export default class UserInfoView {
     /*
      * Run the view
      */
-    execute(): any {
+    async execute() {
         
         // Hide UI elements while loading
         $('#loginNameContainer').addClass('hide');

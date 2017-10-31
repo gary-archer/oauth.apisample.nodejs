@@ -9,9 +9,8 @@ export default class LogoutView {
     /*
      * Run the view
      */
-    execute(): any {
+    async execute() {
         $('#loggedOut').removeClass('hide');
-        return Promise.resolve();
     }
 
     /*
