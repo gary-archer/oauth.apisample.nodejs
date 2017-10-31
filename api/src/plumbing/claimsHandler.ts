@@ -42,7 +42,7 @@ export default class ClaimsHandler {
     private async _getMetadata() {
         
         if (metadata !== null) {
-            return Promise.resolve(metadata);
+            return metadata;
         } 
         
         let metadataEndpoint = this._oauthConfig.authority + '/.well-known/openid-configuration';

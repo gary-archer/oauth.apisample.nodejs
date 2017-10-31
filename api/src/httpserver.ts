@@ -22,7 +22,7 @@ const webFilesRoot = '../../';
 const port = 80;
 
 /*
- * Create the express instance
+ * Initialize the app
  */
 const app = express();
 ApiLogger.initialize('info');
