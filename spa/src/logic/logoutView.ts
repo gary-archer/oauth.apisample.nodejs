@@ -1,5 +1,5 @@
 'use strict';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /*
  * Logic related to the logout view
@@ -9,7 +9,7 @@ export default class LogoutView {
     /*
      * Run the view
      */
-    execute() {
+    execute(): any {
         $('#loggedOut').removeClass('hide');
         return Promise.resolve();
     }
@@ -17,7 +17,7 @@ export default class LogoutView {
     /*
      * Hide UI elements when the view unloads
      */
-    unload() {
+    unload(): void {
         $('#loggedOut').addClass('hide');
     }
 }

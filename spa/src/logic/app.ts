@@ -1,11 +1,10 @@
 'use strict';
-import Authenticator from 'authenticator';
-import HttpClient from 'httpClient';
-import Router from 'router';
-import OAuthLogger from 'oauthLogger';
-import ErrorHandler from 'errorHandler';
-import $ from 'jquery';
-window.$ = $;
+import Authenticator from '../plumbing/authenticator';
+import HttpClient from '../plumbing/httpClient';
+import OAuthLogger from '../plumbing/oauthLogger';
+import ErrorHandler from '../plumbing/errorHandler';
+import Router from './router';
+import * as $ from 'jquery';
 
 /*
  * The application class
@@ -13,22 +12,30 @@ window.$ = $;
 class App {
     
     /*
+     * Fields
+     */
+    appConfig: any;
+    authenticator: any;
+    router: any;
+    
+    /*
      * Class setup
      */
     constructor() {
         // Create members
         this.appConfig = null;
-        this.authenticator = null;
-        this.router = null;
+        this.authenticator = Authenticator;
+        this.router = Router;
         
-        // Initialize logging
+        // Initialize Javascript
+        (<any>window).$ = $;
         this._setupCallbacks();
     }
     
     /*
      * The entry point for the SPA
      */
-    execute() {
+    execute(): void {
         
         // Set up click handlers
         $('#btnHome').click(this._onHome);
@@ -53,7 +60,7 @@ class App {
     /*
      * Download application configuration
      */
-    _getAppConfig()  {
+    _getAppConfig(): any  {
         return HttpClient.loadAppConfiguration('app.config.json')
         .then(config => {
             this.appConfig = config;
@@ -64,7 +71,7 @@ class App {
     /*
      * Point OIDC logging to our application logger and then supply OAuth settings
      */
-    _configureAuthentication() {
+    _configureAuthentication(): void {
         this.authenticator = new Authenticator(this.appConfig.oauth);
         OAuthLogger.initialize();
         this.router = new Router(this.appConfig, this.authenticator);
@@ -73,7 +80,7 @@ class App {
     /*
      * Handle login responses on page load so that we have tokens and can call APIs
      */
-    _handleLoginResponse() {
+    _handleLoginResponse(): any {
         return this.authenticator.handleLoginResponse();
     }
     
@@ -87,7 +94,7 @@ class App {
     /*
      * Once login startup login processing has completed, start listening for hash changes
      */
-    _runPage() {
+    _runPage(): void {
         $(window).on('hashchange', this._onHashChange);
         return this.router.executeView();
     }
@@ -95,7 +102,7 @@ class App {
     /*
      * Change the view based on the hash URL and catch errors
      */
-    _onHashChange() {
+    _onHashChange(): void {
         OAuthLogger.updateLevelIfRequired();
         this.router.executeView()
             .catch(e => { ErrorHandler.reportError(e); });
@@ -104,7 +111,7 @@ class App {
     /*
      * Button handler to reset the hash location to the list view and refresh
      */
-    _onHome() {
+    _onHome(): void {
         if (location.hash === '#' || location.hash.length === 0) {
             this._onHashChange();    
         }
@@ -116,7 +123,7 @@ class App {
     /*
      * Force a page reload
      */
-    _onRefreshData() {
+    _onRefreshData(): void {
         this.router.executeView()
             .catch(e => { ErrorHandler.reportError(e); });
     }
@@ -124,35 +131,35 @@ class App {
     /*
      * Force a new access token to be retrieved
      */
-    _onExpireToken() {
+    _onExpireToken(): void {
         this.authenticator.expireAccessToken();
     }
 
     /*
      * Start a logout request
      */
-    _onLogout() {
+    _onLogout(): void {
         this.authenticator.startLogout();
     }
 
     /*
      * Clear error output
      */
-    _onClearError() {
+    _onClearError(): void {
         ErrorHandler.clear();
     }
 
     /*
      * Clear trace output
      */
-    _onClearTrace() {
+    _onClearTrace(): void {
         OAuthLogger.clear();
     }
     
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks() {
+    _setupCallbacks(): void {
         this._configureAuthentication = this._configureAuthentication.bind(this);
         this._handleLoginResponse = this._handleLoginResponse.bind(this);
         this._getUserClaims = this._getUserClaims.bind(this);

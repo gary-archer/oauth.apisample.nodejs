@@ -1,7 +1,6 @@
 'use strict';
-import HttpClient from 'httpClient';
-import DetailsView from 'detailsView';
-import $ from 'jquery';
+import HttpClient from '../plumbing/httpClient';
+import * as $ from 'jquery';
 
 /*
  * Logic related to the list view
@@ -9,9 +8,15 @@ import $ from 'jquery';
 export default class ListView {
     
     /*
+     * Fields
+     */
+    authenticator: any;
+    baseUrl: string;
+    
+    /*
      * Class setup
      */
-    constructor(authenticator, baseUrl) {
+    constructor(authenticator: any, baseUrl: string) {
         this.authenticator = authenticator;
         this.baseUrl = baseUrl;
         this._setupCallbacks();
@@ -20,7 +25,7 @@ export default class ListView {
     /*
      * Run the view
      */
-    execute(refresh) {
+    execute(): any {
         
         // Set UI content while loading
         $('#listContainer').removeClass('hide');
@@ -34,14 +39,14 @@ export default class ListView {
     /*
      * Hide UI elements when the view unloads
      */
-    unload() {
+    unload(): void {
         $('#listContainer').addClass('hide');
     }
     
     /*
      * Render data
      */
-    _renderData(data) {
+    _renderData(data: any): any {
 
         // Clear loading content
         $('#listContainer').text('');
@@ -76,7 +81,7 @@ export default class ListView {
     /*
      * When a thumbnail is clicked we will request details data and then update the view
      */
-    _selectGolferDetails(e) {
+    _selectGolferDetails(e: any): void {
         let golferId = $(e.target).attr('data-id');
         location.hash = `#golfer=${golferId}`;
         e.preventDefault();
@@ -85,7 +90,7 @@ export default class ListView {
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
-    _setupCallbacks() {
+    _setupCallbacks(): void {
         this._renderData = this._renderData.bind(this);
         this._selectGolferDetails = this._selectGolferDetails.bind(this);
    }

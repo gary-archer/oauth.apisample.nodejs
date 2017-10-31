@@ -1,18 +1,25 @@
 
 'use strict';
-import ListView from 'listView';
-import DetailsView from 'detailsView';
-import LogoutView from 'logoutView';
-import UserInfoView from 'userInfoView';
-import UrlHelper from 'urlHelper';
-import OAuthLogger from 'oauthLogger';
-import $ from 'jquery';
+import ListView from './listView';
+import DetailsView from './detailsView';
+import LogoutView from './logoutView';
+import UserInfoView from './userInfoView';
+import UrlHelper from '../plumbing/urlHelper';
+import OAuthLogger from '../plumbing/oauthLogger';
+import * as $ from 'jquery';
 
 /*
  * A very primitive router to deal with switching views
  */
 export default class Router {
 
+    /*
+     * Fields
+     */
+    appConfig: any;
+    authenticator: any;
+    currentView: any;
+    
     /*
      * Initialize the current view
      */
@@ -25,7 +32,7 @@ export default class Router {
     /*
      * Execute a view based on the hash URL data
      */
-    executeView() {
+    executeView(): any {
         
         // Get URL details
         let oldView = this.currentView;
@@ -61,7 +68,7 @@ export default class Router {
     /*
      * Show the user info child view unless we are logged out
      */
-    executeUserInfoView() {
+    executeUserInfoView(): any {
 
         let hashData = UrlHelper.getLocationHashData();
         if (hashData.loggedout) {

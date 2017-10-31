@@ -1,9 +1,13 @@
-const webpack = require('webpack')
-const path = require('path')
+const path = require('path');
+const webpack = require('webpack');
 
-const config = {
+module.exports = {
+  
+  // The working folder
   context: path.resolve(__dirname, 'src'),
-  entry: ['babel-polyfill', './logic/app.js'],
+
+  // The compiler will pull in all Javascript dependencies starting from our entry point source file
+  entry: ['babel-polyfill', './logic/app.ts'],
   output: {
     
     // Build our code into our SPA bundle file
@@ -11,27 +15,24 @@ const config = {
     filename: 'spa.bundle.min.js'
   },
   resolve: {
-    modules: ['node_modules', 'logic', 'plumbing']
+
+    // Tell import statements which file extensions to look for
+    extensions: ['.js', '.ts']
   },
   module: {
-    rules: [{
-      test: /\.js$/,
-      include: path.resolve(__dirname, 'src'),
-      use: [{
-        loader: 'babel-loader',
-        options: {
-          presets: [
-            ['es2015', { modules: false }]
-          ]
-        }
-      }]
-    }]
+    rules: [
+      // Files with a .js extension are loaded by the typescript loader
+      {test: /\.js$/, loader: 'babel-loader'},
+
+      // Files with a .ts extension are loaded by the typescript loader
+      {test: /\.ts$/, loader: 'ts-loader'}
+    ]
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       
       // Build 3rd party code into a Vendor bundle file
-      name: 'Oidc',
+      name: 'vendor',
       filename: '../dist/vendor.bundle.min.js',
       minChunks (module) {
           return module.context && module.context.indexOf('node_modules') !== -1;
@@ -39,5 +40,3 @@ const config = {
     })
   ]
 }
-
-module.exports = config
