@@ -7,50 +7,42 @@ import ApiError from './apiError';
 export default class ErrorHandler {
     
     /*
-     * Handle logging the error server side and returning an error object to the client
+     * Handle the server error and get client details
      */
-    public static reportError(response: any, exception: any): void {
-       
-        try {
-            // Ensure that the error is of type ApiError
-            let error = ErrorHandler._fromException(exception);
-            
-            // Log the full error to the service
-            let serverError = {
-                message: error.message,
-                statusCode: error.statusCode,
-                area: error.area,
-                url: error.url,
-                details: error.details
-            };
-            ApiLogger.error(JSON.stringify(serverError));
-            
-            // Return a simple error object to the client
-            let clientError = {
+    public static handleError(exception: any): any {
+        
+        // Ensure that the error is of type ApiError
+        let error = ErrorHandler._fromException(exception);
+        
+        // Log the full error to the service
+        let serverError = {
+            message: error.message,
+            statusCode: error.statusCode,
+            area: error.area,
+            url: error.url,
+            details: error.details
+        };
+        ApiLogger.error(JSON.stringify(serverError));
+        
+        // Create details for the client
+        let clientInfo = {
+            status: (serverError.statusCode === 401) ? 401 : 500,
+            wwwAuthenticate: null,
+            error: {
                 area: error.area,
                 message: error.message
-            };
-
-            // Set the client status code
-            let clientStatusCode = (serverError.statusCode === 401) ? 401 : 500;
-            
-            // Set the WWW-Authenticate header if returning a 401
-            if (clientStatusCode === 401) {
-                let headerValue = 'Bearer';
-                if (clientError.message.indexOf('expired') !== -1) {
-                    headerValue += ',error="invalid_token"';
-                }
-                response.setHeader('WWW-Authenticate', headerValue);
             }
-            
-            // Send the response to the client
-            response.status(clientStatusCode).send(JSON.stringify(clientError));
-        }
-        catch(e) {
+        };
 
-            // Make sure error reporting error do not escape
-            ApiLogger.info(`Problem encountered: ${e}`);
+        // Set the WWW-Authenticate header if returning a 401
+        if (clientInfo.status === 401) {
+            clientInfo.wwwAuthenticate = 'Bearer';
+            if (serverError.message.indexOf('expired') !== -1) {
+                clientInfo.wwwAuthenticate += ',error="invalid_token"';
+            }
         }
+
+        return clientInfo;
     }
     
     /*

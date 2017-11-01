@@ -13,7 +13,7 @@ class App {
     /*
      * Fields
      */
-    private _appConfig: any;
+    private _spaConfig: any;
     private _authenticator: any;
     private _router: any;
     
@@ -45,7 +45,7 @@ class App {
         
         // Download configuration, then handle login, then handle login responses
         try {
-            await this._getAppConfig();
+            await this._downloadSpaConfig();
             await this._configureAuthentication();
             await this._handleLoginResponse();
             await this._getUserClaims();
@@ -59,17 +59,17 @@ class App {
     /*
      * Download application configuration
      */
-    private async _getAppConfig() {
-        this._appConfig = await HttpClient.loadAppConfiguration('app.config.json');
+    private async _downloadSpaConfig() {
+        this._spaConfig = await HttpClient.loadAppConfiguration('spa.config.json');
     }
     
     /*
      * Point OIDC logging to our application logger and then supply OAuth settings
      */
     private _configureAuthentication(): void {
-        this._authenticator = new Authenticator(this._appConfig.oauth);
+        this._authenticator = new Authenticator(this._spaConfig.oauth);
         OAuthLogger.initialize();
-        this._router = new Router(this._appConfig, this._authenticator);
+        this._router = new Router(this._spaConfig.app.api_base_url, this._authenticator);
     }
     
     /*
@@ -90,14 +90,15 @@ class App {
      * Once login startup login processing has completed, start listening for hash changes
      */
     private async _runPage() {
-        $(window).on('hashchange', this._onHashChange);
         await this._router.executeView();
+        $(window).on('hashchange', this._onHashChange);
     }
             
     /*
      * Change the view based on the hash URL and catch errors
      */
     private async _onHashChange() {
+        
         OAuthLogger.updateLevelIfRequired();
         
         try {

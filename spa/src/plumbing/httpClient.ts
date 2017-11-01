@@ -73,7 +73,7 @@ export default class HttpClient {
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader ('Authorization', 'Bearer ' + accessToken);
                         }
-                });
+                    });
         }
         catch(xhr) {
 

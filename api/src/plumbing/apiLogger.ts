@@ -20,12 +20,12 @@ const logger = new winston.Logger();
 export default class ApiLogger {
     
     /*
-     * Initialize and set the logging level
+     * Initialize the logger
      */
-    public static initialize(level: string): void {
+    public static initialize(): void {
         
         logger.add(winston.transports.Console, {
-          level: level,
+          level: 'info',
           colorize: true
         });
     }

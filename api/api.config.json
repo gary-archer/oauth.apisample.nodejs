@@ -1,4 +1,9 @@
 {
+    "app": {
+        "trusted_origins": [
+            "http://web.mycompany.com"
+        ]
+    },
     "oauth": {
         "authority":     "https://dev-843469-admin.oktapreview.com",
         "client_id":     "0oac5s69rjXE0HcZO0h7",

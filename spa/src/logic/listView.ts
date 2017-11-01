@@ -10,14 +10,14 @@ export default class ListView {
      * Fields
      */
     private _authenticator: any;
-    private _baseUrl: string;
+    private _apiBaseUrl: string;
     
     /*
      * Class setup
      */
-    public constructor(authenticator: any, baseUrl: string) {
+    public constructor(authenticator: any, apiBaseUrl: string) {
         this._authenticator = authenticator;
-        this._baseUrl = baseUrl;
+        this._apiBaseUrl = apiBaseUrl;
         this._setupCallbacks();
     }
     
@@ -31,7 +31,7 @@ export default class ListView {
         $('#listContainer').text('Calling API to get golfers list ...');
 
         // Get data and render it
-        let data = await HttpClient.callApi(`${this._baseUrl}/golfers`, 'GET', null, this._authenticator);
+        let data = await HttpClient.callApi(`${this._apiBaseUrl}/golfers`, 'GET', null, this._authenticator);
         this._renderData(data);
     }
 

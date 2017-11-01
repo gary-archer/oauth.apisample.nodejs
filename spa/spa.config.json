@@ -1,6 +1,6 @@
 {
     "app": {
-        "dataUrl":          "http://api.mycompany.com/api"
+        "api_base_url":     "http://api.mycompany.com/api"
     },
     "oauth": {
         "authority":        "https://dev-843469-admin.oktapreview.com",

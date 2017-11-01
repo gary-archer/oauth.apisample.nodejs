@@ -10,15 +10,15 @@ export default class DetailsView {
      * Fields
      */
     private _authenticator: any;
-    private _baseUrl: string;
+    private _apiBaseUrl: string;
     private _id: number;
     
     /*
      * Class setup
      */
-    public constructor(authenticator: any, baseUrl: string, id: number) {
+    public constructor(authenticator: any, apiBaseUrl: string, id: number) {
         this._authenticator = authenticator;
-        this._baseUrl = baseUrl;
+        this._apiBaseUrl = apiBaseUrl;
         this._id = id;
         this._setupCallbacks();
     }
@@ -34,7 +34,7 @@ export default class DetailsView {
         
         try {
             // Get data and render it
-            let url = `${this._baseUrl}/golfers/${this._id}`;
+            let url = `${this._apiBaseUrl}/golfers/${this._id}`;
             let data = await HttpClient.callApi(url, 'GET', null, this._authenticator);
             return this._renderData(data);
         }

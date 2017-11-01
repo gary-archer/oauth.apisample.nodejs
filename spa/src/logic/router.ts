@@ -14,15 +14,15 @@ export default class Router {
     /*
      * Fields
      */
-    private _appConfig: any;
+    private _apiBaseUrl: any;
     private _authenticator: any;
     private _currentView: any;
     
     /*
      * Initialize the current view
      */
-    public constructor(appConfig, authenticator) {
-        this._appConfig = appConfig;
+    public constructor(apiBaseUrl, authenticator) {
+        this._apiBaseUrl = apiBaseUrl;
         this._authenticator = authenticator;
     }
     
@@ -30,6 +30,8 @@ export default class Router {
      * Execute a view based on the hash URL data
      */
     public async executeView() {
+
+        alert('execute view');
         
         // Get URL details
         let oldView = this._currentView;
@@ -41,10 +43,10 @@ export default class Router {
         }
         else {
             if (hashData.golfer) {
-                this._currentView = new DetailsView(this._authenticator, this._appConfig.app.dataUrl, hashData.golfer);
+                this._currentView = new DetailsView(this._authenticator, this._apiBaseUrl, hashData.golfer);
             }
             else {
-                this._currentView = new ListView(this._authenticator, this._appConfig.app.dataUrl);
+                this._currentView = new ListView(this._authenticator, this._apiBaseUrl);
             }
         }
 
