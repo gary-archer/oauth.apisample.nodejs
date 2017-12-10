@@ -1,0 +1,25 @@
+{
+  "name": "basicspa",
+  "version": "3.0.0",
+  "description": "A Basic SPA using the OIDC Client security library",
+  "main": "app.ts",
+  "scripts": {
+    "start": "webpack --watch",
+    "build": "webpack -p"
+  },
+  "keywords": [],
+  "author": "Gary Archer",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/core-js": "^0.9.43",
+    "@types/jquery": "^3.2.16",
+    "core-js": "^2.5.1",
+    "ts-loader": "^3.1.1",
+    "typescript": "^2.5.3",
+    "webpack": "^3.6.0"
+  },
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "oidc-client": "^1.4.1"
+  }
+}

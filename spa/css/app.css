@@ -1,0 +1,30 @@
+button
+{
+    width:150px;
+}
+div.row
+{
+    margin: 10px;
+}
+.rightalign
+{
+    text-align:right;
+}
+.data
+{
+    color:green;
+}
+.error
+{
+    color:red;
+}
+.trace
+{
+    color:blue;
+    max-height: 600px;
+    overflow-y: auto
+}
+.hide
+{
+    display:none;
+}
