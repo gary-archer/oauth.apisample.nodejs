@@ -1,5 +1,6 @@
 import * as OpenIdClient from 'openid-client';
-import * as HttpsProxyAgent from 'https-proxy-agent';
+import * as TunnelAgent from 'tunnel-agent';
+import * as Url from 'url';
 import ErrorHandler from './errorHandler';
 import ApiLogger from './apiLogger';
 
@@ -9,8 +10,12 @@ import ApiLogger from './apiLogger';
  * https://github.com/sindresorhus/got/issues/427
  */
 if (process.env.HTTPS_PROXY) {
+    
+    let opts = Url.parse(<any>process.env.HTTPS_PROXY);
     OpenIdClient.Issuer.defaultHttpOptions = {
-        agent: new  HttpsProxyAgent(process.env.HTTPS_PROXY)
+        agent: TunnelAgent.httpsOverHttp({
+            proxy: opts
+        })
     };
 }
 
