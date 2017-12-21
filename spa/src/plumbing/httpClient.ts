@@ -75,7 +75,7 @@ export default class HttpClient {
                     dataType: 'json',
                     contentType: 'application/json',
                     type: method,
-                    beforeSend: function (xhr) {
+                    beforeSend: xhr => {
                         xhr.setRequestHeader ('Authorization', 'Bearer ' + accessToken);
                     }
                 });
