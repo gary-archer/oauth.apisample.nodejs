@@ -5,7 +5,7 @@
         <meta http-equiv='X-UA-Compatible' content='IE=edge'>
         <meta name='viewport' content='width=device-width, initial-scale=1'>
         <base href='/spa/' />
-        <title>OAuth 2.0 Sample - PGA Tour Golfers</title>
+        <title>OAuth 2.0 Sample - Digital Assets</title>
         <link href='css/app.css'                 rel='stylesheet' type='text/css' />
         <link href='css/bootstrap-3.3.7.min.css' rel='stylesheet' type='text/css' />
     </head>
@@ -14,12 +14,11 @@
             
             <div class='row'>
                 <div class='col-xs-9'>
-                    <h1>OAuth 2.0 Sample: PGA Tour Golfers</h1>
+                    <h1 class='text-left'>OAuth 2.0 Sample: Digital Assets</h1>
                 </div>
-                <div class='col-xs-3'>
-                    <div id='loginNameContainer' class='rightalign hide'>
-                        <strong>Logged in as: <span id='userName'></span></strong>
-                    </div>
+                <div class='col-xs-3 logincontainer hide'>
+                    <br/>
+                    Logged in as: <span class='logintext'></span>
                 </div>
             </div>
 
@@ -28,13 +27,13 @@
                     <button id='btnHome' class='btn btn-primary'>Home</button>
                 </div>
                 <div class='col-xs-3'>
-                    <button id='btnExpireAccessToken' class='btn btn-primary disabled initiallyDisabled'>Expire Token</button>
+                    <button id='btnExpireAccessToken' class='btn btn-primary initiallydisabled'>Expire Token</button>
                 </div>
                 <div class='col-xs-3'>
-                    <button id='btnRefreshData' class='btn btn-primary disabled initiallyDisabled'>Refresh Data</button>
+                    <button id='btnRefreshData' class='btn btn-primary initiallydisabled'>Refresh Data</button>
                 </div>
                 <div class='col-xs-3'>
-                    <button id='btnLogout' class='btn btn-primary disabled initiallyDisabled'>Logout</button>
+                    <button id='btnLogout' class='btn btn-primary initiallydisabled'>Logout</button>
                 </div>
             </div>
             
@@ -62,10 +61,26 @@
                 </div>
             </div>
             
-            <div id='listContainer' class='row data'>
+            <div class='listcontainer panel panel-primary hide'>
+                <div class='panel-heading'>
+                    <div class='row'>
+                        <div class ='col-xs-1'></div>    
+                        <div class ='col-xs-5'>Token</div>  
+                        <div class ='col-xs-2'>Price</div>  
+                        <div class ='col-xs-2'>% Change</div>  
+                        <div class ='col-xs-2'>Market Cap</div>  
+                    </div>
+                </div>
+                <div class='panel-group'>
+                </div>
             </div>
             
-            <div id='detailsContainer' class='row data'>
+            <div class='row transactionscontainer panel panel-primary hide'>
+                <div class='panel-heading'>
+                    <p id ='tokenHeader'>Transactions</p>
+                    <p id ='contractAddress'></p>
+                </div>
+                <div class='transactionslist'></div>
             </div>
         </div>
         

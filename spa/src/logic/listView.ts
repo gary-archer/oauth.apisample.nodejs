@@ -28,11 +28,11 @@ export default class ListView {
     public async execute(): Promise<void> {
         
         // Set UI content while loading
-        $('#listContainer').removeClass('hide');
-        $('#listContainer').text('Calling API to get golfers list ...');
+        $('.listcontainer').removeClass('hide');
+        $('.listcontainer').text('Calling API to get ICOs ...');
 
         // Get data and render it
-        let data = await HttpClient.callApi(`${this._apiBaseUrl}/golfers`, 'GET', null, this._authenticator);
+        let data = await HttpClient.callApi(`${this._apiBaseUrl}/icos`, 'GET', null, this._authenticator);
         this._renderData(data);
     }
 

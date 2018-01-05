@@ -1,6 +1,6 @@
 import Authenticator from '../plumbing/authenticator';
 import ListView from './listView';
-import DetailsView from './detailsView';
+import TransactionsView from './transactionsView';
 import LogoutView from './logoutView';
 import UserInfoView from './userInfoView';
 import UrlHelper from '../plumbing/urlHelper';
@@ -41,8 +41,8 @@ export default class Router {
             this._currentView = new LogoutView();
         }
         else {
-            if (hashData.golfer) {
-                this._currentView = new DetailsView(this._authenticator, this._apiBaseUrl, hashData.golfer);
+            if (hashData.contract_address) {
+                this._currentView = new TransactionsView(this._authenticator, this._apiBaseUrl, hashData.contract_address);
             }
             else {
                 this._currentView = new ListView(this._authenticator, this._apiBaseUrl);
@@ -51,8 +51,6 @@ export default class Router {
 
         // Update common elements of the frame window when running a new view
         $('#error').text('');
-        $('.initiallyDisabled').prop('disabled', true);
-        $('.initiallyDisabled').addClass('disabled');
         
         // Unload the old view
         if (oldView) {

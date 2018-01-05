@@ -23,16 +23,13 @@ export default class UserInfoView {
      */
     public async execute(): Promise<void> {
         
-        // Hide UI elements while loading
-        $('#loginNameContainer').addClass('hide');
-
         // Get the data we received from the id token
         let userProfile = await this._authenticator.getOpenIdConnectUserClaims();
         
         // Update the UI
         if (userProfile && userProfile.given_name && userProfile.family_name) {
-            $('#loginNameContainer').removeClass('hide');
-            $('#userName').text(`${userProfile.given_name} ${userProfile.family_name}`);
+            $('.logincontainer').removeClass('hide');
+            $('.logintext').text(`${userProfile.given_name} ${userProfile.family_name}`);
         }
     }
 }

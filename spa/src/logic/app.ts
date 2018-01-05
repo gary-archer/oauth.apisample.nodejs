@@ -41,7 +41,8 @@ class App {
         $('#btnClearTrace').click(this._onClearTrace);
 
         // Disable buttons until ready
-        $('.initiallyDisabled').prop('disabled', true);
+        $('.initiallydisabled').prop('disabled', true);
+        $('.initiallydisabled').addClass('disabled');
         
         // Download configuration, then handle login, then handle login responses
         try {
@@ -90,8 +91,16 @@ class App {
      * Once login startup login processing has completed, start listening for hash changes
      */
     private async _runPage() : Promise<void> {
+        
+        // Get data and create the view HTML 
         await this._router.executeView();
+
+        // Enable buttons
         $(window).on('hashchange', this._onHashChange);
+        
+        // Enable buttons
+        $('.initiallydisabled').prop('disabled', false);
+        $('.initiallydisabled').removeClass('disabled');
     }
             
     /*
