@@ -99,12 +99,12 @@ export default class WebApi {
     private async _getIcoTransactions(request: Request, response: Response, next: any): Promise<void> {
         
         try {
-            ApiLogger.info('API call', `Request for golfer details for id: ${request.params.contract_address}`);
+            ApiLogger.info('API call', `Request for ICO with contract address: ${request.params.contract_address}`);
             
             let repository = new IcoRepository();
-            let golfer = await repository.getDetails(request.params.contract_address);
-            if (golfer) {
-                response.end(JSON.stringify(golfer));
+            let ico = await repository.getTransactions(request.params.contract_address);
+            if (ico) {
+                response.end(JSON.stringify(ico));
             }
             else {
                 response.status(404).send(`The ICO with contract address ${request.params.contract_address} was not found`);

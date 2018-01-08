@@ -1,18 +1,44 @@
-button
+a
 {
+    cursor: pointer;
+}
+.btn
+{
+    margin-top:10px;
     width:150px;
 }
-div.row
-{
-    margin: 10px;
+.panel {
+    border: 0;
 }
-.rightalign
+.listcontainer
+{
+    margin-top: 20px;
+}
+.transactionscontainer
+{
+    margin-top: 20px;
+}
+.transactionslist
+{
+    margin-top: 20px;
+}
+.account
+{
+    color: blue;
+}
+.amount
+{
+    font-weight: bold;
+}
+.logintext
 {
     text-align:right;
+    font-weight: bold;
 }
-.data
+.hash
 {
-    color:green;
+    color: green;
+    word-wrap: break-word;
 }
 .error
 {
@@ -21,8 +47,6 @@ div.row
 .trace
 {
     color:blue;
-    max-height: 600px;
-    overflow-y: auto
 }
 .hide
 {

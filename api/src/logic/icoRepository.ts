@@ -16,7 +16,7 @@ export default class IcoRepository {
     /*
      * Return transactions for an ICO given its contract address
      */
-    public getDetails(contract_address: string): any {
+    public getTransactions(contract_address: string): any {
 
         let foundIco = icoList.icos.find((i:any) => i.contract_address === contract_address);
         if (foundIco) {

@@ -29,7 +29,6 @@ export default class ListView {
         
         // Set UI content while loading
         $('.listcontainer').removeClass('hide');
-        $('.listcontainer').text('Calling API to get ICOs ...');
 
         // Get data and render it
         let data = await HttpClient.callApi(`${this._apiBaseUrl}/icos`, 'GET', null, this._authenticator);
@@ -40,7 +39,7 @@ export default class ListView {
      * Hide UI elements when the view unloads
      */
     public unload(): void {
-        $('#listContainer').addClass('hide');
+        $('.listcontainer').addClass('hide');
     }
     
     /*
@@ -48,41 +47,53 @@ export default class ListView {
      */
     private _renderData(data: any): void {
 
-        // Clear loading content
-        $('#listContainer').text('');
-        
-        // Set button state
-        $('.initiallyDisabled').prop('disabled', false);
-        $('.initiallyDisabled').removeClass('disabled');
-        
-        data.golfers.forEach((golfer:any) => {
+        $('.panel-group').text('');
 
-            // Set up the image and a click handler
-            let golferLink = $(`<a href='#' class='img-thumbnail'>
-                                  <img class='golferImage' src='images/${golfer.name}_tn.png' class='img-responsive' data-id='${golfer.id}'>
-                                </a>`);
+        data.icos.forEach((ico:any) => {
+
+            // Format fields for display
+            let formattedMarketCapUsd = Number(ico.market_cap_usd).toLocaleString();
+            let formattedPriceUsd = ico.price_usd.toFixed(6);
+            let formattedPriceBtc = ico.price_btc.toFixed(6);
+            let formattedPriceEth = ico.price_eth.toFixed(6);
             
-            // Set text properties
-            let golferDiv = $(`<div class='col-xs-3'>
-                                 <div>Name : <b>${golfer.name}</b></div>
-                                 <div>Tour Wins : <b>${golfer.tour_wins}</b></div>
-                               </div>`);
-            
+            // Render the ICO details
+            let icoDiv = $(`<div class='panel panel-default'>
+                              <div class='panel-body'>
+                                <div class='row'>
+                                  <div class='col-xs-1'>
+                                    <img src='images/${ico.token_name}.svg' />
+                                  </div>  
+                                  <div class='col-xs-5'>
+                                    <a data-id=${ico.contract_address}>${ico.token_name}</a><br/>
+                                    ${ico.description}
+                                  </div>  
+                                  <div class='col-xs-2 amount'>
+                                    ${formattedPriceUsd} USD<br/>
+                                    ${formattedPriceBtc} BTC<br/>
+                                    ${formattedPriceEth} ETH
+                                  </div>  
+                                  <div class='col-xs-2'>${ico.percent_change}%</div>  
+                                  <div class='col-xs-2'>${formattedMarketCapUsd} USD</div>
+                                </div>
+                              </div>
+                            </div>`);
+
             // Update the DOM
-            golferDiv.append(golferLink);
-            $('#listContainer').append(golferDiv);
+            $('.panel-group').append(icoDiv);
         });
 
-        // Add event handlers for image clicks
-        $('.golferImage').on('click', this._selectGolferDetails);
+        // A click handler will change the view to look at transaction details
+        $('a').on('click', this._selectIcoTransactions);
     }
     
     /*
-     * When a thumbnail is clicked we will request details data and then update the view
+     * When a thumbnail is clicked we will request transactions data and then update the view
      */
-    private _selectGolferDetails(e: any): void {
-        let golferId = $(e.target).attr('data-id');
-        location.hash = `#golfer=${golferId}`;
+    _selectIcoTransactions(e:any): void {
+        
+        let contract_address = $(e.target).attr('data-id');
+        location.hash = `#contract_address=${contract_address}`;
         e.preventDefault();
     }
     
@@ -91,6 +102,6 @@ export default class ListView {
      */
     private _setupCallbacks(): void {
         this._renderData = this._renderData.bind(this);
-        this._selectGolferDetails = this._selectGolferDetails.bind(this);
+        this._selectIcoTransactions = this._selectIcoTransactions.bind(this);
    }
 }

@@ -32,6 +32,10 @@ export default class Router {
      */
     public async executeView(): Promise<void> {
 
+        // Disable buttons until ready
+        $('.initiallydisabled').prop('disabled', true);
+        $('.initiallydisabled').addClass('disabled');
+
         // Get URL details
         let oldView = this._currentView;
         let hashData = UrlHelper.getLocationHashData();
@@ -59,6 +63,12 @@ export default class Router {
 
         // Run the new view
         await this._currentView.execute();
+
+        // Enable buttons unless logged out
+        if (!hashData.loggedout) {
+            $('.initiallydisabled').prop('disabled', false);
+            $('.initiallydisabled').removeClass('disabled');
+        }
     }
 
     /*

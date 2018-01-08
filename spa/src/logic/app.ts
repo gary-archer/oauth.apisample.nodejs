@@ -40,10 +40,6 @@ class App {
         $('#btnClearError').click(this._onClearError);
         $('#btnClearTrace').click(this._onClearTrace);
 
-        // Disable buttons until ready
-        $('.initiallydisabled').prop('disabled', true);
-        $('.initiallydisabled').addClass('disabled');
-        
         // Download configuration, then handle login, then handle login responses
         try {
             await this._downloadSpaConfig();
@@ -95,12 +91,8 @@ class App {
         // Get data and create the view HTML 
         await this._router.executeView();
 
-        // Enable buttons
+        // Listen for changes to the SPA location
         $(window).on('hashchange', this._onHashChange);
-        
-        // Enable buttons
-        $('.initiallydisabled').prop('disabled', false);
-        $('.initiallydisabled').removeClass('disabled');
     }
             
     /*
