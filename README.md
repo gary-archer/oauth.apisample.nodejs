@@ -2,7 +2,7 @@
 
 ### Overview
 
-* The third SPA sample using OAuth 2.0 and Open Id Connect, referenced in my blog at http://authguidance.com
+* The third SPA sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
 * **The goals of this sample are to implement session management and a production like SSL setup for our SPA and API**
 
 ### Details
