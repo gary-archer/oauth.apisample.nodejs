@@ -39,11 +39,11 @@ export class CompanyRepository {
     /*
      * Return transactions for a company given its id
      */
-    public async getCompanyTransactions(id: number): Promise<CompanyTransactions | null> {
+    public async getCompanyTransactions(id: number): Promise<CompanyTransactions> {
 
         // If the user is unauthorized we return 404
         if (!this._isUserAuthorizedForCompany(id)) {
-            throw new ClientError(404, 'DataAccess', `Transactions for company ${id} were not found for this user`);
+            throw this._unauthorizedError(id);
         }
 
         // Read companies and find that supplied
@@ -64,7 +64,7 @@ export class CompanyRepository {
         }
 
         // If the data is not found we also return 404
-        throw new ClientError(404, 'DataAccess', `Transactions for company ${id} were not found for this user`);
+        throw this._unauthorizedError(id);
     }
 
     /*
@@ -73,5 +73,12 @@ export class CompanyRepository {
     private _isUserAuthorizedForCompany(companyId: number): boolean {
         const found = this._claims.userCompanyIds.find((c) => c === companyId);
         return !!found;
+    }
+
+    /*
+     * Apply claims that were read when the access token was first validated
+     */
+    private _unauthorizedError(companyId: number): boolean {
+        return new ClientError(404, 'DataAccess', `Transactions for company ${companyId} were not found for this user`);
     }
 }

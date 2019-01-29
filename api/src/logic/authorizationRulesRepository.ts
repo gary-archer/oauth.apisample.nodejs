@@ -3,7 +3,7 @@ import {ApiClaims} from '../entities/apiClaims';
 /*
  * A repository class for returning domain specific authorization rules
  */
-export class AuthorizationMicroservice {
+export class AuthorizationRulesRepository {
 
     /*
      * Class setup
@@ -13,25 +13,27 @@ export class AuthorizationMicroservice {
     }
 
     /*
-     * Return custom domain specific claims given the token claims and central user claims
-     * If required the access token could be used to call an authorization microservice
+     * A stub example of looking up product specific data
+     * A real implementation would read from a database or perhaps another microservice
      */
-    public async getProductClaims(claims: ApiClaims, accessToken: string): Promise<void> {
-        claims.setProductSpecificUserRights(this._getCompaniesCoveredByUser(claims.userId));
+    public async setProductClaims(claims: ApiClaims, accessToken: string): Promise<void> {
+
+        const accountsCovered = this._getAccountsCoveredByUser(claims.userId);
+        claims.setProductSpecificUserRights(accountsCovered);
     }
 
     /*
      * For the purposes of our code sample we will grant access to the first 3 companies
      * However, the API will deny access to company 4, which the user does not have rights to
      */
-    private _getCompaniesCoveredByUser(userId: string) {
-        return [1, 2, 3];
+    private _getAccountsCoveredByUser(userId: string) {
+        return [1, 2, 4];
     }
 
     /*
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
     private _setupCallbacks() {
-        this.getProductClaims = this.getProductClaims.bind(this);
+        this.setProductClaims = this.setProductClaims.bind(this);
     }
 }

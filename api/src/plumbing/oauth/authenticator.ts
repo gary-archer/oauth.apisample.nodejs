@@ -1,23 +1,8 @@
 import * as OpenIdClient from 'openid-client';
-import * as TunnelAgent from 'tunnel-agent';
-import * as Url from 'url';
-import {OAuthConfiguration} from '../configuration/oauthConfiguration';
-import {ApiClaims} from '../entities/apiClaims';
-import {TokenValidationResult} from '../entities/tokenValidationResult';
-import {ErrorHandler} from './errorHandler';
-
-/*
- * This handles debugging to Fiddler or Charles so that we can view requests to Okta
- */
-if (process.env.HTTPS_PROXY) {
-
-    const opts = Url.parse(process.env.HTTPS_PROXY as string);
-    OpenIdClient.Issuer.defaultHttpOptions = {
-        agent: TunnelAgent.httpsOverHttp({
-            proxy: opts,
-        }),
-    };
-}
+import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {ApiClaims} from '../../entities/apiClaims';
+import {ErrorHandler} from '../errors/errorHandler';
+import {TokenValidationResult} from './tokenValidationResult';
 
 /*
  * The entry point for OAuth related operations
@@ -25,21 +10,18 @@ if (process.env.HTTPS_PROXY) {
 export class Authenticator {
 
     /*
-     * Metadata is read once only
-     */
-    private static _issuer: any = null;
-
-    /*
      * Instance fields
      */
     private _oauthConfig: OAuthConfiguration;
+    private _issuer: any;
 
     /*
      * Receive configuration and request metadata
      */
-    public constructor(oauthConfig: OAuthConfiguration) {
+    public constructor(oauthConfig: OAuthConfiguration, issuer: any) {
 
         this._oauthConfig = oauthConfig;
+        this._issuer = issuer;
         this._setupCallbacks();
     }
 
@@ -48,7 +30,6 @@ export class Authenticator {
      */
     public async validateTokenAndGetTokenClaims(accessToken: string): Promise<TokenValidationResult> {
 
-        await this._getMetadata();
         return await this._introspectTokenAndGetClaims(accessToken);
     }
 
@@ -58,24 +39,7 @@ export class Authenticator {
      */
     public async getCentralUserInfoClaims(claims: ApiClaims, accessToken: string) {
 
-        await this._getMetadata();
         return await this._lookupCentralUserDataClaims(claims, accessToken);
-    }
-
-    /*
-     * Make a call to the metadata endpoint for the first API request
-     */
-    private async _getMetadata(): Promise<void> {
-
-        if (Authenticator._issuer) {
-            return;
-        }
-
-        try {
-            Authenticator._issuer = await OpenIdClient.Issuer.discover(this._oauthConfig.authority);
-        } catch (e) {
-            throw ErrorHandler.fromMetadataError(e, this._oauthConfig.authority);
-        }
     }
 
     /*
@@ -84,7 +48,7 @@ export class Authenticator {
     private async _introspectTokenAndGetClaims(accessToken: string): Promise<TokenValidationResult> {
 
         // Create the Authorization Server client
-        const client = new Authenticator._issuer.Client({
+        const client = new this._issuer.Client({
             client_id: this._oauthConfig.clientId,
             client_secret: this._oauthConfig.clientSecret,
         });
@@ -111,7 +75,7 @@ export class Authenticator {
         } catch (e) {
 
             // Report introspection errors clearly
-            throw ErrorHandler.fromIntrospectionError(e, Authenticator._issuer.introspection_endpoint);
+            throw ErrorHandler.fromIntrospectionError(e, this._issuer.introspection_endpoint);
         }
     }
 
@@ -122,7 +86,7 @@ export class Authenticator {
     private async _lookupCentralUserDataClaims(claims: ApiClaims, accessToken: string): Promise<void> {
 
         // Create the Authorization Server client
-        const client = new Authenticator._issuer.Client();
+        const client = new this._issuer.Client();
 
         try {
             // Extend token data with central user info
@@ -132,7 +96,7 @@ export class Authenticator {
         } catch (e) {
 
             // Report introspection errors clearly
-            throw ErrorHandler.fromUserInfoError(e, Authenticator._issuer.userinfo_endpoint);
+            throw ErrorHandler.fromUserInfoError(e, this._issuer.userinfo_endpoint);
         }
     }
 

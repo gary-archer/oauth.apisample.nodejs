@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from 'express';
-import {AuthorizationMicroservice} from '../logic/authorizationMicroservice';
+import {AuthorizationRulesRepository} from '../logic/authorizationRulesRepository';
 import {ApiLogger} from '../plumbing/apiLogger';
 import {ResponseWriter} from '../plumbing/responseWriter';
 import {Authenticator} from './authenticator';
@@ -14,14 +14,14 @@ export class ClaimsMiddleware {
      * Fields
      */
     private _authenticator: Authenticator;
-    private _authorizationMicroservice: AuthorizationMicroservice;
+    private _authorizationRulesRepository: AuthorizationRulesRepository;
 
     /*
      * Receive configuration
      */
-    public constructor(authenticator: Authenticator, authorizationMicroservice: AuthorizationMicroservice) {
+    public constructor(authenticator: Authenticator, authorizationRulesRepository: AuthorizationRulesRepository) {
         this._authenticator = authenticator;
-        this._authorizationMicroservice = authorizationMicroservice;
+        this._authorizationRulesRepository = authorizationRulesRepository;
     }
 
     /*
@@ -61,7 +61,7 @@ export class ClaimsMiddleware {
         await this._authenticator.getCentralUserInfoClaims(result.claims!, accessToken);
 
         // Next add product user data to claims
-        await this._authorizationMicroservice.getProductClaims(result.claims!, accessToken);
+        await this._authorizationRulesRepository.setProductClaims(result.claims!, accessToken);
 
         // Next cache the results
         ClaimsCache.addClaimsForToken(accessToken, result.expiry!, result.claims!);
