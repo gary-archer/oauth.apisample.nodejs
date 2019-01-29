@@ -1,5 +1,5 @@
+import {ApiLogger} from '../utilities/apiLogger';
 import {ApiError} from './apiError';
-import {ApiLogger} from './apiLogger';
 import {ClientError} from './clientError';
 
 /*

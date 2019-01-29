@@ -2,7 +2,9 @@ import {NextFunction, Request, Response} from 'express';
 import {Configuration} from '../configuration/configuration';
 import {ErrorHandler} from '../plumbing/errors/errorHandler';
 import {Authenticator} from '../plumbing/oauth/authenticator';
+import {ClaimsCache} from '../plumbing/oauth/claimsCache';
 import {ClaimsMiddleware} from '../plumbing/oauth/claimsMiddleware';
+import {IssuerMetadata} from '../plumbing/oauth/issuerMetadata';
 import {JsonReader} from '../plumbing/utilities/jsonReader';
 import {ResponseWriter} from '../plumbing/utilities/responseWriter';
 import {AuthorizationRulesRepository} from './authorizationRulesRepository';
@@ -15,9 +17,11 @@ import {CompanyRepository} from './companyRepository';
 export class WebApi {
 
     /*
-     * Injected dependencies
+     * Dependencies
      */
     private _apiConfig: Configuration;
+    private _claimsCache: ClaimsCache;
+    private _issuerMetadata: IssuerMetadata;
 
     /*
      * Class setup
@@ -25,6 +29,14 @@ export class WebApi {
     public constructor(apiConfig: Configuration) {
 
         this._apiConfig = apiConfig;
+
+        // Create the singleton claims cache
+        this._claimsCache = new ClaimsCache();
+
+        // Load metadata
+        this._issuerMetadata = new IssuerMetadata(this._apiConfig.oauth);
+        this._issuerMetadata.load();
+
         this._setupCallbacks();
     }
 
@@ -38,10 +50,10 @@ export class WebApi {
 
         try {
 
-            // Create the middleware instance and its dependencies on every API request
-            const authenticator = new Authenticator(this._apiConfig.oauth);
+            // Create the claims middleware instance and non singleton dependencies on every API request
+            const authenticator = new Authenticator(this._apiConfig.oauth, this._issuerMetadata);
             const authorizationRulesRepository = new AuthorizationRulesRepository();
-            const middleware = new ClaimsMiddleware(authenticator, authorizationRulesRepository);
+            const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, authorizationRulesRepository);
 
             // Do the work
             const authorized = await middleware.authorizeRequestAndSetClaims(request, response, next);

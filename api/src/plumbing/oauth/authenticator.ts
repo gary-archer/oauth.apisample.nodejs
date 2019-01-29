@@ -1,4 +1,3 @@
-import * as OpenIdClient from 'openid-client';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ApiClaims} from '../../entities/apiClaims';
 import {ErrorHandler} from '../errors/errorHandler';

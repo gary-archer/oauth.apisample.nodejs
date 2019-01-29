@@ -1,8 +1,8 @@
 import {ApiClaims} from '../entities/apiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
-import {ClientError} from '../plumbing/clientError';
-import {JsonReader} from '../plumbing/jsonReader';
+import {ClientError} from '../plumbing/errors/clientError';
+import {JsonReader} from '../plumbing/utilities/jsonReader';
 
 /*
  * A simple API controller for getting data about a company and its investments
@@ -78,7 +78,7 @@ export class CompanyRepository {
     /*
      * Apply claims that were read when the access token was first validated
      */
-    private _unauthorizedError(companyId: number): boolean {
+    private _unauthorizedError(companyId: number): ClientError {
         return new ClientError(404, 'DataAccess', `Transactions for company ${companyId} were not found for this user`);
     }
 }

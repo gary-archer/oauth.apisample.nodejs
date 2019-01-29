@@ -1,7 +1,6 @@
 import * as OpenIdClient from 'openid-client';
-import * as TunnelAgent from 'tunnel-agent';
-import * as Url from 'url';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {DebugProxyAgent} from '../utilities/debugProxyAgent';
 
 /*
  * A singleton to read metadata at application startup
@@ -21,14 +20,9 @@ export class IssuerMetadata {
         this._oauthConfig = oauthConfig;
 
         // Set up HTTP debugging of OAuth requests
-        if (process.env.HTTPS_PROXY) {
-            const opts = Url.parse(process.env.HTTPS_PROXY as string);
-            OpenIdClient.Issuer.defaultHttpOptions = {
-                agent: TunnelAgent.httpsOverHttp({
-                    proxy: opts,
-                }),
-            };
-        }
+        OpenIdClient.Issuer.defaultHttpOptions = {
+            agent: DebugProxyAgent.get(),
+        };
     }
 
     /*
@@ -38,6 +32,9 @@ export class IssuerMetadata {
         this._metadata = await OpenIdClient.Issuer.discover(this._oauthConfig.authority);
     }
 
+    /*
+     * Return the metadata for use during API requests
+     */
     public get metadata(): string {
         return this._metadata;
     }

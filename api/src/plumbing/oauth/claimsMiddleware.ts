@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
-import {AuthorizationRulesRepository} from '../logic/authorizationRulesRepository';
-import {ApiLogger} from '../plumbing/apiLogger';
-import {ResponseWriter} from '../plumbing/responseWriter';
+import {AuthorizationRulesRepository} from '../../logic/authorizationRulesRepository';
+import {ApiLogger} from '../utilities/apiLogger';
+import {ResponseWriter} from '../utilities/responseWriter';
 import {Authenticator} from './authenticator';
 import {ClaimsCache} from './claimsCache';
 
@@ -13,13 +13,19 @@ export class ClaimsMiddleware {
     /*
      * Fields
      */
+    private _cache: ClaimsCache;
     private _authenticator: Authenticator;
     private _authorizationRulesRepository: AuthorizationRulesRepository;
 
     /*
-     * Receive configuration
+     * Receive dependencies
      */
-    public constructor(authenticator: Authenticator, authorizationRulesRepository: AuthorizationRulesRepository) {
+    public constructor(
+        cache: ClaimsCache,
+        authenticator: Authenticator,
+        authorizationRulesRepository: AuthorizationRulesRepository) {
+
+        this._cache = cache;
         this._authenticator = authenticator;
         this._authorizationRulesRepository = authorizationRulesRepository;
     }
@@ -41,7 +47,7 @@ export class ClaimsMiddleware {
         }
 
         // Bypass validation and use cached results if they exist
-        const cachedClaims = ClaimsCache.getClaimsForToken(accessToken);
+        const cachedClaims = this._cache.getClaimsForToken(accessToken);
         if (cachedClaims !== null) {
             response.locals.claims = cachedClaims;
             return true;
@@ -64,7 +70,7 @@ export class ClaimsMiddleware {
         await this._authorizationRulesRepository.setProductClaims(result.claims!, accessToken);
 
         // Next cache the results
-        ClaimsCache.addClaimsForToken(accessToken, result.expiry!, result.claims!);
+        this._cache.addClaimsForToken(accessToken, result.expiry!, result.claims!);
 
         // Then move onto the API controller to execute business logic
         ApiLogger.info('Claims Middleware', 'Claims lookup completed successfully');
