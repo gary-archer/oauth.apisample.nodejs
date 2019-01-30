@@ -2,7 +2,7 @@ import {ApiClaims} from '../entities/apiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {ClientError} from '../plumbing/errors/clientError';
-import {JsonReader} from '../plumbing/utilities/jsonReader';
+import {JsonFileReader} from '../plumbing/utilities/jsonFileReader';
 
 /*
  * A simple API controller for getting data about a company and its investments
@@ -13,12 +13,12 @@ export class CompanyRepository {
      * Every API request receives our complex claims which are only calculated when the token is first received
      */
     private _claims: ApiClaims;
-    private _jsonReader: JsonReader;
+    private _jsonReader: JsonFileReader;
 
     /*
      * Receive claims when constructed
      */
-    public constructor(claims: ApiClaims, jsonReader: JsonReader) {
+    public constructor(claims: ApiClaims, jsonReader: JsonFileReader) {
         this._claims = claims;
         this._jsonReader = jsonReader;
     }
@@ -71,7 +71,7 @@ export class CompanyRepository {
      * Apply claims that were read when the access token was first validated
      */
     private _isUserAuthorizedForCompany(companyId: number): boolean {
-        const found = this._claims.userCompanyIds.find((c) => c === companyId);
+        const found = this._claims.accountsCovered.find((c) => c === companyId);
         return !!found;
     }
 

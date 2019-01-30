@@ -16,13 +16,12 @@ export class ClientError extends Error {
     public constructor(statusCode: number, area: string, message: string) {
 
         super(message);
-
-        // Ensure that instanceof works
-        Object.setPrototypeOf(this, new.target.prototype);
-
         this._statusCode = statusCode;
         this._area = area;
         this._id = null;
+
+        // Ensure that instanceof works
+        Object.setPrototypeOf(this, new.target.prototype);
     }
 
     public get statusCode(): number {

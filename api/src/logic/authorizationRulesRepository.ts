@@ -19,7 +19,7 @@ export class AuthorizationRulesRepository {
     public async setProductClaims(claims: ApiClaims, accessToken: string): Promise<void> {
 
         const accountsCovered = this._getAccountsCoveredByUser(claims.userId);
-        claims.setProductSpecificUserRights(accountsCovered);
+        claims.setAccountsCovered(accountsCovered);
     }
 
     /*

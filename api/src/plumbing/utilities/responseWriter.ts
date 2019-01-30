@@ -8,7 +8,7 @@ export class ResponseWriter {
     /*
      * Return data to the caller, which could be a success or error object
      */
-    public static writeObject(response: Response, statusCode: number, data: any) {
+    public static writeObjectResponse(response: Response, statusCode: number, data: any) {
         response.setHeader('Content-Type', 'application/json');
         response.status(statusCode).send(JSON.stringify(data));
     }

@@ -64,11 +64,17 @@ export class Authenticator {
                 } as TokenValidationResult;
             }
 
-            // Get claims and use the immutable user id as the subject claim
+            // Get token claims and use the immutable user id as the subject claim
+            const claims = new ApiClaims(
+                this._getClaim(tokenData.uid, 'uid'),
+                this._getClaim(tokenData.cid, 'client_id'),
+                this._getClaim(tokenData.scope, 'scope'),
+            );
+
             return {
                 isValid: true,
-                expiry: tokenData.exp,
-                claims: new ApiClaims(tokenData.uid, tokenData.cid, tokenData.scope),
+                expiry: this._getClaim(tokenData.exp, 'exp'),
+                claims,
             } as TokenValidationResult;
 
         } catch (e) {
@@ -90,13 +96,25 @@ export class Authenticator {
         try {
             // Extend token data with central user info
             const response = await client.userinfo(accessToken);
-            claims.setCentralUserData(response);
+            claims.setCentralUserInfo(response.given_name, response.family_name, response.email);
 
         } catch (e) {
 
-            // Report introspection errors clearly
+            // Report user info lookup errors clearly
             throw ErrorHandler.fromUserInfoError(e, this._issuer.userinfo_endpoint);
         }
+    }
+
+    /*
+     * Sanity checks when receiving claims to avoid failing later with a cryptic error
+     */
+    private _getClaim(claim: string, name: string): any {
+
+        if (!claim) {
+            throw ErrorHandler.fromMissingClaim(claim);
+        }
+
+        return claim;
     }
 
     /*

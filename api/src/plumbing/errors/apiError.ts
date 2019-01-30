@@ -6,12 +6,12 @@ const MIN_ERROR_ID = 10000;
 const MAX_ERROR_ID = 99999;
 
 /*
- * Manage errors due to API failures
+ * An error entity that the API will log
  */
 export class ApiError extends Error {
 
     /*
-     * Fields
+     * Error properties to log
      */
     private _statusCode: number;
     private _area: string;
@@ -21,29 +21,22 @@ export class ApiError extends Error {
     private _details: string;
 
     /*
-     * Let callers supply a subset of named parameters via object destructuring
+     * Construct from input
      */
-    public constructor({
-        message = '',
-        statusCode = 500,
-        area = '',
-        instanceId = Math.floor(Math.random() * (MAX_ERROR_ID - MIN_ERROR_ID + 1) + MIN_ERROR_ID),
-        url = '',
-        time = new Date().toUTCString(),
-        details = '',
-    }) {
+    public constructor(area: string, message: string) {
 
         super(message);
+        this._area = area;
+
+        // Default other fields
+        this._statusCode = 500,
+        this._instanceId = Math.floor(Math.random() * (MAX_ERROR_ID - MIN_ERROR_ID + 1) + MIN_ERROR_ID),
+        this._url = '',
+        this._time = new Date().toUTCString(),
+        this._details = '';
 
         // Ensure that instanceof works
         Object.setPrototypeOf(this, new.target.prototype);
-
-        this._statusCode = statusCode;
-        this._area = area;
-        this._instanceId = instanceId;
-        this._url = url;
-        this._time = time;
-        this._details = details;
     }
 
     public get statusCode(): number {
@@ -66,6 +59,10 @@ export class ApiError extends Error {
         return this._url;
     }
 
+    public set url(url) {
+        this._url = url;
+    }
+
     get time() {
         return this._time;
     }
@@ -79,7 +76,7 @@ export class ApiError extends Error {
     }
 
     /*
-     * Ensure that the stack trace is included in the logged error
+     * Return an object ready to log, including the stack trace
      */
     public toLogFormat(): any {
 
@@ -96,7 +93,7 @@ export class ApiError extends Error {
     }
 
     /*
-     * Convert to client fields
+     * Translate to a confidential error that is returned to the API caller, with a reference to the logged details
      */
     public toClientError(): ClientError {
 

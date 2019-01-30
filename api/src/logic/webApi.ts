@@ -5,7 +5,7 @@ import {Authenticator} from '../plumbing/oauth/authenticator';
 import {ClaimsCache} from '../plumbing/oauth/claimsCache';
 import {ClaimsMiddleware} from '../plumbing/oauth/claimsMiddleware';
 import {IssuerMetadata} from '../plumbing/oauth/issuerMetadata';
-import {JsonReader} from '../plumbing/utilities/jsonReader';
+import {JsonFileReader} from '../plumbing/utilities/jsonFileReader';
 import {ResponseWriter} from '../plumbing/utilities/responseWriter';
 import {AuthorizationRulesRepository} from './authorizationRulesRepository';
 import {CompanyController} from './companyController';
@@ -89,13 +89,13 @@ export class WebApi {
 
         try {
             // Create the controller instance and its dependencies on every API request
-            const reader = new JsonReader();
+            const reader = new JsonFileReader();
             const repository = new CompanyRepository(response.locals.claims, reader);
             const controller = new CompanyController(repository);
 
             // Get the data and return it in the response
             const result = await controller.getCompanyList();
-            ResponseWriter.writeObject(response, 200, result);
+            ResponseWriter.writeObjectResponse(response, 200, result);
 
         } catch (e) {
             this.unhandledExceptionHandler(e, request, response);
@@ -112,14 +112,14 @@ export class WebApi {
 
         try {
             // Create the controller instance and its dependencies on every API request
-            const reader = new JsonReader();
+            const reader = new JsonFileReader();
             const repository = new CompanyRepository(response.locals.claims, reader);
             const controller = new CompanyController(repository);
 
             // Get the data and return it in the response
             const id = parseInt(request.params.id, 10);
             const result = await controller.getCompanyTransactions(id);
-            ResponseWriter.writeObject(response, 200, result);
+            ResponseWriter.writeObjectResponse(response, 200, result);
 
         } catch (e) {
             this.unhandledExceptionHandler(e, request, response);
@@ -135,7 +135,7 @@ export class WebApi {
         response: Response): void {
 
         const clientError = ErrorHandler.handleError(unhandledException);
-        ResponseWriter.writeObject(response, clientError.statusCode, clientError.toResponseFormat());
+        ResponseWriter.writeObjectResponse(response, clientError.statusCode, clientError.toResponseFormat());
     }
 
     /*

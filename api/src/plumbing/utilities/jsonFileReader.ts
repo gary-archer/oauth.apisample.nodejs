@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 /*
  * A simple utility to deal with the infrastructure of reading JSON files
  */
-export class JsonReader {
+export class JsonFileReader {
 
     /*
      * Do the file reading and return a promise

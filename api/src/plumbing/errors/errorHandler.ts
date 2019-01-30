@@ -55,24 +55,17 @@ export class ErrorHandler {
             return exception;
         }
 
-        // Well coded errors should derive from this base class
-        if (exception instanceof Error) {
+        // General exceptions
+        const apiError = new ApiError('Exception', 'Problem encountered');
+        apiError.stack = exception.stack;
 
-            const apiError = new ApiError({
-                message: `Problem encountered`,
-                area: 'Exception',
-                details: exception.message,
-            });
-            apiError.stack = exception.stack;
-            return apiError;
+        if (exception instanceof Error) {
+            apiError.details = exception.message;
+        } else {
+            apiError.details = exception.toString();
         }
 
-        // For other errors we just call toString
-        return new ApiError({
-            message: 'Problem encountered',
-            area: 'Exception',
-            details: exception.toString(),
-        });
+        return apiError;
     }
 
     /*
@@ -80,13 +73,8 @@ export class ErrorHandler {
      */
     public static fromMetadataError(responseError: any, url: string): ApiError {
 
-        const apiError = new ApiError({
-            statusCode: 500,
-            area: 'Metadata Lookup',
-            url,
-            message: 'Metadata lookup failed',
-        });
-        ErrorHandler._updateErrorFromHttpResponse(apiError, responseError);
+        const apiError = new ApiError('Metadata Lookup', 'Metadata lookup failed');
+        apiError.url = url;
         return apiError;
     }
 
@@ -95,12 +83,8 @@ export class ErrorHandler {
      */
     public static fromIntrospectionError(responseError: any, url: string): ApiError {
 
-        const apiError = new ApiError({
-            statusCode: 500,
-            area: 'Token Validation',
-            url,
-            message: 'Token validation failed',
-        });
+        const apiError = new ApiError('Token Validation', 'Token validation failed');
+        apiError.url = url;
         ErrorHandler._updateErrorFromHttpResponse(apiError, responseError);
         return apiError;
     }
@@ -110,23 +94,24 @@ export class ErrorHandler {
      */
     public static fromUserInfoError(responseError: any, url: string): ApiError {
 
-        // Already handled expired errors
-        if (responseError instanceof ApiError) {
-            return responseError;
-        }
-
-        const apiError = new ApiError({
-            statusCode: 500,
-            area: 'User Info',
-            url,
-            message: 'User info lookup failed',
-        });
+        const apiError = new ApiError('User Info', 'User info lookup failed');
+        apiError.url = url;
         ErrorHandler._updateErrorFromHttpResponse(apiError, responseError);
         return apiError;
     }
 
     /*
-     * Update error fields with response details
+     * The error thrown if we cannot find an expected claim during OAuth processing
+     */
+    public static fromMissingClaim(claimName: string): ApiError {
+
+        const apiError = new ApiError('Token Processing Error', 'Expected data not found');
+        apiError.details = `An empty value was found for the expected claim ${claimName}`;
+        return apiError;
+    }
+
+    /*
+     * Update error fields with OAuth response details
      */
     private static _updateErrorFromHttpResponse(apiError: ApiError, responseError: any): void {
 

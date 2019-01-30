@@ -14,11 +14,11 @@ export class ApiClaims {
     // OAuth scopes can represent high level areas of the business
     public scopes: string[];
 
-    // Details from the Central User Data for given name, family name and email
-    public userInfo: UserInfoClaims | null;
+    // Data from the OAuth user info endpoint
+    public centralUserInfo: UserInfoClaims | null;
 
     // Product Specific data used for authorization
-    public userCompanyIds: number[];
+    public accountsCovered: number[];
 
     /*
      * Initialize from token details we are interested in
@@ -27,21 +27,21 @@ export class ApiClaims {
         this.userId = userId;
         this.callingApplicationId = callingApplicationId;
         this.scopes = scope.split(' ');
-        this.userInfo = null;
-        this.userCompanyIds = [];
+        this.centralUserInfo = null;
+        this.accountsCovered = [];
     }
 
     /*
      * Set fields after receiving OAuth user info data
      */
-    public setCentralUserData(response: any) {
-        this.userInfo = new UserInfoClaims(response.given_name, response.family_name, response.email);
+    public setCentralUserInfo(givenName: string, familyName: string, email: string) {
+        this.centralUserInfo = new UserInfoClaims(givenName, familyName, email);
     }
 
     /*
-     * Set a custom business rule
+     * Set accounts covered by the user
      */
-    public setProductSpecificUserRights(userCompanyIds: number[]) {
-        this.userCompanyIds = userCompanyIds;
+    public setAccountsCovered(accountsCovered: number[]) {
+        this.accountsCovered = accountsCovered;
     }
 }
