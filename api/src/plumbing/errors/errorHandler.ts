@@ -55,16 +55,10 @@ export class ErrorHandler {
             return exception;
         }
 
-        // General exceptions
+        // Handle general exceptions
         const apiError = new ApiError('Exception', 'Problem encountered');
+        apiError.details = this._getExceptionDetails(exception);
         apiError.stack = exception.stack;
-
-        if (exception instanceof Error) {
-            apiError.details = exception.message;
-        } else {
-            apiError.details = exception.toString();
-        }
-
         return apiError;
     }
 
@@ -75,6 +69,7 @@ export class ErrorHandler {
 
         const apiError = new ApiError('Metadata Lookup', 'Metadata lookup failed');
         apiError.url = url;
+        ErrorHandler._updateErrorFromHttpResponse(apiError, responseError);
         return apiError;
     }
 
@@ -123,7 +118,19 @@ export class ErrorHandler {
         } else {
 
             // Otherwise capture exception details
-            apiError.details = responseError.toString();
+            apiError.details = this._getExceptionDetails(responseError);
+        }
+    }
+
+    /*
+     * Given an exception try to return a good string representation
+     */
+    private static _getExceptionDetails(exception: any): string {
+
+        if (exception instanceof Error) {
+            return exception.message;
+        } else {
+            return exception.toString();
         }
     }
 }

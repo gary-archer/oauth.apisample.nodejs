@@ -35,9 +35,9 @@ export class HttpConfiguration {
     }
 
     /*
-     * Set up Web API routes
+     * Set up Web API routes and initialize the API
      */
-    public configureApiRoutes(): void {
+    public async initializeApi(): Promise<void> {
 
         // For the code sample's ease of debugging we'll turn off caching
         this._expressApp.set('etag', false);
@@ -56,12 +56,15 @@ export class HttpConfiguration {
 
         // Our exception middleware handles all exceptions
         this._expressApp.use('/api/*', this._webApi.unhandledExceptionHandler);
+
+        // Prepate the API to handle secured requests
+        await this._webApi.initialize();
     }
 
     /*
-     * Set up Web API listening
+     * Set up listening for web content
      */
-    public configureWebRoutes(): void {
+    public initializeWeb(): void {
 
         this._expressApp.get('/spa/*', this._getWebResource);
         this._expressApp.get('/spa', this._getWebRootResource);
@@ -71,7 +74,7 @@ export class HttpConfiguration {
     /*
      * Start listening
      */
-    public startListening(): void {
+    public startServer(): void {
 
         // Use the web URL to determine the port
         const webUrl = url.parse(this._apiConfig.app.trustedOrigins[0]);

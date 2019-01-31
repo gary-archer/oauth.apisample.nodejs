@@ -24,20 +24,21 @@ export class WebApi {
     private _issuerMetadata: IssuerMetadata;
 
     /*
-     * API construction and startup
+     * API construction
      */
     public constructor(apiConfig: Configuration) {
 
         this._apiConfig = apiConfig;
-
-        // Create the singleton claims cache
         this._claimsCache = new ClaimsCache();
-
-        // Load metadata
         this._issuerMetadata = new IssuerMetadata(this._apiConfig.oauth);
-        this._issuerMetadata.load();
-
         this._setupCallbacks();
+    }
+
+    /*
+     * Load metadata once at application startup
+     */
+    public async initialize(): Promise<void> {
+        await this._issuerMetadata.load();
     }
 
     /*
@@ -59,7 +60,7 @@ export class WebApi {
             const accessToken = this._readAccessToken(request);
 
             // Do the token and claims work
-            const claims = await middleware.authorizeRequestAndSetClaims(request, response, next);
+            const claims = await middleware.authorizeRequestAndGetClaims(accessToken);
             if (!claims) {
 
                 // Return 401 responses if the token is missing, expired or invalid
@@ -67,7 +68,7 @@ export class WebApi {
             } else {
 
                 // On success, set claims against the request context and move on to the controller logic
-                response.locals.claims = cachedClaims;
+                response.locals.claims = claims;
                 next();
             }
 

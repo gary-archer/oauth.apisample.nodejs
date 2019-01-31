@@ -1,25 +1,36 @@
 import * as express from 'express';
 import * as fs from 'fs-extra';
 import {Configuration} from './configuration/configuration';
+import {ErrorHandler} from './plumbing/errors/errorHandler';
 import {HttpConfiguration} from './plumbing/startup/httpConfiguration';
 import {ApiLogger} from './plumbing/utilities/apiLogger';
+import {DebugProxyAgent} from './plumbing/utilities/debugProxyAgent';
 
-/*
- * First load configuration
- */
-const apiConfigBuffer = fs.readFileSync('api.config.json');
-const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
+(async () => {
 
- /*
- * Create the express app
- */
-const expressApp = express();
-ApiLogger.initialize();
+    // Initialize diagnostics
+    ApiLogger.initialize();
+    DebugProxyAgent.initialize();
 
-/*
- * Set up web server behaviour and start listening for requests
- */
-const http = new HttpConfiguration(expressApp, apiConfig);
-http.configureApiRoutes();
-http.configureWebRoutes();
-http.startListening();
+    try {
+
+        // First load configuration
+        const apiConfigBuffer = fs.readFileSync('api.config.json');
+        const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
+
+    // Next configure web server behaviour
+        const expressApp = express();
+        const http = new HttpConfiguration(expressApp, apiConfig);
+        http.initializeWeb();
+        await http.initializeApi();
+
+        // Start receiving requests
+        http.startServer();
+
+    } catch (e) {
+
+        // Repoirt startup errors
+        const error = ErrorHandler.fromException(e);
+        ApiLogger.error(JSON.stringify(error.toLogFormat()));
+    }
+})();

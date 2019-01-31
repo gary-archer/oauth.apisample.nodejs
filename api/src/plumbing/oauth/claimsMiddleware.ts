@@ -35,7 +35,7 @@ export class ClaimsMiddleware {
     /*
      * Authorize a request and return true if authorization checks pass
      */
-    public async authorizeRequestAndGetClaims(accessToken: string | null): Promise<ApiClaims> {
+    public async authorizeRequestAndGetClaims(accessToken: string | null): Promise<ApiClaims | null> {
 
         // First handle missing tokens
         if (accessToken == null) {
@@ -55,8 +55,7 @@ export class ClaimsMiddleware {
         // Handle invalid or expired tokens
         if (!result.isValid) {
             ApiLogger.info('Claims Middleware', 'Invalid or expired access token received');
-            ResponseWriter.writeInvalidTokenResponse(response);
-            return false;
+            return null;
         }
 
         // Next add central user info to the user's claims

@@ -7,7 +7,7 @@
     "lint": "tslint -c tslint.json src/**/*.ts",
     "build": "ts-node --no-cache src/app.ts",
     "start": "nodemon -e ts --exec \"npm run build\"",
-    "httpDebug": "cross-env HTTPS_PROXY=http://127.0.0.1:8888 --exec \"npm run start\""
+    "httpDebug": "cross-env HTTPS_PROXY=http://127.0.0.1:8888 nodemon -e ts --exec \"npm run build\""
   },
   "keywords": [],
   "author": "Gary Archer",

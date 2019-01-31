@@ -1,5 +1,6 @@
 import * as OpenIdClient from 'openid-client';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {ErrorHandler} from '../errors/errorHandler';
 import {DebugProxyAgent} from '../utilities/debugProxyAgent';
 
 /*
@@ -29,7 +30,12 @@ export class IssuerMetadata {
      * Load the metadata at startup
      */
     public async load(): Promise<void> {
-        this._metadata = await OpenIdClient.Issuer.discover(this._oauthConfig.authority);
+
+        try {
+            this._metadata = await OpenIdClient.Issuer.discover(this._oauthConfig.authority);
+        } catch (e) {
+            throw ErrorHandler.fromMetadataError(e, this._oauthConfig.authority);
+        }
     }
 
     /*
