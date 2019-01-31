@@ -78,6 +78,11 @@ export class ErrorHandler {
      */
     public static fromIntrospectionError(responseError: any, url: string): ApiError {
 
+        // Avoid reprocessing
+        if (responseError instanceof ApiError) {
+            return responseError;
+        }
+
         const apiError = new ApiError('Token Validation', 'Token validation failed');
         apiError.url = url;
         ErrorHandler._updateErrorFromHttpResponse(apiError, responseError);
@@ -88,6 +93,11 @@ export class ErrorHandler {
      * Handle user info lookup failures
      */
     public static fromUserInfoError(responseError: any, url: string): ApiError {
+
+        // Avoid reprocessing
+        if (responseError instanceof ApiError) {
+            return responseError;
+        }
 
         const apiError = new ApiError('User Info', 'User info lookup failed');
         apiError.url = url;
@@ -100,7 +110,7 @@ export class ErrorHandler {
      */
     public static fromMissingClaim(claimName: string): ApiError {
 
-        const apiError = new ApiError('Token Processing Error', 'Expected data not found');
+        const apiError = new ApiError('Claims Processing Error', 'Authorization Data Not Found');
         apiError.details = `An empty value was found for the expected claim ${claimName}`;
         return apiError;
     }

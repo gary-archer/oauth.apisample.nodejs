@@ -11,7 +11,7 @@ import {ApiLogger} from '../utilities/apiLogger';
 /*
  * The relative path to web files
  */
-const WEB_FILES_ROOT = '../..';
+const WEB_FILES_ROOT = '../../../..';
 
 /*
  * Configure Express

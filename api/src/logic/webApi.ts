@@ -52,7 +52,7 @@ export class WebApi {
         try {
 
             // Create the claims middleware instance and non singleton dependencies on every API request
-            const authenticator = new Authenticator(this._apiConfig.oauth, this._issuerMetadata);
+            const authenticator = new Authenticator(this._apiConfig.oauth, this._issuerMetadata.metadata);
             const authorizationRulesRepository = new AuthorizationRulesRepository();
             const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, authorizationRulesRepository);
 

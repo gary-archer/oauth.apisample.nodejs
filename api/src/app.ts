@@ -18,7 +18,7 @@ import {DebugProxyAgent} from './plumbing/utilities/debugProxyAgent';
         const apiConfigBuffer = fs.readFileSync('api.config.json');
         const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
 
-    // Next configure web server behaviour
+        // Next configure web server behaviour
         const expressApp = express();
         const http = new HttpConfiguration(expressApp, apiConfig);
         http.initializeWeb();
@@ -29,7 +29,7 @@ import {DebugProxyAgent} from './plumbing/utilities/debugProxyAgent';
 
     } catch (e) {
 
-        // Repoirt startup errors
+        // Report startup errors
         const error = ErrorHandler.fromException(e);
         ApiLogger.error(JSON.stringify(error.toLogFormat()));
     }

@@ -67,7 +67,7 @@ export class Authenticator {
             // Get token claims and use the immutable user id as the subject claim
             const claims = new ApiClaims(
                 this._getClaim(tokenData.uid, 'uid'),
-                this._getClaim(tokenData.cid, 'client_id'),
+                this._getClaim(tokenData.client_id, 'client_id'),
                 this._getClaim(tokenData.scope, 'scope'),
             );
 
@@ -94,9 +94,14 @@ export class Authenticator {
         const client = new this._issuer.Client();
 
         try {
-            // Extend token data with central user info
+            // Get the user info
             const response = await client.userinfo(accessToken);
-            claims.setCentralUserInfo(response.given_name, response.family_name, response.email);
+
+            // Update token claims with central user data
+            claims.setCentralUserInfo(
+                this._getClaim(response.given_name, 'given_name'),
+                this._getClaim(response.family_name, 'family_name'),
+                this._getClaim(response.email, 'email'));
 
         } catch (e) {
 
@@ -111,7 +116,7 @@ export class Authenticator {
     private _getClaim(claim: string, name: string): any {
 
         if (!claim) {
-            throw ErrorHandler.fromMissingClaim(claim);
+            throw ErrorHandler.fromMissingClaim(name);
         }
 
         return claim;
