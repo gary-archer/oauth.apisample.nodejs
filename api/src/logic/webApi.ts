@@ -24,7 +24,7 @@ export class WebApi {
     private _issuerMetadata: IssuerMetadata;
 
     /*
-     * Class setup
+     * API construction and startup
      */
     public constructor(apiConfig: Configuration) {
 
@@ -55,15 +55,25 @@ export class WebApi {
             const authorizationRulesRepository = new AuthorizationRulesRepository();
             const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, authorizationRulesRepository);
 
-            // Do the work
-            const authorized = await middleware.authorizeRequestAndSetClaims(request, response, next);
+            // Try to get the access token
+            const accessToken = this._readAccessToken(request);
 
-            // Only move to the API operation if authorized
-            if (authorized) {
+            // Do the token and claims work
+            const claims = await middleware.authorizeRequestAndSetClaims(request, response, next);
+            if (!claims) {
+
+                // Return 401 responses if the token is missing, expired or invalid
+                ResponseWriter.writeInvalidTokenResponse(response);
+            } else {
+
+                // On success, set claims against the request context and move on to the controller logic
+                response.locals.claims = cachedClaims;
                 next();
             }
 
         } catch (e) {
+
+            // Return a 500 error if something went wrong, and prevent redirect loops for the SPA
             this.unhandledExceptionHandler(e, request, response);
         }
     }
@@ -136,6 +146,22 @@ export class WebApi {
 
         const clientError = ErrorHandler.handleError(unhandledException);
         ResponseWriter.writeObjectResponse(response, clientError.statusCode, clientError.toResponseFormat());
+    }
+
+    /*
+     * Try to read the token from the authorization header
+     */
+    private _readAccessToken(request: Request): string | null {
+
+        const authorizationHeader = request.header('authorization');
+        if (authorizationHeader) {
+            const parts = authorizationHeader.split(' ');
+            if (parts.length === 2 && parts[0] === 'Bearer') {
+                return parts[1];
+            }
+        }
+
+        return null;
     }
 
     /*
