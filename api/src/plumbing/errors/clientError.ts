@@ -32,11 +32,11 @@ export class ClientError extends Error {
         return this._area;
     }
 
-    get id() {
+    public get id(): number | null {
         return this._id;
     }
 
-    set id(id) {
+    public set id(id: number | null) {
         this._id = id;
     }
 

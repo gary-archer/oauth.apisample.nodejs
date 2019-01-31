@@ -1,5 +1,6 @@
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ApiClaims} from '../../entities/apiClaims';
+import {UserInfoClaims} from '../../entities/userInfoClaims';
 import {ErrorHandler} from '../errors/errorHandler';
 import {TokenValidationResult} from './tokenValidationResult';
 
@@ -25,26 +26,9 @@ export class Authenticator {
     }
 
     /*
-     * When we receive a new token, validate it and return token claims
-     */
-    public async validateTokenAndGetTokenClaims(accessToken: string): Promise<TokenValidationResult> {
-
-        return await this._introspectTokenAndGetClaims(accessToken);
-    }
-
-    /*
-     * This sample uses Okta user info as the source of central user data
-     * Since getting user info is an OAuth operation we include that in this class also
-     */
-    public async getCentralUserInfoClaims(claims: ApiClaims, accessToken: string) {
-
-        return await this._lookupCentralUserDataClaims(claims, accessToken);
-    }
-
-    /*
      * Make a call to the introspection endpoint to read our token
      */
-    private async _introspectTokenAndGetClaims(accessToken: string): Promise<TokenValidationResult> {
+    public async validateTokenAndGetTokenClaims(accessToken: string): Promise<TokenValidationResult> {
 
         // Create the Authorization Server client
         const client = new this._issuer.Client({
@@ -88,7 +72,7 @@ export class Authenticator {
      * We will read central user data by calling the Open Id Connect User Info endpoint
      * For many companies it may instead make sense to call a Central User Info API
      */
-    private async _lookupCentralUserDataClaims(claims: ApiClaims, accessToken: string): Promise<void> {
+    public async getCentralUserInfoClaims(accessToken: string): Promise<UserInfoClaims | null> {
 
         // Create the Authorization Server client
         const client = new this._issuer.Client();
@@ -97,15 +81,22 @@ export class Authenticator {
             // Get the user info
             const response = await client.userinfo(accessToken);
 
-            // Update token claims with central user data
-            claims.setCentralUserInfo(
-                this._getClaim(response.given_name, 'given_name'),
-                this._getClaim(response.family_name, 'family_name'),
-                this._getClaim(response.email, 'email'));
+            // Check claims exist, then return them in an object
+            return {
+                givenName: this._getClaim(response.given_name, 'given_name'),
+                familyName: this._getClaim(response.family_name, 'family_name'),
+                email: this._getClaim(response.email, 'email'),
+            } as UserInfoClaims;
 
         } catch (e) {
 
-            // Report user info lookup errors clearly
+            // Handle a race condition where the access token expires just after introspection
+            // In this case we return null to indicate expiry
+            if (e.error && e.error === 'invalid_token') {
+                return null;
+            }
+
+            // Otherwise log and throw user info
             throw ErrorHandler.fromUserInfoError(e, this._issuer.userinfo_endpoint);
         }
     }
@@ -126,7 +117,7 @@ export class Authenticator {
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
     private _setupCallbacks(): void {
-        this._introspectTokenAndGetClaims = this._introspectTokenAndGetClaims.bind(this);
-        this._lookupCentralUserDataClaims = this._lookupCentralUserDataClaims.bind(this);
+        this.validateTokenAndGetTokenClaims = this.validateTokenAndGetTokenClaims.bind(this);
+        this.getCentralUserInfoClaims = this.getCentralUserInfoClaims.bind(this);
     }
 }

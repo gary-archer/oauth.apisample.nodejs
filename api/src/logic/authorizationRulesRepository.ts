@@ -14,19 +14,14 @@ export class AuthorizationRulesRepository {
 
     /*
      * A stub example of looking up product specific data
-     * A real implementation would read from a database or perhaps another microservice
      */
-    public async setProductClaims(claims: ApiClaims, accessToken: string): Promise<void> {
+    public async getAccountsCoveredByUser(claims: ApiClaims, accessToken: string): Promise<number[]> {
 
-        const accountsCovered = this._getAccountsCoveredByUser(claims.userId);
-        claims.setAccountsCovered(accountsCovered);
-    }
+        // A real implementation would return results based on the user id from the token
+        // This might be a database lookup or a call to another service
+        // const userId = claims.userId;
 
-    /*
-     * For the purposes of our code sample we will grant access to the first 3 companies
-     * However, the API will deny access to company 4, which the user does not have rights to
-     */
-    private _getAccountsCoveredByUser(userId: string) {
+        // In our case we just return hard coded data
         return [1, 2, 4];
     }
 
@@ -34,6 +29,6 @@ export class AuthorizationRulesRepository {
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
     private _setupCallbacks() {
-        this.setProductClaims = this.setProductClaims.bind(this);
+        this.getAccountsCoveredByUser = this.getAccountsCoveredByUser.bind(this);
     }
 }

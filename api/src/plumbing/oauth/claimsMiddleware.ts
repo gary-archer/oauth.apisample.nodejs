@@ -59,17 +59,25 @@ export class ClaimsMiddleware {
         }
 
         // Next add central user info to the user's claims
-        await this._authenticator.getCentralUserInfoClaims(result.claims!, accessToken);
+        const userInfo = await this._authenticator.getCentralUserInfoClaims(accessToken);
+        if (userInfo === null) {
+            ApiLogger.info('Claims Middleware', 'Expired access token used for user info lookup');
+            return null;
+        }
+        result.claims!.centralUserInfo = userInfo!;
 
-        // Next add product user data to the user's claims
-        await this._authorizationRulesRepository.setProductClaims(result.claims!, accessToken);
+        // The example product specific 'coverage based' data we will use for authorization
+        const accountsCovered = await this._authorizationRulesRepository.getAccountsCoveredByUser(
+            result.claims!,
+            accessToken);
+        result.claims!.accountsCovered = accountsCovered;
 
         // Cache the claims against the token hash until the token's expiry time
         // The next time the API is called the claims can be quickly looked up
         this._cache.addClaimsForToken(accessToken, result.expiry!, result.claims!);
 
         // Then move onto the API controller to execute business logic
-        ApiLogger.info('Claims Middleware', 'Claims lookup completed successfully');
+        ApiLogger.info('Claims Middleware', 'Claims lookup for new token completed successfully');
         return result.claims;
     }
 }

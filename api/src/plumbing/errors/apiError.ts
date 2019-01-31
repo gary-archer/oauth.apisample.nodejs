@@ -47,11 +47,11 @@ export class ApiError extends Error {
         return this._area;
     }
 
-    public set area(area) {
+    public set area(area: string) {
         this._area = area;
     }
 
-    get instanceId() {
+    public get instanceId(): number {
         return this._instanceId;
     }
 
@@ -59,11 +59,11 @@ export class ApiError extends Error {
         return this._url;
     }
 
-    public set url(url) {
+    public set url(url: string) {
         this._url = url;
     }
 
-    get time() {
+    public get time(): string {
         return this._time;
     }
 
@@ -71,7 +71,7 @@ export class ApiError extends Error {
         return this._details;
     }
 
-    public set details(details) {
+    public set details(details: string) {
         this._details = details;
     }
 

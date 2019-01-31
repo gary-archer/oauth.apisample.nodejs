@@ -20,8 +20,9 @@ export class IssuerMetadata {
     public constructor(oauthConfig: OAuthConfiguration) {
         this._oauthConfig = oauthConfig;
 
-        // Set up HTTP debugging of OAuth requests
+        // Set up OAuth HTTP requests and extend the default 1.5 second timeout
         OpenIdClient.Issuer.defaultHttpOptions = {
+            timeout: 30000,
             agent: DebugProxyAgent.get(),
         };
     }
@@ -32,7 +33,8 @@ export class IssuerMetadata {
     public async load(): Promise<void> {
 
         try {
-            this._metadata = await OpenIdClient.Issuer.discover(this._oauthConfig.authority);
+            const endpoint = `${this._oauthConfig.authority}/.well-known/openid-configuration`;
+            this._metadata = await OpenIdClient.Issuer.discover(endpoint);
         } catch (e) {
             throw ErrorHandler.fromMetadataError(e, this._oauthConfig.authority);
         }
