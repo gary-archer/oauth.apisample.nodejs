@@ -1,4 +1,5 @@
 import {Response} from 'express';
+import { ClientError } from '../errors/clientError';
 
 /*
  * Helper methods to write the response
@@ -20,10 +21,7 @@ export class ResponseWriter {
         response.setHeader('Content-Type', 'application/json');
         response.setHeader('WWW-Authenticate', 'Bearer');
 
-        const data = {
-            area: 'Authentication',
-            message: 'Missing, invalid or expired access token',
-        };
-        response.status(401).send(JSON.stringify(data));
+        const error = new ClientError(401, 'unauthorized', 'Missing, invalid or expired access token');
+        response.status(error.statusCode).send(JSON.stringify(error.toResponseFormat()));
     }
 }
