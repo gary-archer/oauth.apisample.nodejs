@@ -4,14 +4,14 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
 import * as url from 'url';
-import {Configuration} from '../../configuration/configuration';
-import {WebApi} from '../../logic/webApi';
-import {ApiLogger} from '../utilities/apiLogger';
+import {Configuration} from '../configuration/configuration';
+import {WebApi} from '../logic/webApi';
+import {ApiLogger} from '../plumbing/utilities/apiLogger';
 
 /*
  * The relative path to web files
  */
-const WEB_FILES_ROOT = '../../../..';
+const WEB_FILES_ROOT = '../../..';
 
 /*
  * Configure Express
@@ -52,7 +52,7 @@ export class HttpConfiguration {
                     });
         };
 
-        // For the code sample's ease of debugging we'll turn off caching
+        // We don't want API requests to be cached unless explicitly designed for caching
         this._expressApp.set('etag', false);
 
         // Allow cross origin requests from the SPA

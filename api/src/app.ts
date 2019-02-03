@@ -2,9 +2,9 @@ import * as express from 'express';
 import * as fs from 'fs-extra';
 import {Configuration} from './configuration/configuration';
 import {ErrorHandler} from './plumbing/errors/errorHandler';
-import {HttpConfiguration} from './plumbing/startup/httpConfiguration';
 import {ApiLogger} from './plumbing/utilities/apiLogger';
 import {DebugProxyAgent} from './plumbing/utilities/debugProxyAgent';
+import {HttpConfiguration} from './startup/httpConfiguration';
 
 (async () => {
 
