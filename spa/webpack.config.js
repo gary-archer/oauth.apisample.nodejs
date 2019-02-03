@@ -17,7 +17,8 @@ module.exports = {
   resolve: {
     
     // Set extensions for import statements
-    extensions: ['.ts']
+    // Note that JS prevents ts-loader failures for some core node imports
+    extensions: ['.ts', '.js']
   },
   module: {
     rules: [
