@@ -2,7 +2,7 @@
   "name": "basicapi",
   "version": "3.0.0",
   "description": "A Basic OAuth secured API",
-  "main": "server.ts",
+  "main": "app.ts",
   "scripts": {
     "lint": "tslint -c tslint.json src/**/*.ts",
     "build": "ts-node --no-cache src/app.ts",
