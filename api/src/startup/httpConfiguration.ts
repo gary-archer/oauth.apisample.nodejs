@@ -5,8 +5,8 @@ import * as https from 'https';
 import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
-import {WebApi} from '../logic/webApi';
 import {ApiLogger} from '../plumbing/utilities/apiLogger';
+import {WebApi} from './webApi';
 
 /*
  * The relative path to web files

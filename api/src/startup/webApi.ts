@@ -1,6 +1,9 @@
 import {NextFunction, Request, Response} from 'express';
 import {Configuration} from '../configuration/configuration';
 import {BasicApiClaims} from '../entities/BasicApiClaims';
+import {AuthorizationRulesRepository} from '../logic/authorizationRulesRepository';
+import {CompanyController} from '../logic/companyController';
+import {CompanyRepository} from '../logic/companyRepository';
 import {ClientError} from '../plumbing/errors/clientError';
 import {ErrorHandler} from '../plumbing/errors/errorHandler';
 import {Authenticator} from '../plumbing/oauth/authenticator';
@@ -9,9 +12,6 @@ import {ClaimsMiddleware} from '../plumbing/oauth/claimsMiddleware';
 import {IssuerMetadata} from '../plumbing/oauth/issuerMetadata';
 import {JsonFileReader} from '../plumbing/utilities/jsonFileReader';
 import {ResponseWriter} from '../plumbing/utilities/responseWriter';
-import {AuthorizationRulesRepository} from './authorizationRulesRepository';
-import {CompanyController} from './companyController';
-import {CompanyRepository} from './companyRepository';
 
 /*
  * This presents an overview of our overall API behaviour and deals with Express's request and response objects
