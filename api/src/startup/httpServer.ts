@@ -48,13 +48,10 @@ export class HttpServer {
         // Create the server. which will wire up Express controller routes from container definitions
         const server = new InversifyExpressServer(this._container, null, null, null, CustomAuthProvider);
 
-        const accessor = new BasicApiClaimsAccessor(this._container);
-
         // Configure middleware
         server.setConfig((app: Application) => {
             this._configureApiMiddleware(app);
             this._configureWebStaticContent(app);
-            app.use(accessor.handler);
         });
 
         // Add an API error handler last, which will also catch unhandled promise rejections

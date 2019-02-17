@@ -1,4 +1,3 @@
-import {Application, NextFunction, Request, Response} from 'express';
 import * as fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
@@ -11,6 +10,7 @@ import {CompanyRepository} from './logic/companyRepository';
 import {UserInfoController} from './logic/userInfoController';
 import {HttpServer} from './startup/httpServer';
 import {BasicApiClaimsAccessor} from './utilities/basicApiClaimsAccessor';
+import {BasicApiClaimsFactory} from './utilities/basicApiClaimsFactory';
 import {JsonFileReader} from './utilities/jsonFileReader';
 
 // Initialize diagnostics
@@ -28,26 +28,9 @@ container.bind<CompanyRepository>(CompanyRepository).toSelf().inRequestScope();
 container.bind<CompanyController>(CompanyController).toSelf().inRequestScope();
 container.bind<UserInfoController>(UserInfoController).toSelf().inRequestScope();
 
-container.bind<BasicApiClaims>(BasicApiClaims).toConstantValue(new BasicApiClaims());
-
-// I'd like to do this but can't get it to work
-// https://github.com/inversify/InversifyJS/issues/381
-/*container.bind<BasicApiClaims>(BasicApiClaims).toDynamicValue((context) => {
-
-    // TODO - figure out how to get the request scope items
-    // console.log('*** GETTING CLAIMS');
-    console.log('trying to get');
-    const claims = context.container.get<BasicApiClaims>(BasicApiClaims);
-    console.log('got claims');
-    return claims;
-
-    // const context = ctx.currentRequest.requestScope.get('inversify-express-utils:httpcontext');
-
-    // https://stackoverflow.com/questions/54218295/inject-httpcontext-into-inversifyjs-middleware
-    // console.log('Trying to get HTTP context');
-    // const httpContext = Reflect.getMetadata('inversify-express-utils:httpcontext', request);
-    // console.log(httpContext);
-});*/
+// TODO: I'd like to get rid of the need to declare anything here
+container.bind<BasicApiClaimsFactory>(BasicApiClaimsFactory).toSelf().inRequestScope();
+container.bind<BasicApiClaimsAccessor>(BasicApiClaimsAccessor).toSelf().inRequestScope();
 
 // Run our HTTP configuration and then start the server
 const httpServer = new HttpServer(apiConfig, container);

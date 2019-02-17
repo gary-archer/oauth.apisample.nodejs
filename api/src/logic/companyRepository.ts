@@ -1,8 +1,9 @@
-import {injectable} from 'inversify';
+import {inject, injectable} from 'inversify';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {ClientError} from '../framework/errors/clientError';
+import {BasicApiClaimsFactory} from '../utilities/basicApiClaimsFactory';
 import {JsonFileReader} from '../utilities/jsonFileReader';
 
 /*
@@ -20,10 +21,12 @@ export class CompanyRepository {
     /*
      * Receive claims when constructed
      */
-    public constructor(claims: BasicApiClaims, jsonReader: JsonFileReader) {
+    public constructor(@inject(BasicApiClaimsFactory) factory: BasicApiClaimsFactory, jsonReader: JsonFileReader) {
 
         // TODO: Problems getting BasicApiClaims injected
-        this._claims = claims;
+        this._claims = factory.getClaims();
+        console.log(this._claims.userId);
+        console.log(this._claims.scopes);
         this._jsonReader = jsonReader;
     }
 

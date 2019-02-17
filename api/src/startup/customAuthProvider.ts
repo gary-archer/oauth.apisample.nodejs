@@ -19,9 +19,11 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
 
             // TODO: Wire up claims processing properly
             const claims = new BasicApiClaims();
-            claims.setTokenInfo('userid', 'clientid', ['openid', 'email', 'profile']);
+            claims.setTokenInfo('myuserid', 'myclientid', ['openid', 'email', 'profile']);
             claims.setCentralUserInfo('Guest', 'UserX', 'guestuser@authguidance.com');
             claims.accountsCovered = [1, 2, 4];
+
+            console.log('*** IN CUSTOM AUTH PROVIDER - RETURNING USER');
             return new CustomPrincipal(claims);
         }
 
