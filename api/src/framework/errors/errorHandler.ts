@@ -12,6 +12,8 @@ export class ErrorHandler {
      */
     public static handleError(exception: any): ClientError {
 
+        console.log('*** IN HANDLE ERROR');
+
         // Ensure that the exception has a known type
         const handledError = ErrorHandler.fromException(exception);
         if (exception instanceof ClientError) {

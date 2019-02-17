@@ -1,8 +1,10 @@
 import * as fs from 'fs-extra';
+import {injectable} from 'inversify';
 
 /*
  * A simple utility to deal with the infrastructure of reading JSON files
  */
+@injectable()
 export class JsonFileReader {
 
     /*

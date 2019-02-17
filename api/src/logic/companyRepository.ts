@@ -1,12 +1,15 @@
+import {injectable} from 'inversify';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {ClientError} from '../framework/errors/clientError';
+import {BasicApiClaimsAccessor} from '../utilities/basicApiClaimsAccessor';
 import {JsonFileReader} from '../utilities/jsonFileReader';
 
 /*
  * A simple API controller for getting data about a company and its investments
  */
+@injectable()
 export class CompanyRepository {
 
     /*
@@ -18,8 +21,10 @@ export class CompanyRepository {
     /*
      * Receive claims when constructed
      */
-    public constructor(claims: BasicApiClaims, jsonReader: JsonFileReader) {
-        this._claims = claims;
+    public constructor(claimsAccessor: BasicApiClaimsAccessor, jsonReader: JsonFileReader) {
+
+        // TODO: Problems getting BasicApiClaims injected
+        this._claims = claimsAccessor.getClaims();
         this._jsonReader = jsonReader;
     }
 
@@ -43,7 +48,7 @@ export class CompanyRepository {
 
         // If the user is unauthorized we return 404
         if (!this._isUserAuthorizedForCompany(id)) {
-            throw this._unauthorizedError(id);
+           throw this._unauthorizedError(id);
         }
 
         // Read companies and find that supplied
@@ -71,6 +76,7 @@ export class CompanyRepository {
      * Apply claims that were read when the access token was first validated
      */
     private _isUserAuthorizedForCompany(companyId: number): boolean {
+
         const found = this._claims.accountsCovered.find((c) => c === companyId);
         return !!found;
     }

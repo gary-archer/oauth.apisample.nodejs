@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "strict": true,
-    "lib": ["es2017", "dom"]
+    "strict": false,
+    "lib": ["es2017", "dom"],
+    "types": ["reflect-metadata"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src/**/*.ts"
