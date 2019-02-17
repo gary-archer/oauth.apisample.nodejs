@@ -8,6 +8,7 @@ import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
+import {BasicApiClaimsAccessor} from '../utilities/basicApiClaimsAccessor';
 import {AuthorizationHandler} from './authorizationHandler';
 import {CustomAuthProvider} from './customAuthProvider';
 
@@ -41,30 +42,19 @@ export class HttpServer {
      */
     public configure(): void {
 
-        // TODO
+        // TODO - can I use a root path for some behaviours?
         // { rootPath: apiPrefix }
 
         // Create the server. which will wire up Express controller routes from container definitions
         const server = new InversifyExpressServer(this._container, null, null, null, CustomAuthProvider);
 
-        /*const container = this._container;
-        const contextBindingMiddleware = (req, res, next)  => {
-            if (container.isBound('httpcontext')) {
-                console.log('is bound');
-                container.rebind<Request>('httpcontext').toSelf().inRequestScope();
-            } else {
-                console.log('is not bound');
-                container.bind<Request>('httpcontext').toSelf().inRequestScope();
-            }
+        const accessor = new BasicApiClaimsAccessor(this._container);
 
-            next();
-         };*/
-
-        // Configure API and web behaviour
+        // Configure middleware
         server.setConfig((app: Application) => {
             this._configureApiMiddleware(app);
             this._configureWebStaticContent(app);
-            // app.use(contextBindingMiddleware);
+            app.use(accessor.handler);
         });
 
         // Add an API error handler last, which will also catch unhandled promise rejections

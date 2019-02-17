@@ -3,6 +3,7 @@ import * as fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
 import {Configuration} from './configuration/configuration';
+import {BasicApiClaims} from './entities/basicApiClaims';
 import {ApiLogger} from './framework/utilities/apiLogger';
 import {DebugProxyAgent} from './framework/utilities/debugProxyAgent';
 import {CompanyController} from './logic/companyController';
@@ -27,16 +28,18 @@ container.bind<CompanyRepository>(CompanyRepository).toSelf().inRequestScope();
 container.bind<CompanyController>(CompanyController).toSelf().inRequestScope();
 container.bind<UserInfoController>(UserInfoController).toSelf().inRequestScope();
 
+container.bind<BasicApiClaims>(BasicApiClaims).toConstantValue(new BasicApiClaims());
+
 // I'd like to do this but can't get it to work
 // https://github.com/inversify/InversifyJS/issues/381
-container.bind<BasicApiClaimsAccessor>(BasicApiClaimsAccessor).toDynamicValue((ctx) => {
+/*container.bind<BasicApiClaims>(BasicApiClaims).toDynamicValue((context) => {
 
     // TODO - figure out how to get the request scope items
     // console.log('*** GETTING CLAIMS');
-    if (container.isBound('httpcontext')) {
-        const httpContext = ctx.container.get<Request>('httpcontext');
-        console.log(httpContext);
-    }
+    console.log('trying to get');
+    const claims = context.container.get<BasicApiClaims>(BasicApiClaims);
+    console.log('got claims');
+    return claims;
 
     // const context = ctx.currentRequest.requestScope.get('inversify-express-utils:httpcontext');
 
@@ -44,9 +47,7 @@ container.bind<BasicApiClaimsAccessor>(BasicApiClaimsAccessor).toDynamicValue((c
     // console.log('Trying to get HTTP context');
     // const httpContext = Reflect.getMetadata('inversify-express-utils:httpcontext', request);
     // console.log(httpContext);
-
-    return new BasicApiClaimsAccessor();
-});
+});*/
 
 // Run our HTTP configuration and then start the server
 const httpServer = new HttpServer(apiConfig, container);

@@ -3,7 +3,6 @@ import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {ClientError} from '../framework/errors/clientError';
-import {BasicApiClaimsAccessor} from '../utilities/basicApiClaimsAccessor';
 import {JsonFileReader} from '../utilities/jsonFileReader';
 
 /*
@@ -21,10 +20,10 @@ export class CompanyRepository {
     /*
      * Receive claims when constructed
      */
-    public constructor(claimsAccessor: BasicApiClaimsAccessor, jsonReader: JsonFileReader) {
+    public constructor(claims: BasicApiClaims, jsonReader: JsonFileReader) {
 
         // TODO: Problems getting BasicApiClaims injected
-        this._claims = claimsAccessor.getClaims();
+        this._claims = claims;
         this._jsonReader = jsonReader;
     }
 
