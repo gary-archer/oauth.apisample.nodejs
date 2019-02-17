@@ -1,8 +1,8 @@
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
-import {ClientError} from '../plumbing/errors/clientError';
-import {JsonFileReader} from '../plumbing/utilities/jsonFileReader';
+import {ClientError} from '../framework/errors/clientError';
+import {JsonFileReader} from '../utilities/jsonFileReader';
 
 /*
  * A simple API controller for getting data about a company and its investments

@@ -1,5 +1,5 @@
+import {OAuthConfiguration} from '../framework/oauth/oauthConfiguration';
 import {AppConfiguration} from './appConfiguration';
-import {OAuthConfiguration} from './oauthConfiguration';
 
 /*
  * A holder for configuration settings

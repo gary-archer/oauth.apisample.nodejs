@@ -1,6 +1,6 @@
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ErrorHandler} from '../errors/errorHandler';
 import {CoreApiClaims} from './coreApiClaims';
+import {OAuthConfiguration} from './oauthConfiguration';
 
 /*
  * The entry point for OAuth related operations

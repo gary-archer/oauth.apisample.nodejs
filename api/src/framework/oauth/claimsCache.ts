@@ -1,7 +1,7 @@
 import * as hasher from 'js-sha256';
 import * as NodeCache from 'node-cache';
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {CoreApiClaims} from './coreApiClaims';
+import {OAuthConfiguration} from './oauthConfiguration';
 
 /*
  * A simple in memory claims cache for our API

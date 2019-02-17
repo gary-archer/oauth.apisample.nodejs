@@ -1,11 +1,11 @@
 import {BasicApiClaims} from '../entities/BasicApiClaims';
-import {CoreApiClaims} from '../plumbing/oauth/coreApiClaims';
-import {CustomClaimsRepository} from '../plumbing/oauth/customClaimsRepository';
+import {CoreApiClaims} from '../framework/oauth/coreApiClaims';
+import {CustomClaimsProvider} from '../framework/oauth/customClaimsProvider';
 
 /*
  * An example of including domain specific authorization rules during claims lookup
  */
-export class AuthorizationRulesRepository implements CustomClaimsRepository {
+export class BasicApiClaimsProvider implements CustomClaimsProvider {
 
     /*
      * The interface supports returning results based on the user id from the token

@@ -1,5 +1,3 @@
-import {UserInfoClaims} from './userInfoClaims';
-
 /*
  * Common API claims that our code OAuth plumbing understands
  */
@@ -34,6 +32,18 @@ export class CoreApiClaims {
         return this._scopes;
     }
 
+    public get givenName(): string {
+        return this._givenName;
+    }
+
+    public get familyName(): string {
+        return this._familyName;
+    }
+
+    public get email(): string {
+        return this._email;
+    }
+
     /*
      * Set token claims after introspection
      */
@@ -50,18 +60,6 @@ export class CoreApiClaims {
         this._givenName = givenName;
         this._familyName = familyName;
         this._email = email;
-    }
-
-    /*
-     * Return user info fields as an entity
-     */
-    public getCentralUserInfo(): UserInfoClaims {
-
-        return {
-            givenName: this._givenName,
-            familyName: this._familyName,
-            email: this._email,
-        } as UserInfoClaims;
     }
 
     /*

@@ -2,7 +2,7 @@ import {ApiLogger} from '../utilities/apiLogger';
 import {Authenticator} from './authenticator';
 import {ClaimsCache} from './claimsCache';
 import {CoreApiClaims} from './coreApiClaims';
-import {CustomClaimsRepository} from './customClaimsRepository';
+import {CustomClaimsProvider} from './customClaimsProvider';
 
 /*
  * The entry point for the processing to validate tokens and return claims
@@ -16,19 +16,16 @@ export class ClaimsMiddleware {
      */
     private _cache: ClaimsCache;
     private _authenticator: Authenticator;
-    private _customClaimsRepository: CustomClaimsRepository;
+    private _customClaimsProvider: CustomClaimsProvider;
 
     /*
      * Receive dependencies
      */
-    public constructor(
-        cache: ClaimsCache,
-        authenticator: Authenticator,
-        customClaimsRepository: CustomClaimsRepository) {
+    public constructor(cache: ClaimsCache, authenticator: Authenticator, customClaimsProvider: CustomClaimsProvider) {
 
         this._cache = cache;
         this._authenticator = authenticator;
-        this._customClaimsRepository = customClaimsRepository;
+        this._customClaimsProvider = customClaimsProvider;
     }
 
     /*
@@ -64,10 +61,8 @@ export class ClaimsMiddleware {
             return false;
         }
 
-        // Look up any product specific custom claims if required
-        if (this._customClaimsRepository) {
-            await this._customClaimsRepository.addCustomClaims(accessToken, claims);
-        }
+        // Add any custom product specific custom claims
+        await this._customClaimsProvider.addCustomClaims(accessToken, claims);
 
         // Cache the claims against the token hash until the token's expiry time
         // The next time the API is called, all of the above results can be quickly looked up

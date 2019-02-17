@@ -1,9 +1,9 @@
 import * as express from 'express';
 import * as fs from 'fs-extra';
 import {Configuration} from './configuration/configuration';
-import {ErrorHandler} from './plumbing/errors/errorHandler';
-import {ApiLogger} from './plumbing/utilities/apiLogger';
-import {DebugProxyAgent} from './plumbing/utilities/debugProxyAgent';
+import {ErrorHandler} from './framework/errors/errorHandler';
+import {ApiLogger} from './framework/utilities/apiLogger';
+import {DebugProxyAgent} from './framework/utilities/debugProxyAgent';
 import {HttpConfiguration} from './startup/httpConfiguration';
 
 (async () => {

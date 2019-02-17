@@ -1,7 +1,7 @@
 import * as OpenIdClient from 'openid-client';
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ErrorHandler} from '../errors/errorHandler';
 import {DebugProxyAgent} from '../utilities/debugProxyAgent';
+import {OAuthConfiguration} from './oauthConfiguration';
 
 /*
  * A singleton to read metadata at application startup

@@ -1,5 +1,5 @@
 import {Response} from 'express';
-import { ClientError } from '../errors/clientError';
+import {ClientError} from '../errors/clientError';
 
 /*
  * Helper methods to write the response

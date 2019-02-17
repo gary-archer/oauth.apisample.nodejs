@@ -5,7 +5,7 @@ import * as https from 'https';
 import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
-import {ApiLogger} from '../plumbing/utilities/apiLogger';
+import {ApiLogger} from '../framework/utilities/apiLogger';
 import {WebApi} from './webApi';
 
 /*

@@ -1,17 +1,18 @@
 import {NextFunction, Request, Response} from 'express';
 import {Configuration} from '../configuration/configuration';
 import {BasicApiClaims} from '../entities/BasicApiClaims';
-import {AuthorizationRulesRepository} from '../logic/authorizationRulesRepository';
+import {UserInfoClaims} from '../entities/userInfoClaims';
+import {ClientError} from '../framework/errors/clientError';
+import {ErrorHandler} from '../framework/errors/errorHandler';
+import {Authenticator} from '../framework/oauth/authenticator';
+import {ClaimsCache} from '../framework/oauth/claimsCache';
+import {ClaimsMiddleware} from '../framework/oauth/claimsMiddleware';
+import {IssuerMetadata} from '../framework/oauth/issuerMetadata';
+import {ResponseWriter} from '../framework/utilities/responseWriter';
+import {BasicApiClaimsProvider} from '../logic/basicApiClaimsProvider';
 import {CompanyController} from '../logic/companyController';
 import {CompanyRepository} from '../logic/companyRepository';
-import {ClientError} from '../plumbing/errors/clientError';
-import {ErrorHandler} from '../plumbing/errors/errorHandler';
-import {Authenticator} from '../plumbing/oauth/authenticator';
-import {ClaimsCache} from '../plumbing/oauth/claimsCache';
-import {ClaimsMiddleware} from '../plumbing/oauth/claimsMiddleware';
-import {IssuerMetadata} from '../plumbing/oauth/issuerMetadata';
-import {JsonFileReader} from '../plumbing/utilities/jsonFileReader';
-import {ResponseWriter} from '../plumbing/utilities/responseWriter';
+import {JsonFileReader} from '../utilities/jsonFileReader';
 
 /*
  * This presents an overview of our overall API behaviour and deals with Express's request and response objects
@@ -53,8 +54,8 @@ export class WebApi {
 
         // Create authorization related classes on every API request
         const authenticator = new Authenticator(this._apiConfig.oauth, this._issuerMetadata.metadata);
-        const authorizationRulesRepository = new AuthorizationRulesRepository();
-        const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, authorizationRulesRepository);
+        const customClaimsProvider = new BasicApiClaimsProvider();
+        const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, customClaimsProvider);
 
         // Try to get the access token and create empty claims
         const accessToken = this._readAccessToken(request);
@@ -85,7 +86,13 @@ export class WebApi {
         next: NextFunction): void {
 
         const claims = response.locals.claims as BasicApiClaims;
-        ResponseWriter.writeObjectResponse(response, 200, claims.getCentralUserInfo());
+        const userInfo = {
+            givenName: claims.givenName,
+            familyName: claims.familyName,
+            email: claims.email,
+        } as UserInfoClaims;
+
+        ResponseWriter.writeObjectResponse(response, 200, userInfo);
     }
 
     /*
