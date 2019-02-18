@@ -1,13 +1,14 @@
+import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {BasicApiClaimsAccessor} from '../utilities/basicApiClaimsAccessor';
-import {CompanyRepository} from './companyRepository';
+import {CompanyRepository, TYPES} from './companyRepository';
 
 /*
  * Our API controller runs after claims handling has completed
  */
-@controller('/api/companies', BasicApiClaimsAccessor)
+@controller('/api/companies', 'BasicApiClaimsAccessor')
 export class CompanyController extends BaseHttpController {
 
     /*
@@ -18,7 +19,7 @@ export class CompanyController extends BaseHttpController {
     /*
      * Receive dependencies
      */
-    public constructor(repository: CompanyRepository) {
+    public constructor(@inject('CompanyRepository') repository: CompanyRepository) {
         super();
         this._repository = repository;
     }
