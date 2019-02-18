@@ -1,14 +1,17 @@
 import {NextFunction, Request, Response} from 'express';
-import {injectable} from 'inversify';
+import {inject, injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
 import {BasicApiClaims} from '../entities/BasicApiClaims';
+import {IssuerMetadata} from '../framework/oauth/issuerMetadata';
 import {CustomPrincipal} from './customPrincipal';
 
 /*
- * Our custom authorization filter
+ * A singleton to act as the Express entry point for authentication processing
  */
 @injectable()
 export class CustomAuthProvider implements interfaces.AuthProvider {
+
+    // TODO: Add some set methods here
 
     /*
      * The entry point for implementing authorization
@@ -17,13 +20,14 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
 
         if (request.originalUrl.startsWith('/api/') && request.method !== 'OPTIONS') {
 
+            console.log('*** getUser for API request: ' + request.originalUrl);
+
             // TODO: Wire up claims processing properly
             const claims = new BasicApiClaims();
             claims.setTokenInfo('myuserid', 'myclientid', ['openid', 'email', 'profile']);
             claims.setCentralUserInfo('Guest', 'UserX', 'guestuser@authguidance.com');
             claims.accountsCovered = [1, 2, 4];
 
-            console.log('*** IN CUSTOM AUTH PROVIDER - RETURNING USER');
             return new CustomPrincipal(claims);
         }
 

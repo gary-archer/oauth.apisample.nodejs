@@ -23,18 +23,11 @@ export class AuthorizationHandler {
     /*
      * API construction
      */
-    public constructor(apiConfig: Configuration) {
+    public constructor(apiConfig: Configuration, issuerMetadata: IssuerMetadata) {
         this._apiConfig = apiConfig;
         this._claimsCache = new ClaimsCache(this._apiConfig.oauth);
-        this._issuerMetadata = new IssuerMetadata(this._apiConfig.oauth);
+        this._issuerMetadata = issuerMetadata;
         this._setupCallbacks();
-    }
-
-    /*
-     * Load metadata once at application startup
-     */
-    public async initialize(): Promise<void> {
-        await this._issuerMetadata.load();
     }
 
     /*

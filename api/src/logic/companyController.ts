@@ -3,12 +3,12 @@ import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-e
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {BasicApiClaimsAccessor} from '../utilities/basicApiClaimsAccessor';
-import {CompanyRepository, TYPES} from './companyRepository';
+import {CompanyRepository} from './companyRepository';
 
 /*
  * Our API controller runs after claims handling has completed
  */
-@controller('/api/companies', 'BasicApiClaimsAccessor')
+@controller('/companies', 'BasicApiClaimsAccessor')
 export class CompanyController extends BaseHttpController {
 
     /*

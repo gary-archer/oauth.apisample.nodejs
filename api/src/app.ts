@@ -2,39 +2,37 @@ import * as fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
 import {Configuration} from './configuration/configuration';
-import {BasicApiClaims} from './entities/basicApiClaims';
+import {ErrorHandler} from './framework/errors/errorHandler';
 import {ApiLogger} from './framework/utilities/apiLogger';
 import {DebugProxyAgent} from './framework/utilities/debugProxyAgent';
-import {CompanyController} from './logic/companyController';
-import {CompanyRepository, TYPES} from './logic/companyRepository';
-import {UserInfoController} from './logic/userInfoController';
+import {Bootstrap} from './startup/bootstrap';
 import {HttpServer} from './startup/httpServer';
-import {BasicApiClaimsAccessor} from './utilities/basicApiClaimsAccessor';
-import {BasicApiClaimsFactory} from './utilities/basicApiClaimsFactory';
-import {JsonFileReader} from './utilities/jsonFileReader';
 
-// Initialize diagnostics
-ApiLogger.initialize();
-DebugProxyAgent.initialize();
+(async () => {
 
-// First load configuration
-const apiConfigBuffer = fs.readFileSync('api.config.json');
-const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
+    // Initialize diagnostics
+    ApiLogger.initialize();
+    DebugProxyAgent.initialize();
 
-// Let the DI container know about injectable classes and create them on every request
-const container = new Container();
-container.bind<JsonFileReader>('JsonFileReader').to(JsonFileReader).inRequestScope();
-container.bind<CompanyRepository>('CompanyRepository').to(CompanyRepository).inRequestScope();
-container.bind<CompanyController>('CompanyController').to(CompanyController).inRequestScope();
-container.bind<UserInfoController>('UserInfoController').to(UserInfoController).inRequestScope();
+    try {
 
-// TODO: I'd like to get rid of the need to declare anything here
-container.bind<BasicApiClaimsFactory>('BasicApiClaimsFactory').to(BasicApiClaimsFactory).inRequestScope();
-container.bind<BasicApiClaimsAccessor>('BasicApiClaimsAccessor').to(BasicApiClaimsAccessor).inRequestScope();
+        // First load configuration
+        const apiConfigBuffer = fs.readFileSync('api.config.json');
+        const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
 
-// Run our HTTP configuration and then start the server
-const httpServer = new HttpServer(apiConfig, container);
-httpServer.configure();
-httpServer.start();
+        // Create the container and register the API dependencies
+        const container = new Container();
+        Bootstrap.registerDependencies(container);
 
-// TODO: Catch startup errors
+        // Run our HTTP configuration and then start the server
+        const httpServer = new HttpServer(apiConfig, container);
+        await httpServer.initialize();
+        httpServer.start();
+
+    } catch (e) {
+
+        // Report startup errors
+        const error = ErrorHandler.fromException(e);
+        ApiLogger.error(JSON.stringify(error.toLogFormat()));
+    }
+})();

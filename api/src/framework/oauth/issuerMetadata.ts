@@ -28,7 +28,7 @@ export class IssuerMetadata {
     }
 
     /*
-     * Load the metadata at startup
+     * Load the metadata at startup and wait for completion
      */
     public async load(): Promise<void> {
 

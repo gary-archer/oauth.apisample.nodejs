@@ -4,7 +4,7 @@ import {UserInfoClaims} from '../entities/userInfoClaims';
 /*
  * A controller class to return user info
  */
-@controller('/api/userclaims')
+@controller('/userclaims')
 export class UserInfoController extends BaseHttpController {
 
     /*

@@ -10,12 +10,10 @@ export class BasicApiClaimsFactory {
     private _claims: BasicApiClaims;
 
     public constructor() {
-        console.log('*** CONSTRUCTING FACTORY');
         this._claims = new BasicApiClaims();
     }
 
     public setClaims(claims: BasicApiClaims): void {
-        console.log('*** FACTORY SETTING CLAIMS');
         this._claims = claims;
     }
 

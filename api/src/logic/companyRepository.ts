@@ -6,12 +6,6 @@ import {ClientError} from '../framework/errors/clientError';
 import {BasicApiClaimsFactory} from '../utilities/basicApiClaimsFactory';
 import {JsonFileReader} from '../utilities/jsonFileReader';
 
-export const TYPES = {
-    BasicApiClaimsFactory: Symbol.for('BasicApiClaimsFactory'),
-    BasicApiClaimsAccessor: Symbol.for('BasicApiClaimsAccessor'),
-    CompanyRepository: Symbol.for('CompanyRepository'),
-};
-
 /*
  * A simple API controller for getting data about a company and its investments
  */
@@ -31,11 +25,7 @@ export class CompanyRepository {
         @inject('JsonFileReader') jsonReader: JsonFileReader,
         @inject('BasicApiClaimsFactory') claimsFactory: BasicApiClaimsFactory) {
 
-        // TODO: Problems getting BasicApiClaims injected
-        console.log('In REPOSITORY');
         this._claims = claimsFactory.getClaims();
-        console.log(this._claims.userId);
-        console.log(this._claims.scopes);
         this._jsonReader = jsonReader;
     }
 

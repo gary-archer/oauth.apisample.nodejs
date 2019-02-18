@@ -13,6 +13,7 @@ export class CustomPrincipal implements interfaces.Principal {
     public constructor(details: BasicApiClaims) {
         this.details = details;
     }
+
     public isAuthenticated(): Promise<boolean> {
         return Promise.resolve(true);
     }
