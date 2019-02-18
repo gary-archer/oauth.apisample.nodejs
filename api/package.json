@@ -5,7 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "lint": "tslint -c tslint.json src/**/*.ts",
-    "build": "ts-node --no-cache src/app.ts",
+    "build": "ts-node --no-cache src/startup/app.ts",
     "start": "nodemon -e ts --exec \"npm run build\"",
     "httpDebug": "cross-env HTTPS_PROXY=http://127.0.0.1:8888 nodemon -e ts --exec \"npm run build\""
   },

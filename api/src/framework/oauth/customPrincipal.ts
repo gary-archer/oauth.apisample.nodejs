@@ -1,16 +1,16 @@
 import {injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
-import {BasicApiClaims} from '../entities/BasicApiClaims';
 
 /*
- * Implement the inversify express interface to return our claims
+ * The  inversify express interface for a custom principal
  */
+// TODO: Do I need injectable?
 @injectable()
 export class CustomPrincipal implements interfaces.Principal {
 
     public details: any;
 
-    public constructor(details: BasicApiClaims) {
+    public constructor(details: any) {
         this.details = details;
     }
 

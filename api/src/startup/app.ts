@@ -1,12 +1,12 @@
 import * as fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
-import {Configuration} from './configuration/configuration';
-import {ErrorHandler} from './framework/errors/errorHandler';
-import {ApiLogger} from './framework/utilities/apiLogger';
-import {DebugProxyAgent} from './framework/utilities/debugProxyAgent';
-import {Bootstrap} from './startup/bootstrap';
-import {HttpServer} from './startup/httpServer';
+import {Configuration} from '../configuration/configuration';
+import {ErrorHandler} from '../framework/errors/errorHandler';
+import {ApiLogger} from '../framework/utilities/apiLogger';
+import {DebugProxyAgent} from '../framework/utilities/debugProxyAgent';
+import {Bootstrap} from './bootstrap';
+import {HttpServer} from './httpServer';
 
 (async () => {
 

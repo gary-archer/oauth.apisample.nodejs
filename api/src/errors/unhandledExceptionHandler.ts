@@ -12,6 +12,7 @@ export class UnhandledExceptionHandler {
      */
     public handleException(unhandledException: any, request: Request, response: Response, next: NextFunction): void {
 
+        console.log('*** Unhandled exception');
         const clientError = ErrorHandler.handleError(unhandledException);
         ResponseWriter.writeObjectResponse(response, clientError.statusCode, clientError.toResponseFormat());
     }
