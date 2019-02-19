@@ -5,7 +5,7 @@ import {Configuration} from '../configuration/configuration';
 import {ErrorHandler} from '../framework/errors/errorHandler';
 import {ApiLogger} from '../framework/utilities/apiLogger';
 import {DebugProxyAgent} from '../framework/utilities/debugProxyAgent';
-import {Bootstrap} from './bootstrap';
+import {DependencyInjection} from '../utilities/dependencyInjection';
 import {HttpServer} from './httpServer';
 
 // The application entry point
@@ -21,14 +21,13 @@ import {HttpServer} from './httpServer';
         const apiConfigBuffer = fs.readFileSync('api.config.json');
         const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
 
-        // Create the container and register the API dependencies
+        // Create the container and register the API's dependencies
         const container = new Container();
-        Bootstrap.registerDependencies(container);
+        DependencyInjection.register(container);
 
-        // Run our HTTP configuration and then start the server
+        // Configure then start the server
         const httpServer = new HttpServer(apiConfig, container);
-        await httpServer.initialize();
-        httpServer.start();
+        await httpServer.start();
 
     } catch (e) {
 

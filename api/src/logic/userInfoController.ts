@@ -1,4 +1,5 @@
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
+import {BasicApiClaims} from '../entities/basicApiClaims';
 import {UserInfoClaims} from '../entities/userInfoClaims';
 
 /*
@@ -13,11 +14,12 @@ export class UserInfoController extends BaseHttpController {
     @httpGet('/current')
     private get(): UserInfoClaims {
 
-        // TODO: Inject claims using HTTP context
+        // TODO: Use a class and deal with serialization of private fields
+        const claims = this.httpContext.user.details as BasicApiClaims;
         return {
-            givenName: 'Gary',
-            familyName: 'Archer',
-            email: 'garyarcher36@gmail.com',
+            givenName: claims.givenName,
+            familyName: claims.familyName,
+            email: claims.email,
         } as UserInfoClaims;
     }
 }

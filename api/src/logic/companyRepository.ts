@@ -4,7 +4,12 @@ import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {ClientError} from '../framework/errors/clientError';
 import {BasicApiClaimsFactory} from '../utilities/basicApiClaimsFactory';
+import {TYPES} from '../utilities/dependencyInjection';
 import {JsonFileReader} from '../utilities/jsonFileReader';
+
+// console.log('*** Company, Types is ');
+// console.log(TYPES);
+// console.log(TYPES.JsonFileReader);
 
 /*
  * A simple API controller for getting data about a company and its investments
@@ -59,7 +64,7 @@ export class CompanyRepository {
 
             // Next read transactions from the database
             const companyTransactions =
-                await this._jsonReader.readData<CompanyTransactions[]>('data/companyTransactions2.json');
+                await this._jsonReader.readData<CompanyTransactions[]>('data/companyTransactions.json');
 
             // Then join the data
             const foundTransactions = companyTransactions.find((ct) => ct.id === id);

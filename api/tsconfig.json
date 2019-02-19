@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "strict": false,
+    "strict": true,
     "lib": ["es2017", "dom"],
     "types": ["reflect-metadata"],
     "module": "commonjs",

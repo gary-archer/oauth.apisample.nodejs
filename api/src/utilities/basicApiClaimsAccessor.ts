@@ -20,9 +20,11 @@ export class BasicApiClaimsAccessor extends BaseMiddleware {
 
         if (this.httpContext && this.httpContext.user && this.httpContext.user.isAuthenticated()) {
 
+            // Get the claims
             const claims = this.httpContext.user.details as BasicApiClaims;
             const factory = new BasicApiClaimsFactory();
             factory.setClaims(claims);
+
             this.bind<BasicApiClaimsFactory>('BasicApiClaimsFactory').toConstantValue(factory);
         }
 

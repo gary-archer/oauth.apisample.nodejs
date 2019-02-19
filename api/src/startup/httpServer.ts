@@ -9,6 +9,7 @@ import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {CustomAuthProvider} from '../framework/oauth/customAuthProvider';
+import {ApiLogger} from '../framework/utilities/apiLogger';
 
 /*
  * The relative path to web files
@@ -25,7 +26,6 @@ export class HttpServer {
      */
     private _apiConfig: Configuration;
     private _container: Container;
-    private _expressApp: Application;
 
     /*
      * Receive the configuration and the container
@@ -36,9 +36,40 @@ export class HttpServer {
     }
 
     /*
+     * Configure then start listening for requests
+     */
+    public async start(): Promise<void> {
+
+        // Do the startup configuration
+        const expressApp = await this.configure();
+
+        // Use the web URL to determine the port
+        const webUrl = url.parse(this._apiConfig.app.trustedOrigins[0]);
+
+        // Calculate the port from the URL
+        let port = 443;
+        if (webUrl.port) {
+            port = Number(webUrl.port);
+        }
+
+        // Node does not support certificate stores so we need to load a certificate file from disk
+        const sslOptions = {
+            pfx: fs.readFileSync(`certs/${this._apiConfig.app.sslCertificateFileName}`),
+            passphrase: this._apiConfig.app.sslCertificatePassword,
+        };
+
+        // Start listening on HTTPS
+        const httpsServer = https.createServer(sslOptions, expressApp);
+        httpsServer.listen(port, () => {
+
+            ApiLogger.info('HTTP Server', `Listening on HTTPS port ${port}`);
+        });
+    }
+
+    /*
      * Configure behaviour before starting the server
      */
-    public async initialize(): Promise<void> {
+    private async configure(): Promise<Application> {
 
         // Create the server. which will use registered @controller attributes to set up Express routes
         const server = new InversifyExpressServer(
@@ -75,37 +106,8 @@ export class HttpServer {
             expressApp.use('/api/*', errorHandler.handleException);
         });
 
-        // Create and store a reference to the express app
-        this._expressApp = server.build();
-    }
-
-    /*
-     * Start listening for requests
-     */
-    public start(): void {
-
-        // Use the web URL to determine the port
-        const webUrl = url.parse(this._apiConfig.app.trustedOrigins[0]);
-
-        // Calculate the port from the URL
-        let port = 443;
-        if (webUrl.port) {
-            port = Number(webUrl.port);
-        }
-
-        // Node does not support certificate stores so we need to load a certificate file from disk
-        const sslOptions = {
-            pfx: fs.readFileSync(`certs/${this._apiConfig.app.sslCertificateFileName}`),
-            passphrase: this._apiConfig.app.sslCertificatePassword,
-        };
-
-        // Start listening on HTTPS
-        const httpsServer = https.createServer(sslOptions, this._expressApp);
-        httpsServer.listen(port, () => {
-
-            // TODO: Use API logger
-            console.log(`Server is listening on HTTPS port ${port}`);
-        });
+        // Build and return the express app
+        return server.build();
     }
 
     /*

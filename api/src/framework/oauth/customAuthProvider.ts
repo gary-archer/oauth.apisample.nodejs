@@ -19,9 +19,9 @@ import {OAuthConfiguration} from './oauthConfiguration';
 export class CustomAuthProvider implements interfaces.AuthProvider {
 
     // Fields created during initialization
-    private _configuration: OAuthConfiguration;
-    private _issuerMetadata: IssuerMetadata;
-    private _claimsCache: ClaimsCache;
+    private _configuration!: OAuthConfiguration;
+    private _issuerMetadata!: IssuerMetadata;
+    private _claimsCache!: ClaimsCache;
 
     /*
      * Do one time initialization
@@ -43,7 +43,10 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
     /*
      * The entry point for implementing authorization
      */
-    public async getUser(request: Request, response: Response, next: NextFunction): Promise<interfaces.Principal> {
+    public async getUser(
+        request: Request,
+        response: Response,
+        next: NextFunction): Promise<interfaces.Principal> {
 
         // Check we have an API request
         if (request.originalUrl.startsWith('/api/') && request.method !== 'OPTIONS') {
@@ -70,7 +73,7 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
             }
         }
 
-        return null;
+        return {} as any;
     }
 
     /*
