@@ -8,6 +8,7 @@ import {DebugProxyAgent} from '../framework/utilities/debugProxyAgent';
 import {Bootstrap} from './bootstrap';
 import {HttpServer} from './httpServer';
 
+// The application entry point
 (async () => {
 
     // Initialize diagnostics
@@ -16,7 +17,7 @@ import {HttpServer} from './httpServer';
 
     try {
 
-        // First load configuration
+        // Load our JSON configuration
         const apiConfigBuffer = fs.readFileSync('api.config.json');
         const apiConfig = JSON.parse(apiConfigBuffer.toString()) as Configuration;
 

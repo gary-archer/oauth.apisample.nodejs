@@ -1,4 +1,4 @@
-import {Response} from 'express';
+import {Request, Response} from 'express';
 import {ClientError} from '../errors/clientError';
 
 /*
@@ -9,19 +9,26 @@ export class ResponseWriter {
     /*
      * Return data to the caller, which could be a success or error object
      */
-    public static writeObjectResponse(response: Response, statusCode: number, data: any) {
+    public static writeObjectResponse(request: Request, response: Response, statusCode: number, data: any) {
+
+        // Ensure the response is seen as JSON
         response.setHeader('Content-Type', 'application/json');
+
+        // Write the standard header for 401 responses
+        if (statusCode === 401) {
+            response.setHeader('WWW-Authenticate', 'Bearer');
+        }
+
+        // Authentication middleware error responses do not have our CORS headers so write them here
+        const CORS_HEADER = 'Access-Control-Allow-Origin';
+        if (!response.getHeader(CORS_HEADER)) {
+            const originHeader = request.header('Origin');
+            if (originHeader) {
+                response.setHeader(CORS_HEADER, originHeader);
+            }
+        }
+
+        // Next write the response as an objecy
         response.status(statusCode).send(JSON.stringify(data));
-    }
-
-    /*
-     * Return an invalid token response to the caller
-     */
-    public static writeInvalidTokenResponse(response: Response): void {
-        response.setHeader('Content-Type', 'application/json');
-        response.setHeader('WWW-Authenticate', 'Bearer');
-
-        const error = new ClientError(401, 'unauthorized', 'Missing, invalid or expired access token');
-        response.status(error.statusCode).send(JSON.stringify(error.toResponseFormat()));
     }
 }

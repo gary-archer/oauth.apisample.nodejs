@@ -16,11 +16,10 @@ export class BasicApiClaimsAccessor extends BaseMiddleware {
 
     public handler(req: Request, res: Response, next: NextFunction): void {
 
-        // The readme here has an example of injecting a trace id into a service class
-        // https://github.com/weefsell/inversify-express
+        // TODO: This is messy and needs to be made more intuitive next
+
         if (this.httpContext && this.httpContext.user && this.httpContext.user.isAuthenticated()) {
 
-            // This should set something that has not been set yet - like a factory
             const claims = this.httpContext.user.details as BasicApiClaims;
             const factory = new BasicApiClaimsFactory();
             factory.setClaims(claims);

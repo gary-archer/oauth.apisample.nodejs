@@ -16,6 +16,7 @@ export class Bootstrap {
      */
     public static registerDependencies(container: Container): void {
 
+        // TODO: Avoid strings and do this in a more standard way
         container.bind<JsonFileReader>('JsonFileReader').to(JsonFileReader).inRequestScope();
         container.bind<CompanyRepository>('CompanyRepository').to(CompanyRepository).inRequestScope();
         container.bind<CompanyController>('CompanyController').to(CompanyController).inRequestScope();

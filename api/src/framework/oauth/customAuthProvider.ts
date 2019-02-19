@@ -58,26 +58,19 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
 
                 } else {
 
-                    // TODO: 400 errors are logged OK, but response has no CORS headers
-                    // Also get "Can't set headers after they are sent" error trying to write response
-
-                    // If we could not get claims then pass a 401 error to the next middleware
-                    const error = new ClientError(401, 'unauthorized', 'Missing, invalid or expired access token');
-                    next(error);
+                    // If we could not get claims then return a 401 error
+                    // We throw here in order to avoid an unhandled promise exception
+                    throw new ClientError(401, 'unauthorized', 'Missing, invalid or expired access token');
                 }
             } catch (e) {
 
                 // If there was an exception, pass it to the next middleware
+                // The assumption is that the API has a final middleware that deals with errors
                 next(e);
-
-                // TODO: 500 errors are output OK, but without CORS headers
-                // Understand what inversify express does with the error
-
-                // Authorization errors are returned as a 500 repsonse
-                // const clientError = ErrorHandler.handleError(e);
-                // ResponseWriter.writeObjectResponse(response, clientError.statusCode, clientError.toResponseFormat());
             }
         }
+
+        return null;
     }
 
     /*
@@ -104,8 +97,6 @@ export class CustomAuthProvider implements interfaces.AuthProvider {
         } else {
 
             // Non success responses mean a missing, expired or invalid token, and we will return 401
-            // Note that any failures will be thrown as exceptions and will result in a 500 response
-            ResponseWriter.writeInvalidTokenResponse(response);
             return null;
         }
     }

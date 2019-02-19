@@ -7,6 +7,8 @@ import {BasicApiClaims} from '../entities/BasicApiClaims';
 @injectable()
 export class BasicApiClaimsFactory {
 
+    // TODO: This is messy and needs to be made more intuitive next
+
     private _claims: BasicApiClaims;
 
     public constructor() {

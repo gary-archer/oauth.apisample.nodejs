@@ -102,6 +102,8 @@ export class HttpServer {
         // Start listening on HTTPS
         const httpsServer = https.createServer(sslOptions, this._expressApp);
         httpsServer.listen(port, () => {
+
+            // TODO: Use API logger
             console.log(`Server is listening on HTTPS port ${port}`);
         });
     }

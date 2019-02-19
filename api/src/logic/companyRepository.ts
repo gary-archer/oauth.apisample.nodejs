@@ -59,7 +59,7 @@ export class CompanyRepository {
 
             // Next read transactions from the database
             const companyTransactions =
-                await this._jsonReader.readData<CompanyTransactions[]>('data/companyTransactions.json');
+                await this._jsonReader.readData<CompanyTransactions[]>('data/companyTransactions2.json');
 
             // Then join the data
             const foundTransactions = companyTransactions.find((ct) => ct.id === id);

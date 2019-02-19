@@ -19,9 +19,11 @@ export class ErrorHandler {
             // Client errors mean the caller did something wrong
             const clientError = handledError as ClientError;
 
-            // Log the error
-            const errorToLog = clientError.toLogFormat();
-            ApiLogger.error(JSON.stringify(errorToLog));
+            // Log the error unless it is a token expired error
+            if (clientError.statusCode !== 401) {
+                const errorToLog = clientError.toLogFormat();
+                ApiLogger.error(JSON.stringify(errorToLog));
+            }
 
             // Return the API response to the caller
             return clientError;
@@ -66,6 +68,8 @@ export class ErrorHandler {
      * Handle the request promise error for metadata lookup failures
      */
     public static fromMetadataError(responseError: any, url: string): ApiError {
+
+        // TODO: Intermittent RequestError due to Okta alt certificate names not reported correctly
 
         const apiError = new ApiError('metadata_lookup_failure', 'Metadata lookup failed');
         ErrorHandler._updateErrorFromHttpResponse(apiError, url, responseError);
@@ -140,7 +144,7 @@ export class ErrorHandler {
      */
     private static _getExceptionDetails(exception: any): string {
 
-        if (exception instanceof Error) {
+        if (exception.message) {
             return exception.message;
         } else {
             return exception.toString();

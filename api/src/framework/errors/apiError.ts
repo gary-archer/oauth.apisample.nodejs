@@ -38,6 +38,10 @@ export class ApiError extends Error {
         Object.setPrototypeOf(this, new.target.prototype);
     }
 
+    public get details(): string {
+        return this._details;
+    }
+
     public set details(details: string) {
         this._details = details;
     }

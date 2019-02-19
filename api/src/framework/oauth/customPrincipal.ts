@@ -1,12 +1,11 @@
-import {injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
 
 /*
- * The  inversify express interface for a custom principal
+ * Implement the inversify express interface for a custom principal
  */
-// TODO: Do I need injectable?
-@injectable()
 export class CustomPrincipal implements interfaces.Principal {
+
+    // TODO: Move this to core API claims
 
     public details: any;
 
