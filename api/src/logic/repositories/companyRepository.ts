@@ -1,10 +1,10 @@
 import {inject, injectable} from 'inversify';
+import {ClientError} from '../../framework/errors/clientError';
+import {TYPES} from '../../plumbing/dependencies/types';
+import {JsonFileReader} from '../../plumbing/utilities/jsonFileReader';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
-import {ClientError} from '../framework/errors/clientError';
-import {JsonFileReader} from '../utilities/jsonFileReader';
-import {TYPES} from '../utilities/types';
 
 /*
  * A simple API controller for getting data about a company and its investments

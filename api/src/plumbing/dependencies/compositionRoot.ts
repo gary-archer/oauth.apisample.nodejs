@@ -1,9 +1,9 @@
 import {Container} from 'inversify';
-import {BasicApiClaims} from '../entities/basicApiClaims';
-import {CompanyController} from '../logic/companyController';
-import {CompanyRepository} from '../logic/companyRepository';
-import {UserInfoController} from '../logic/userInfoController';
-import {JsonFileReader} from './jsonFileReader';
+import {CompanyController} from '../../logic/controllers/companyController';
+import {UserInfoController} from '../../logic/controllers/userInfoController';
+import {BasicApiClaims} from '../../logic/entities/basicApiClaims';
+import {CompanyRepository} from '../../logic/repositories/companyRepository';
+import {JsonFileReader} from '../utilities/jsonFileReader';
 import {TYPES} from './types';
 import {UserContextAccessor} from './userContextAccessor';
 

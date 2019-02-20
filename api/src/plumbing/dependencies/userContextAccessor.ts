@@ -1,12 +1,11 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {BaseMiddleware} from 'inversify-express-utils';
-import {BasicApiClaims} from '../entities/basicApiClaims';
+import {BasicApiClaims} from '../../logic/entities/basicApiClaims';
 import {TYPES} from './types';
 
 /*
  * A helper object to allow us to inject user context into our repository class
- * 
  */
 @injectable()
 export class UserContextAccessor extends BaseMiddleware {

@@ -1,10 +1,10 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
+import {TYPES} from '../../plumbing/dependencies/types';
+import {UserContextAccessor} from '../../plumbing/dependencies/userContextAccessor';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
-import {TYPES} from '../utilities/types';
-import {UserContextAccessor} from '../utilities/userContextAccessor';
-import {CompanyRepository} from './companyRepository';
+import {CompanyRepository} from '../repositories/companyRepository';
 
 /*
  * Our API controller runs after claims handling has completed

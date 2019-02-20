@@ -7,9 +7,9 @@ import {interfaces, InversifyExpressServer, TYPE} from 'inversify-express-utils'
 import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
-import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {CustomAuthProvider} from '../framework/oauth/customAuthProvider';
 import {ApiLogger} from '../framework/utilities/apiLogger';
+import {UnhandledExceptionHandler} from '../plumbing/errors/unhandledExceptionHandler';
 
 /*
  * The relative path to web files

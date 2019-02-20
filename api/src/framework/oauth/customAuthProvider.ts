@@ -1,8 +1,10 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
-import {BasicApiClaims} from '../../entities/basicApiClaims';
-import {BasicApiClaimsProvider} from '../../logic/basicApiClaimsProvider';
+
+// TODO: Get rid of logic dependencies from framework
+import {BasicApiClaimsProvider} from '../../logic/authorization/basicApiClaimsProvider';
+import {BasicApiClaims} from '../../logic/entities/basicApiClaims';
 import {ClientError} from '../errors/clientError';
 import {ResponseWriter} from '../utilities/responseWriter';
 import {Authenticator} from './authenticator';

@@ -1,6 +1,6 @@
+import {CoreApiClaims} from '../../framework/oauth/coreApiClaims';
+import {CustomClaimsProvider} from '../../framework/oauth/customClaimsProvider';
 import {BasicApiClaims} from '../entities/basicApiClaims';
-import {CoreApiClaims} from '../framework/oauth/coreApiClaims';
-import {CustomClaimsProvider} from '../framework/oauth/customClaimsProvider';
 
 /*
  * An example of including domain specific authorization rules during claims lookup

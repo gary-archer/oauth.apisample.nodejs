@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
-import {ErrorHandler} from '../framework/errors/errorHandler';
-import {ResponseWriter} from '../framework/utilities/responseWriter';
+import {ErrorHandler} from '../../framework/errors/errorHandler';
+import {ResponseWriter} from '../../framework/utilities/responseWriter';
 
 /*
  * Our unhandled exception class, which gives us some control over how we use the framework
