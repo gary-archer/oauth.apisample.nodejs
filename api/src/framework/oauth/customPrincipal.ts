@@ -5,8 +5,6 @@ import {interfaces} from 'inversify-express-utils';
  */
 export class CustomPrincipal implements interfaces.Principal {
 
-    // TODO: Move this to core API claims
-
     public details: any;
 
     public constructor(details: any) {

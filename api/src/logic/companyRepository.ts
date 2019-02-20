@@ -3,13 +3,8 @@ import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {ClientError} from '../framework/errors/clientError';
-import {BasicApiClaimsFactory} from '../utilities/basicApiClaimsFactory';
-import {TYPES} from '../utilities/dependencyInjection';
 import {JsonFileReader} from '../utilities/jsonFileReader';
-
-// console.log('*** Company, Types is ');
-// console.log(TYPES);
-// console.log(TYPES.JsonFileReader);
+import {TYPES} from '../utilities/types';
 
 /*
  * A simple API controller for getting data about a company and its investments
@@ -27,10 +22,10 @@ export class CompanyRepository {
      * Receive claims when constructed
      */
     public constructor(
-        @inject('JsonFileReader') jsonReader: JsonFileReader,
-        @inject('BasicApiClaimsFactory') claimsFactory: BasicApiClaimsFactory) {
+        @inject(TYPES.JsonFileReader) jsonReader: JsonFileReader,
+        @inject(TYPES.BasicApiClaims) claims: BasicApiClaims) {
 
-        this._claims = claimsFactory.getClaims();
+        this._claims = claims;
         this._jsonReader = jsonReader;
     }
 

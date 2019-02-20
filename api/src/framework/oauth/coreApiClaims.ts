@@ -1,6 +1,9 @@
+import {injectable} from 'inversify';
+
 /*
  * Common API claims that our code OAuth plumbing understands
  */
+@injectable()
 export class CoreApiClaims {
 
     // The immutable user id from the access token, which may exist in the API's database

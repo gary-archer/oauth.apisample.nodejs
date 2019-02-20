@@ -3,7 +3,7 @@ import {ErrorHandler} from '../framework/errors/errorHandler';
 import {ResponseWriter} from '../framework/utilities/responseWriter';
 
 /*
- * Our unhandled exception class
+ * Our unhandled exception class, which gives us some control over how we use the framework
  */
 export class UnhandledExceptionHandler {
 

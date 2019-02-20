@@ -1,11 +1,14 @@
 import * as fs from 'fs-extra';
+
+// The ordering of these two dependencies is important for inversify to work
 import {Container} from 'inversify';
 import 'reflect-metadata';
+
 import {Configuration} from '../configuration/configuration';
 import {ErrorHandler} from '../framework/errors/errorHandler';
 import {ApiLogger} from '../framework/utilities/apiLogger';
 import {DebugProxyAgent} from '../framework/utilities/debugProxyAgent';
-import {DependencyInjection} from '../utilities/dependencyInjection';
+import {CompositionRoot} from '../utilities/compositionRoot';
 import {HttpServer} from './httpServer';
 
 // The application entry point
@@ -23,7 +26,7 @@ import {HttpServer} from './httpServer';
 
         // Create the container and register the API's dependencies
         const container = new Container();
-        DependencyInjection.register(container);
+        CompositionRoot.registerDependencies(container);
 
         // Configure then start the server
         const httpServer = new HttpServer(apiConfig, container);

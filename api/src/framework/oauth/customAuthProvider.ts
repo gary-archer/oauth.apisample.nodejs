@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
-import {BasicApiClaims} from '../../entities/BasicApiClaims';
+import {BasicApiClaims} from '../../entities/basicApiClaims';
 import {BasicApiClaimsProvider} from '../../logic/basicApiClaimsProvider';
 import {ClientError} from '../errors/clientError';
 import {ResponseWriter} from '../utilities/responseWriter';

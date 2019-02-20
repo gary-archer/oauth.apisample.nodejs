@@ -1,4 +1,4 @@
-import {BasicApiClaims} from '../entities/BasicApiClaims';
+import {BasicApiClaims} from '../entities/basicApiClaims';
 import {CoreApiClaims} from '../framework/oauth/coreApiClaims';
 import {CustomClaimsProvider} from '../framework/oauth/customClaimsProvider';
 

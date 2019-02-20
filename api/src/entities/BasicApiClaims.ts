@@ -1,8 +1,10 @@
+import {injectable} from 'inversify';
 import {CoreApiClaims} from '../framework/oauth/coreApiClaims';
 
 /*
  * Override the core claims to support additional custom claims
  */
+@injectable()
 export class BasicApiClaims extends CoreApiClaims {
 
     // Product Specific data used for authorization

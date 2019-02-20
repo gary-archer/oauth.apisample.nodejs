@@ -2,13 +2,14 @@ import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
-import {BasicApiClaimsAccessor} from '../utilities/basicApiClaimsAccessor';
+import {TYPES} from '../utilities/types';
+import {UserContextAccessor} from '../utilities/userContextAccessor';
 import {CompanyRepository} from './companyRepository';
 
 /*
  * Our API controller runs after claims handling has completed
  */
-@controller('/companies', 'BasicApiClaimsAccessor')
+@controller('/companies', TYPES.UserContextAccessor)
 export class CompanyController extends BaseHttpController {
 
     /*
@@ -19,7 +20,7 @@ export class CompanyController extends BaseHttpController {
     /*
      * Receive dependencies
      */
-    public constructor(@inject('CompanyRepository') repository: CompanyRepository) {
+    public constructor(@inject(TYPES.CompanyRepository) repository: CompanyRepository) {
         super();
         this._repository = repository;
     }
@@ -38,7 +39,7 @@ export class CompanyController extends BaseHttpController {
     @httpGet('/:id/transactions')
      public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
 
-        // TODO: Report errors properly
+        // TODO: Report non number errors properly
         const idValue = parseInt(id, 10);
         return await this._repository.getCompanyTransactions(idValue);
     }
