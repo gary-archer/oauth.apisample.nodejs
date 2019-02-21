@@ -1,5 +1,6 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
+import {ClientError} from '../../framework/errors/clientError';
 import {TYPES} from '../../plumbing/dependencies/types';
 import {UserContextAccessor} from '../../plumbing/dependencies/userContextAccessor';
 import {Company} from '../entities/company';
@@ -39,8 +40,12 @@ export class CompanyController extends BaseHttpController {
     @httpGet('/:id/transactions')
      public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
 
-        // TODO: Report non number errors properly
+        // Throw a 400 error if we have an invalid id
         const idValue = parseInt(id, 10);
+        if (isNaN(idValue) || idValue <= 0) {
+            throw new ClientError(400, 'invalid_company_id', 'The company id must be a positive numeric integer');
+        }
+
         return await this._repository.getCompanyTransactions(idValue);
     }
 }
