@@ -11,7 +11,7 @@ import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {AuthorizationFilter} from '../framework/oauth/authorizationFilter';
 import {ApiLogger} from '../framework/utilities/apiLogger';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
-import {BasicApiClaimsFactory} from '../utilities/BasicApiClaimsFactory';
+import {BasicApiClaimsFactory} from '../utilities/basicApiClaimsFactory';
 
 /*
  * The relative path to web files
