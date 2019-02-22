@@ -4,8 +4,8 @@ import {UserInfoController} from '../logic/controllers/userInfoController';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 import {CompanyRepository} from '../logic/repositories/companyRepository';
 import {JsonFileReader} from '../utilities/jsonFileReader';
+import {UserContextAccessor} from '../utilities/userContextAccessor';
 import {TYPES} from './types';
-import {UserContextAccessor} from './userContextAccessor';
 
 /*
  * Compose the application's business dependencies

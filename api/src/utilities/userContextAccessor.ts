@@ -1,18 +1,14 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {BaseMiddleware} from 'inversify-express-utils';
+import {TYPES} from '../dependencies/types';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
-import {TYPES} from './types';
 
 /*
  * A helper object to allow us to inject user context into our repository class
  */
 @injectable()
 export class UserContextAccessor extends BaseMiddleware {
-
-    public constructor() {
-        super();
-    }
 
     /*
      * This method only fires when authentication succeeds

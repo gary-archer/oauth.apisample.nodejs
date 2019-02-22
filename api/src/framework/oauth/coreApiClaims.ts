@@ -64,26 +64,4 @@ export class CoreApiClaims {
         this._familyName = familyName;
         this._email = email;
     }
-
-    /*
-     * Include private fields when serializing claims to the claims cache
-     */
-    public serializePrivateFields(): any {
-        return {
-            userId: this._userId,
-            clientId: this._clientId,
-            scopes: this._scopes,
-            givenName: this._givenName,
-            familyName: this._familyName,
-            email: this._email,
-        };
-    }
-
-    /*
-     * Set private fields when deserializing claims from the claims cache
-     */
-    public deserializePrivateFields(data: any): void {
-        this.setTokenInfo(data.userId, data.clientId, data.scopes);
-        this.setCentralUserInfo(data.givenName, data.familyName, data.email);
-    }
 }
