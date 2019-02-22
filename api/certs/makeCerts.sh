@@ -52,7 +52,7 @@ echo '*** Successfully created Root CA'
 #
 # Create the certificate public + private key
 #
-openssl genrsa -out $SSL_CERT_FILE_NAME.key 2048
+openssl genrsa -out $SSL_CERT_FILE_NAME.key 2048 -passout pass:$SSL_CERT_PASSWORD
 echo '*** Successfully created SSL key'
 
 #

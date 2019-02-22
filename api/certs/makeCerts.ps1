@@ -59,7 +59,7 @@ function CreateRootCertPrivateKey()
  #>
 function CreateSslCertificateKey()
 {
-	$args = "genrsa -out ${sslCertFileName}.key 2048"
+	$args = "genrsa -out ${sslCertFileName}.key 2048 -passout pass:${sslCertPassword}"
 	RunOpenSslCommand $args
 }
 
