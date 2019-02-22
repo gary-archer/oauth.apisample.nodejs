@@ -12,6 +12,8 @@ export class ErrorHandler {
      */
     public static handleError(exception: any): ClientError {
 
+        // TODO: Update to standard error handling
+
         // Ensure that the exception has a known type
         const handledError = ErrorHandler.fromException(exception);
         if (exception instanceof ClientError) {

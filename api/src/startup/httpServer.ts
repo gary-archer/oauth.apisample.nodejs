@@ -8,7 +8,7 @@ import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
-import {CustomAuthProvider} from '../framework/oauth/customAuthProvider';
+import {AuthorizationFilter} from '../framework/oauth/authorizationFilter';
 import {ApiLogger} from '../framework/utilities/apiLogger';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 import {BasicApiClaimsFactory} from '../utilities/BasicApiClaimsFactory';
@@ -63,7 +63,6 @@ export class HttpServer {
         // Start listening on HTTPS
         const httpsServer = https.createServer(sslOptions, expressApp);
         httpsServer.listen(port, () => {
-
             ApiLogger.info('HTTP Server', `Listening on HTTPS port ${port}`);
         });
     }
@@ -79,10 +78,10 @@ export class HttpServer {
             null,
             {rootPath: '/api'},
             null,
-            CustomAuthProvider);
+            AuthorizationFilter);
 
         // Configure the security middleware for the API
-        await this._configureAuthProvider();
+        await this._configureAuthorizationFilter();
 
         // Configure other middleware
         server.setConfig((expressApp: Application) => {
@@ -111,15 +110,15 @@ export class HttpServer {
     /*
      * Configure behaviour of our authorization handling
      */
-    private async _configureAuthProvider(): Promise<void> {
+    private async _configureAuthorizationFilter(): Promise<void> {
 
         // Override default behaviour to rebind our custom auth provider as a singleton, then retrieve it
-        this._container.rebind<interfaces.AuthProvider>(TYPE.AuthProvider).to(CustomAuthProvider).inSingletonScope();
-        const authProvider =
-            this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider) as CustomAuthProvider<BasicApiClaims>;
+        this._container.rebind<interfaces.AuthProvider>(TYPE.AuthProvider).to(AuthorizationFilter).inSingletonScope();
+        const authorizationFilter =
+            this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider) as AuthorizationFilter<BasicApiClaims>;
 
         // Initialize the authentication handler
-        await authProvider.initialize(this._apiConfig.oauth, new BasicApiClaimsFactory(this._apiConfig.oauth));
+        await authorizationFilter.initialize(this._apiConfig.oauth, new BasicApiClaimsFactory(this._apiConfig.oauth));
     }
 
     /*

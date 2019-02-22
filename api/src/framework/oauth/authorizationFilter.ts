@@ -1,10 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
-
-// TODO NEXT: Get rid of logic dependencies from framework
-import {BasicApiClaimsProvider} from '../../logic/authorization/basicApiClaimsProvider';
-import {BasicApiClaims} from '../../logic/entities/basicApiClaims';
 import {ClientError} from '../errors/clientError';
 import {ClaimsFactory} from '../utilities/claimsFactory';
 import {ResponseWriter} from '../utilities/responseWriter';
@@ -20,7 +16,7 @@ import {OAuthConfiguration} from './oauthConfiguration';
  * A singleton to act as the Express entry point for authentication processing
  */
 @injectable()
-export class CustomAuthProvider<TClaims extends CoreApiClaims> implements interfaces.AuthProvider {
+export class AuthorizationFilter<TClaims extends CoreApiClaims> implements interfaces.AuthProvider {
 
     // Fields created during initialization
     private _configuration!: OAuthConfiguration;
@@ -31,8 +27,9 @@ export class CustomAuthProvider<TClaims extends CoreApiClaims> implements interf
     /*
      * Do one time initialization
      */
-    public async initialize(configuration: OAuthConfiguration, factory: ClaimsFactory<TClaims>)
-                : Promise<CustomAuthProvider<TClaims>> {
+    public async initialize(
+        configuration: OAuthConfiguration,
+        factory: ClaimsFactory<TClaims>): Promise<AuthorizationFilter<TClaims>> {
 
         // Store input
         this._configuration = configuration;
@@ -86,28 +83,25 @@ export class CustomAuthProvider<TClaims extends CoreApiClaims> implements interf
     /*
      * Do the authorization work and return claims on success
      */
-    private async _authorizeApiRequest(request: Request, response: Response): Promise<BasicApiClaims | null> {
+    private async _authorizeApiRequest(request: Request, response: Response): Promise<TClaims | null> {
 
         // Create authorization related classes on every API request
         const authenticator = new Authenticator(this._configuration, this._issuerMetadata.metadata);
-        const customClaimsProvider = new BasicApiClaimsProvider();
-        const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, customClaimsProvider);
+        const middleware = new ClaimsMiddleware(this._claimsCache, authenticator, this._factory);
 
         // Try to get the access token and create empty claims
         const accessToken = this._readAccessToken(request);
-        const claims = new BasicApiClaims();
 
-        // Call the middleware to do the work
-        const success = await middleware.authorizeRequestAndSetClaims(accessToken, claims);
-        if (success) {
-
-            // On success, set claims against the request context and move on to the controller logic
-            return claims;
-
-        } else {
+        // Call the middleware to process the access token and return claims
+        const claims = await middleware.authorizeRequestAndGetClaims(accessToken);
+        if (!claims) {
 
             // Non success responses mean a missing, expired or invalid token, and we will return 401
             return null;
+        } else {
+
+            // On success, set claims against the request context and move on to the controller logic
+            return claims;
         }
     }
 

@@ -5,15 +5,15 @@ import {BasicApiClaims} from '../entities/basicApiClaims';
 /*
  * An example of including domain specific authorization rules during claims lookup
  */
-export class BasicApiClaimsProvider implements CustomClaimsProvider {
+export class BasicApiClaimsProvider implements CustomClaimsProvider<BasicApiClaims> {
 
     /*
      * The interface supports returning results based on the user id from the token
      * This might involve a database lookup or a call to another service
      */
-    public async addCustomClaims(accessToken: string, claims: CoreApiClaims): Promise<void> {
+    public async addCustomClaims(accessToken: string, claims: BasicApiClaims): Promise<void> {
 
         // Any attempts to access data for company 3 will result in an unauthorized error
-        (claims as BasicApiClaims).accountsCovered = [1, 2, 4];
+        claims.accountsCovered = [1, 2, 4];
     }
 }

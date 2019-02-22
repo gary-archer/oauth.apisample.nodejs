@@ -32,7 +32,7 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
     /*
      * Add claims to the cache until the token's time to live
      */
-    public async addClaimsForToken(accessToken: string, expiry: number, claims: CoreApiClaims): Promise<void> {
+    public async addClaimsForToken(accessToken: string, expiry: number, claims: TClaims): Promise<void> {
 
         // Use the exp field returned from introspection to work out the token expiry time
         const epochSeconds = Math.floor((new Date() as any) / 1000);
@@ -41,26 +41,25 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
 
             // Cache the token until it expires
             const hash = hasher.sha256(accessToken);
-            await this._cache.set(hash, JSON.stringify(claims.serializePrivateFields()), secondsToCache);
+            await this._cache.set(hash, claims, secondsToCache);
         }
     }
 
     /*
      * Get claims from the cache or return null if not found
      */
-    public async getClaimsForToken(accessToken: string, claims: CoreApiClaims): Promise<boolean> {
+    public async getClaimsForToken(accessToken: string): Promise<TClaims | null> {
 
         // Get the token hash and see if it exists in the cache
         const hash = hasher.sha256(accessToken);
-        const claimsJson = await this._cache.get<string>(hash);
-        if (claimsJson) {
+        const claims = await this._cache.get<TClaims>(hash);
+        if (!claims) {
 
-            // If so then return cached claims
-            claims.deserializePrivateFields(JSON.parse(claimsJson));
-            return true;
+            // If this is a new token and we need to do claims processing
+            return null;
         }
 
-        // Otherwise it is a new token and we need to do claims processing
-        return false;
+        // Otherwise return cached claims
+        return claims;
     }
 }
