@@ -9,19 +9,22 @@ import {CustomClaimsProvider} from './customClaimsProvider';
  * Our approach provides extensible claims to our API and enables high performance
  * It also takes close control of error responses to our SPA
  */
-export class ClaimsMiddleware {
+export class ClaimsMiddleware<TClaims extends CoreApiClaims> {
 
     /*
-     * Fields
+     * Injected dependencies
      */
-    private _cache: ClaimsCache;
+    private _cache: ClaimsCache<TClaims>;
     private _authenticator: Authenticator;
     private _customClaimsProvider: CustomClaimsProvider;
 
     /*
      * Receive dependencies
      */
-    public constructor(cache: ClaimsCache, authenticator: Authenticator, customClaimsProvider: CustomClaimsProvider) {
+    public constructor(
+        cache: ClaimsCache<TClaims>,
+        authenticator: Authenticator,
+        customClaimsProvider: CustomClaimsProvider) {
 
         this._cache = cache;
         this._authenticator = authenticator;

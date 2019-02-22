@@ -6,7 +6,7 @@ import {OAuthConfiguration} from './oauthConfiguration';
 /*
  * A simple in memory claims cache for our API
  */
-export class ClaimsCache {
+export class ClaimsCache<TClaims extends CoreApiClaims> {
 
     /*
      * The singleton cache

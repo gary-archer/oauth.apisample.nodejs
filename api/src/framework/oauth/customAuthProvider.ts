@@ -2,14 +2,16 @@ import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {interfaces} from 'inversify-express-utils';
 
-// TODO: Get rid of logic dependencies from framework
+// TODO NEXT: Get rid of logic dependencies from framework
 import {BasicApiClaimsProvider} from '../../logic/authorization/basicApiClaimsProvider';
 import {BasicApiClaims} from '../../logic/entities/basicApiClaims';
 import {ClientError} from '../errors/clientError';
+import {ClaimsFactory} from '../utilities/claimsFactory';
 import {ResponseWriter} from '../utilities/responseWriter';
 import {Authenticator} from './authenticator';
 import {ClaimsCache} from './claimsCache';
 import {ClaimsMiddleware} from './claimsMiddleware';
+import {CoreApiClaims} from './coreApiClaims';
 import {CustomPrincipal} from './customPrincipal';
 import {IssuerMetadata} from './issuerMetadata';
 import {OAuthConfiguration} from './oauthConfiguration';
@@ -18,27 +20,30 @@ import {OAuthConfiguration} from './oauthConfiguration';
  * A singleton to act as the Express entry point for authentication processing
  */
 @injectable()
-export class CustomAuthProvider implements interfaces.AuthProvider {
+export class CustomAuthProvider<TClaims extends CoreApiClaims> implements interfaces.AuthProvider {
 
     // Fields created during initialization
     private _configuration!: OAuthConfiguration;
     private _issuerMetadata!: IssuerMetadata;
-    private _claimsCache!: ClaimsCache;
+    private _claimsCache!: ClaimsCache<TClaims>;
+    private _factory!: ClaimsFactory<TClaims>;
 
     /*
      * Do one time initialization
      */
-    public async initialize(configuration: OAuthConfiguration): Promise<CustomAuthProvider> {
+    public async initialize(configuration: OAuthConfiguration, factory: ClaimsFactory<TClaims>)
+                : Promise<CustomAuthProvider<TClaims>> {
 
         // Store input
         this._configuration = configuration;
+        this._factory = factory;
 
         // Load metadata
         this._issuerMetadata = new IssuerMetadata(this._configuration);
         await this._issuerMetadata.load();
 
         // Create the claims cache
-        this._claimsCache = new ClaimsCache(this._configuration);
+        this._claimsCache = this._factory.createClaimsCache();
         return this;
     }
 

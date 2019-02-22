@@ -5,10 +5,10 @@ import {Container} from 'inversify';
 import 'reflect-metadata';
 
 import {Configuration} from '../configuration/configuration';
+import {CompositionRoot} from '../dependencies/compositionRoot';
 import {ErrorHandler} from '../framework/errors/errorHandler';
 import {ApiLogger} from '../framework/utilities/apiLogger';
 import {DebugProxyAgent} from '../framework/utilities/debugProxyAgent';
-import {CompositionRoot} from '../plumbing/dependencies/compositionRoot';
 import {HttpServer} from './httpServer';
 
 // The application entry point

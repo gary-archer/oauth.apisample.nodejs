@@ -1,7 +1,7 @@
 import {inject, injectable} from 'inversify';
+import {TYPES} from '../../dependencies/types';
 import {ClientError} from '../../framework/errors/clientError';
-import {TYPES} from '../../plumbing/dependencies/types';
-import {JsonFileReader} from '../../plumbing/utilities/jsonFileReader';
+import {JsonFileReader} from '../../utilities/jsonFileReader';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';

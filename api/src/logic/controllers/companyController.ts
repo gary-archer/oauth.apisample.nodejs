@@ -1,8 +1,8 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
+import {TYPES} from '../../dependencies/types';
+import {UserContextAccessor} from '../../dependencies/userContextAccessor';
 import {ClientError} from '../../framework/errors/clientError';
-import {TYPES} from '../../plumbing/dependencies/types';
-import {UserContextAccessor} from '../../plumbing/dependencies/userContextAccessor';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {CompanyRepository} from '../repositories/companyRepository';

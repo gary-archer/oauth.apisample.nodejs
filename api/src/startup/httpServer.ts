@@ -7,9 +7,11 @@ import {interfaces, InversifyExpressServer, TYPE} from 'inversify-express-utils'
 import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
+import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {CustomAuthProvider} from '../framework/oauth/customAuthProvider';
 import {ApiLogger} from '../framework/utilities/apiLogger';
-import {UnhandledExceptionHandler} from '../plumbing/errors/unhandledExceptionHandler';
+import {BasicApiClaims} from '../logic/entities/basicApiClaims';
+import {BasicApiClaimsFactory} from '../utilities/BasicApiClaimsFactory';
 
 /*
  * The relative path to web files
@@ -79,14 +81,10 @@ export class HttpServer {
             null,
             CustomAuthProvider);
 
-        // Rebind it as a singleton since we want to avoid continually creating it
-        this._container.rebind<interfaces.AuthProvider>(TYPE.AuthProvider).to(CustomAuthProvider).inSingletonScope();
+        // Configure the security middleware for the API
+        await this._configureAuthProvider();
 
-        // Initialize OAuth processing
-        const authProvider = this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider) as CustomAuthProvider;
-        await authProvider.initialize(this._apiConfig.oauth);
-
-        // Configure middleware
+        // Configure other middleware
         server.setConfig((expressApp: Application) => {
 
             // We don't want API requests to be cached unless explicitly designed for caching
@@ -100,7 +98,7 @@ export class HttpServer {
             this._configureWebStaticContent(expressApp);
         });
 
-        // Add an API error handler last, which will also catch unhandled promise rejections
+        // Configure errormiddleware last, which will also catch unhandled promise rejections
         server.setErrorConfig((expressApp) => {
             const errorHandler = new UnhandledExceptionHandler();
             expressApp.use('/api/*', errorHandler.handleException);
@@ -108,6 +106,20 @@ export class HttpServer {
 
         // Build and return the express app
         return server.build();
+    }
+
+    /*
+     * Configure behaviour of our authorization handling
+     */
+    private async _configureAuthProvider(): Promise<void> {
+
+        // Override default behaviour to rebind our custom auth provider as a singleton, then retrieve it
+        this._container.rebind<interfaces.AuthProvider>(TYPE.AuthProvider).to(CustomAuthProvider).inSingletonScope();
+        const authProvider =
+            this._container.get<interfaces.AuthProvider>(TYPE.AuthProvider) as CustomAuthProvider<BasicApiClaims>;
+
+        // Initialize the authentication handler
+        await authProvider.initialize(this._apiConfig.oauth, new BasicApiClaimsFactory(this._apiConfig.oauth));
     }
 
     /*

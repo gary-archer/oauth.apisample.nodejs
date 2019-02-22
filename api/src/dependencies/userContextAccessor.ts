@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {BaseMiddleware} from 'inversify-express-utils';
-import {BasicApiClaims} from '../../logic/entities/basicApiClaims';
+import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 import {TYPES} from './types';
 
 /*
