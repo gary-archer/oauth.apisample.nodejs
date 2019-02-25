@@ -5,5 +5,6 @@ import {CoreApiClaims} from './coreApiClaims';
  */
 export interface CustomClaimsProvider<TClaims extends CoreApiClaims> {
 
+    // TODO: Make this an abstract class as for C# and Java
     addCustomClaims(accessToken: string, claims: TClaims): Promise<void>;
 }

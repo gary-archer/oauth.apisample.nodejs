@@ -27,6 +27,7 @@ export class ApiError extends Error {
 
         super(userMessage);
 
+        // Give fields their default values
         this._statusCode = 500;
         this._errorCode = errorCode;
         this._area = 'BasicApi';

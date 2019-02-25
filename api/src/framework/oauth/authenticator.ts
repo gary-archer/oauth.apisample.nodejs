@@ -1,4 +1,4 @@
-import {ErrorHandler} from '../errors/errorHandler';
+import {OAuthErrorHandler} from '../errors/oauthErrorHandler';
 import {CoreApiClaims} from './coreApiClaims';
 import {OAuthConfiguration} from './oauthConfiguration';
 
@@ -57,7 +57,8 @@ export class Authenticator {
         } catch (e) {
 
             // Report introspection errors clearly
-            throw ErrorHandler.fromIntrospectionError(e, this._issuer.introspection_endpoint);
+            const handler = new OAuthErrorHandler();
+            throw handler.fromIntrospectionError(e, this._issuer.introspection_endpoint);
         }
     }
 
@@ -92,7 +93,8 @@ export class Authenticator {
             }
 
             // Otherwise log and throw user info
-            throw ErrorHandler.fromUserInfoError(e, this._issuer.userinfo_endpoint);
+            const handler = new OAuthErrorHandler();
+            throw handler.fromUserInfoError(e, this._issuer.userinfo_endpoint);
         }
     }
 
@@ -102,7 +104,8 @@ export class Authenticator {
     private _getClaim(claim: string, name: string): any {
 
         if (!claim) {
-            throw ErrorHandler.fromMissingClaim(name);
+            const handler = new OAuthErrorHandler();
+            throw handler.fromMissingClaim(name);
         }
 
         return claim;

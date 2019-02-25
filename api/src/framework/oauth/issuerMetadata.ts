@@ -1,5 +1,5 @@
 import * as OpenIdClient from 'openid-client';
-import {ErrorHandler} from '../errors/errorHandler';
+import {OAuthErrorHandler} from '../errors/oauthErrorHandler';
 import {DebugProxyAgent} from '../utilities/debugProxyAgent';
 import {OAuthConfiguration} from './oauthConfiguration';
 
@@ -36,7 +36,8 @@ export class IssuerMetadata {
             const endpoint = `${this._oauthConfig.authority}/.well-known/openid-configuration`;
             this._metadata = await OpenIdClient.Issuer.discover(endpoint);
         } catch (e) {
-            throw ErrorHandler.fromMetadataError(e, this._oauthConfig.authority);
+            const handler = new OAuthErrorHandler();
+            throw handler.fromMetadataError(e, this._oauthConfig.authority);
         }
     }
 

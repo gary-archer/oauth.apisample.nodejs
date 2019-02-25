@@ -1,7 +1,9 @@
+import {IClientError} from './iclientError';
+
 /*
  * Manage errors due to invalid client usage
  */
-export class ClientError extends Error {
+export class ClientError extends Error implements IClientError {
 
     /*
      * Mandatory fields for both 4xx and 500 errors
@@ -35,7 +37,7 @@ export class ClientError extends Error {
         Object.setPrototypeOf(this, new.target.prototype);
     }
 
-    public get statusCode(): number {
+    public getStatusCode(): number {
         return this._statusCode;
     }
 

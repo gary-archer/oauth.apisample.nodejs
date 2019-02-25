@@ -6,7 +6,7 @@ import 'reflect-metadata';
 
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
-import {ErrorHandler} from '../framework/errors/errorHandler';
+import {UnhandledExceptionHandler} from '../errors/UnhandledExceptionHandler';
 import {ApiLogger} from '../framework/utilities/apiLogger';
 import {DebugProxyAgent} from '../framework/utilities/debugProxyAgent';
 import {HttpServer} from './httpServer';
@@ -28,14 +28,14 @@ import {HttpServer} from './httpServer';
         const container = new Container();
         CompositionRoot.registerDependencies(container);
 
-        // Configure then start the server
+        // Start the server
         const httpServer = new HttpServer(apiConfig, container);
         await httpServer.start();
 
     } catch (e) {
 
         // Report startup errors
-        const error = ErrorHandler.fromException(e);
-        ApiLogger.error(JSON.stringify(error.toLogFormat()));
+        const handler = new UnhandledExceptionHandler();
+        const error = handler.handleStartupException(e);
     }
 })();
