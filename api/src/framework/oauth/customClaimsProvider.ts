@@ -1,10 +1,15 @@
 import {CoreApiClaims} from './coreApiClaims';
 
 /*
- * An interface for adding custom claims from within core claims handling code
+ * A default implementation for adding custom claims from within core claims handling code
  */
-export interface CustomClaimsProvider<TClaims extends CoreApiClaims> {
+export class CustomClaimsProvider<TClaims extends CoreApiClaims> {
 
-    // TODO: Make this an abstract class as for C# and Java
-    addCustomClaims(accessToken: string, claims: TClaims): Promise<void>;
+    /*
+     * This can be overridden by derived classes
+     */
+    public addCustomClaims(accessToken: string, claims: TClaims): Promise<void> {
+
+        // Look up custom data for authorization and add it to claims
+    }
 }

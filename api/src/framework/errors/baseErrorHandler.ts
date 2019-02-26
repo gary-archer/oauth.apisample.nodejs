@@ -46,7 +46,7 @@ export class BaseErrorHandler {
      */
     protected fromException(exception: any): ApiError {
 
-        const apiError = new ApiError('general_exception', 'An unexpected exception occurred in the API');
+        const apiError = new ApiError('server_error', 'An unexpected exception occurred in the API');
         apiError.details = this._getExceptionDetails(exception);
         apiError.stack = exception.stack;
         return apiError;
@@ -70,10 +70,7 @@ export class BaseErrorHandler {
      */
     protected tryConvertToClientError(exception: any): IClientError | null {
 
-        if ('getStatusCode' in exception &&
-            'toResponseFormat' in exception &&
-            'toLogFormat' in exception) {
-
+        if (exception.getStatusCode && exception.toResponseFormat && exception.toLogFormat) {
             return exception as IClientError;
         }
 
@@ -85,7 +82,6 @@ export class BaseErrorHandler {
      */
     protected _getExceptionDetails(exception: any): string {
 
-        // TODO: Make this method private and create exceptions in the same manner as C# and Java
         if (exception.message) {
             return exception.message;
         } else {

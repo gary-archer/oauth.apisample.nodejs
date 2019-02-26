@@ -14,10 +14,11 @@ export class CompositionRoot {
 
     /*
      * Most dependencies are given request scope and created once per API request
+     * Note that all of the below bound objects get created once at application startup
      */
     public static registerDependencies(container: Container): void {
 
-        // Business logic
+        // Business objects
         container.bind<JsonFileReader>(TYPES.JsonFileReader).to(JsonFileReader).inRequestScope();
         container.bind<CompanyRepository>(TYPES.CompanyRepository).to(CompanyRepository).inRequestScope();
         container.bind<CompanyController>(TYPES.CompanyController).to(CompanyController).inRequestScope();

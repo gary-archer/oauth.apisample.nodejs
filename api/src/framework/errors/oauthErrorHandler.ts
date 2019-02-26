@@ -13,9 +13,8 @@ export class OAuthErrorHandler extends BaseErrorHandler {
      */
     public fromMetadataError(responseError: any, url: string): ApiError {
 
-        // TODO: Intermittent RequestError due to Okta alt certificate names not reported correctly
         const apiError = new ApiError('metadata_lookup_failure', 'Metadata lookup failed');
-        this._updateErrorFromHttpResponse(apiError, url, responseError);
+        apiError.details = this._getErrorDetails(null, responseError, url);
         return apiError;
     }
 
@@ -24,13 +23,13 @@ export class OAuthErrorHandler extends BaseErrorHandler {
      */
     public fromIntrospectionError(responseError: any, url: string): ApiError {
 
-        // Avoid reprocessing
         if (responseError instanceof ApiError) {
             return responseError;
         }
 
-        const apiError = new ApiError('introspection_failure', 'Token validation failed');
-        this._updateErrorFromHttpResponse(apiError, url, responseError);
+        const [code, description] = this._readOAuthErrorResponse(responseError);
+        const apiError = this._createOAuthApiError('introspection_failure', 'Token validation failed', code);
+        apiError.details = this._getErrorDetails(description, responseError, url);
         return apiError;
     }
 
@@ -39,13 +38,13 @@ export class OAuthErrorHandler extends BaseErrorHandler {
      */
     public fromUserInfoError(responseError: any, url: string): ApiError {
 
-        // Avoid reprocessing
         if (responseError instanceof ApiError) {
             return responseError;
         }
 
-        const apiError = new ApiError('userinfo_failure', 'User info lookup failed');
-        this._updateErrorFromHttpResponse(apiError, url, responseError);
+        const [code, description] = this._readOAuthErrorResponse(responseError);
+        const apiError = this._createOAuthApiError('userinfo_failure', 'User info lookup failed', code);
+        apiError.details = this._getErrorDetails(description, responseError, url);
         return apiError;
     }
 
@@ -60,25 +59,54 @@ export class OAuthErrorHandler extends BaseErrorHandler {
     }
 
     /*
-     * Update error fields with OAuth response details
+     * Return the error and error_description fields from an OAuth error message if present
      */
-    private _updateErrorFromHttpResponse(
-        apiError: ApiError,
-        url: string,
-        responseError: any): void {
+    private _readOAuthErrorResponse(responseError: any): [string | null, string | null] {
 
-        if (responseError.error && responseError.error_description) {
+        let code = null;
+        let description = null;
 
-            // Include OAuth error details if returned
-            apiError.message += ` : ${responseError.error}`;
-            apiError.details = responseError.error_description;
-        } else {
-
-            // Otherwise capture exception details
-            apiError.details = this._getExceptionDetails(responseError);
+        if (responseError.error) {
+            code = responseError.error;
         }
 
-        // Include the URL in the error details
-        apiError.details += `, URL: ${url}`;
+        if (responseError.error_description) {
+            description = responseError.error_description;
+        }
+
+        return [code, description];
+    }
+
+    /*
+     * Create an error object from an error code and include the OAuth error code in the user message
+     */
+    private _createOAuthApiError(errorCode: string, userMessage: string, oauthErrorCode: string | null): ApiError {
+
+        // Include the OAuth error code in the short technical message returned
+        let message = userMessage;
+        if (errorCode) {
+            message += ` : ${errorCode}`;
+        }
+
+        return new ApiError(errorCode, message);
+    }
+
+    /*
+     * Concatenate parts of an error
+     */
+    private _getErrorDetails(oauthDetails: string | null, responseError: any, url: string): string {
+
+        let detailsText = '';
+        if (oauthDetails) {
+            detailsText += oauthDetails;
+        } else {
+            detailsText += this._getExceptionDetails(responseError);
+        }
+
+        if (url) {
+            detailsText += `, URL: ${url}`;
+        }
+
+        return detailsText;
     }
 }

@@ -69,7 +69,7 @@ export class ApiError extends Error {
     public toClientError(): ClientError {
 
         // Set a generic client error code for the server exception
-        const error = new ClientError(this._statusCode, 'internal_server_error', this.message);
+        const error = new ClientError(this._statusCode, this._errorCode, this.message);
 
         // Also indicate which part of the system, where in logs and when the error occurred
         error.setExceptionDetails(this._area, this._instanceId, this._utcTime);

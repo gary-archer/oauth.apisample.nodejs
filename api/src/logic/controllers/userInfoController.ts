@@ -14,7 +14,6 @@ export class UserInfoController extends BaseHttpController {
     @httpGet('/current')
     private get(): UserInfoClaims {
 
-        // TODO: Use a class and deal with serialization of private fields
         const claims = this.httpContext.user.details as BasicApiClaims;
         return {
             givenName: claims.givenName,
