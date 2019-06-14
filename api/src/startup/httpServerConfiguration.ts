@@ -34,8 +34,8 @@ export class HttpServerConfiguration {
     /*
      * Receive the configuration and the container
      */
-    public constructor(apiConfig: Configuration, container: Container, loggerFactory: ILoggerFactory) {
-        this._configuration = apiConfig;
+    public constructor(configuration: Configuration, container: Container, loggerFactory: ILoggerFactory) {
+        this._configuration = configuration;
         this._container = container;
         this._loggerFactory = loggerFactory;
     }
@@ -50,7 +50,7 @@ export class HttpServerConfiguration {
         const server = new InversifyExpressServer(
             this._container,
             null,
-            {rootPath: '/api'},
+            {rootPath: '/api/'},
             null,
             null);
 

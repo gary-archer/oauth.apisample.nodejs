@@ -6,6 +6,5 @@ import {OAuthConfiguration} from './oauthConfiguration';
 export interface FrameworkConfiguration {
     apiName: string;
     oauth: OAuthConfiguration;
-    maxClaimsCacheMinutes: number;
     loggers: any;
 }

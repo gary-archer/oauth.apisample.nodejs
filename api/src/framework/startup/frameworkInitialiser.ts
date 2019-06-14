@@ -21,12 +21,12 @@ export class FrameworkInitialiser {
     private readonly _container: Container;
     private readonly _configuration: FrameworkConfiguration;
     private readonly _loggerFactory: ILoggerFactory;
+    private readonly _httpContextAccessor: HttpContextAccessor;
 
     // Properties set via builder methods
     private _apiBasePath: string;
 
     // Calculated properties
-    private _httpContextAccessor!: HttpContextAccessor;
     private _exceptionHandler!: UnhandledExceptionHandler;
     private _unhandledPromiseRejectionHandler!: UnhandledPromiseRejectionHandler;
 
@@ -41,6 +41,7 @@ export class FrameworkInitialiser {
         this._container = container;
         this._configuration = configuration;
         this._loggerFactory = loggerFactory;
+        this._httpContextAccessor = new HttpContextAccessor();
         this._apiBasePath = '/';
     }
 
@@ -61,9 +62,6 @@ export class FrameworkInitialiser {
      * Prepare the framework
      */
     public prepare(): FrameworkInitialiser {
-
-        // Create an object to access the child container per request via the HTTP context
-        this._httpContextAccessor = new HttpContextAccessor();
 
         // Create the unhandled exception handler for API requests
         this._exceptionHandler = new UnhandledExceptionHandler(this._configuration, this._httpContextAccessor);

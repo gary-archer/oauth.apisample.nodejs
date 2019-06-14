@@ -72,11 +72,9 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
      */
     public async build(): Promise<BaseAuthenticationFilter> {
 
-        // Load OAuth metadata if the API is configured to use OAuth security
+        // Load Open Id Connect metadata
         const issuerMetadata = new IssuerMetadata(this._configuration);
-        if (this._configuration.oauth) {
-            await issuerMetadata.load();
-        }
+        await issuerMetadata.load();
 
         // Create the cache used to store claims results after authentication processing
         // Use a constructor function as the first parameter, as required by TypeScript generics

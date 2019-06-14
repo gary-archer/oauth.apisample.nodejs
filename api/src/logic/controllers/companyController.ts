@@ -27,7 +27,7 @@ export class CompanyController extends BaseApiController {
     /*
      * Return the list of companies
      */
-    @httpGet('')
+    @httpGet('/')
     public async getCompanyList(): Promise<Company[]> {
 
         // Log the operation name, which the framework cannot derive, then call the operation
@@ -38,7 +38,7 @@ export class CompanyController extends BaseApiController {
     /*
      * Return the transaction details for a company
      */
-    @httpGet(':id/transactions')
+    @httpGet('/:id/transactions')
     public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
 
         // Log the operation name, which the framework cannot derive
