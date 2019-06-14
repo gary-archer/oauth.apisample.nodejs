@@ -10,11 +10,12 @@ export const FRAMEWORKTYPES = {
     LoggerFactory: Symbol.for('LoggerFactory'),
     ILogEntry: Symbol.for('ILogEntry'),
 
-    // The framework manages OAuth security
+    // The framework manages core security classes
     IssuerMetadata: Symbol.for('IssuerMetadata'),
     ClaimsMiddleware: Symbol.for('ClaimsMiddleware'),
     ClaimsCache: Symbol.for('ClaimsCache'),
-    Authenticator: Symbol.for('Authenticator'),
-    ApiClaims: Symbol.for('ApiClaims'),
     ClaimsSupplier: Symbol.for('ClaimsSupplier'),
+    OAuthAuthenticator: Symbol.for('OAuthAuthenticator'),
+    HeaderAuthenticator: Symbol.for('HeaderAuthenticator'),
+    ApiClaims: Symbol.for('ApiClaims'),
 };

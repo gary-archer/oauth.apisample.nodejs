@@ -5,7 +5,7 @@ import {ClientError} from '../errors/clientError';
 import {ClaimsCache} from './claimsCache';
 import {ClaimsSupplier} from './claimsSupplier';
 import {CoreApiClaims} from './coreApiClaims';
-import {IAuthenticator} from './iauthenticator';
+import {OAuthAuthenticator} from './oauthAuthenticator';
 
 /*
  * The entry point for the processing to validate tokens and return claims
@@ -16,7 +16,7 @@ export class ClaimsMiddleware<TClaims extends CoreApiClaims> {
 
     // Injected dependencies
     private readonly _cache: ClaimsCache<TClaims>;
-    private readonly _authenticator: IAuthenticator;
+    private readonly _authenticator: OAuthAuthenticator;
     private readonly _claimsSupplier: ClaimsSupplier<TClaims>;
 
     /*
@@ -24,7 +24,7 @@ export class ClaimsMiddleware<TClaims extends CoreApiClaims> {
      */
     public constructor(
         @inject(FRAMEWORKTYPES.ClaimsCache) cache: ClaimsCache<TClaims>,
-        @inject(FRAMEWORKTYPES.Authenticator) authenticator: IAuthenticator,
+        @inject(FRAMEWORKTYPES.OAuthAuthenticator) authenticator: OAuthAuthenticator,
         @inject(FRAMEWORKTYPES.ClaimsSupplier) claimsSupplier: ClaimsSupplier<TClaims>) {
 
         this._cache = cache;

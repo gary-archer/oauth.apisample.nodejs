@@ -8,7 +8,9 @@ import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
-import {FrameworkInitialiser, ILoggerFactory} from '../framework';
+import {ILoggerFactory} from '../framework/logging/iloggerFactory';
+import {FrameworkInitialiser} from '../framework/startup/frameworkInitialiser';
+import {OAuthAuthenticationFilterBuilder} from '../framework/startup/oauthAuthenticationFilterBuilder';
 import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvider';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 
@@ -52,18 +54,19 @@ export class HttpServerConfiguration {
             null,
             null);
 
-        // Create a framework initialiser
-        const framework = new FrameworkInitialiser<BasicApiClaims>(
+        // Prepare the framework
+        const framework = new FrameworkInitialiser(
             this._container,
             this._configuration.framework,
-            this._loggerFactory);
+            this._loggerFactory)
+                .withApiBasePath('/api/')
+                .prepare();
 
-        // Prepare the framework which will register its dependencies
-        // Use supplier functions for the concrete claims type, to work around TypeScript generic type erasure
-        await framework.withApiBasePath('/api/')
-                       .withClaimsSupplier(BasicApiClaims)
-                       .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
-                       .prepare();
+        // Create the authentication filter
+        const authenticationFilter = await new OAuthAuthenticationFilterBuilder<BasicApiClaims>(framework)
+            .withClaimsSupplier(BasicApiClaims)
+            .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
+            .build();
 
         // Next register the API's business logic dependencies
         CompositionRoot.registerDependencies(this._container);
@@ -81,8 +84,8 @@ export class HttpServerConfiguration {
             // Configure how web static content is served
             this._configureWebStaticContent(expressApp);
 
-            // Configure framework cross cutting concerns for security and logging
-            framework.configureMiddleware(expressApp);
+            // Configure framework cross cutting concerns
+            framework.configureMiddleware(expressApp, authenticationFilter);
         });
 
         // Configure framework error handling last

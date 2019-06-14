@@ -3,7 +3,7 @@
  */
 
 import {FrameworkConfiguration} from './configuration/frameworkConfiguration';
-import {FrameworkInitialiser} from './configuration/frameworkInitialiser';
+
 import {FRAMEWORKTYPES} from './configuration/frameworkTypes';
 import {ApiError} from './errors/apiError';
 import {ClientError} from './errors/clientError';
@@ -17,9 +17,12 @@ import {ILoggerFactory} from './logging/iloggerFactory';
 import {IPerformanceBreakdown} from './logging/iperformanceBreakdown';
 import {LoggerFactory} from './logging/loggerFactory';
 import {LoggerMiddleware} from './logging/loggerMiddleware';
-import {AuthenticationFilter} from './security/authenticationFilter';
+import {BaseAuthenticationFilter} from './security/baseAuthenticationFilter';
 import {CoreApiClaims} from './security/coreApiClaims';
 import {CustomPrincipal} from './security/customPrincipal';
+import {FrameworkInitialiser} from './startup/frameworkInitialiser';
+import {HeaderAuthenticationFilterBuilder} from './startup/headerAuthenticationFilterBuilder';
+import {OAuthAuthenticationFilterBuilder} from './startup/oauthAuthenticationFilterBuilder';
 import {CustomHeaderMiddleware} from './utilities/customHeaderMiddleware';
 import {DebugProxyAgent} from './utilities/debugProxyAgent';
 import {HttpContextAccessor} from './utilities/httpContextAccessor';
@@ -42,7 +45,9 @@ export {
     IPerformanceBreakdown,
     LoggerFactory,
     LoggerMiddleware,
-    AuthenticationFilter,
+    BaseAuthenticationFilter,
+    HeaderAuthenticationFilterBuilder,
+    OAuthAuthenticationFilterBuilder,
     CoreApiClaims,
     CustomPrincipal,
     CustomHeaderMiddleware,

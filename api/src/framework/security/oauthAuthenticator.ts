@@ -7,14 +7,13 @@ import {OAuthErrorHandler} from '../errors/oauthErrorHandler';
 import {ILogEntry} from '../logging/ilogEntry';
 import {using} from '../utilities/using';
 import {CoreApiClaims} from './coreApiClaims';
-import {IAuthenticator} from './iauthenticator';
 import {IssuerMetadata} from './issuerMetadata';
 
 /*
  * The default authenticator does OAuth token handling and is used by public APIs
  */
 @injectable()
-export class Authenticator implements IAuthenticator {
+export class OAuthAuthenticator {
 
     // Injected dependencies
     private readonly _configuration: FrameworkConfiguration;

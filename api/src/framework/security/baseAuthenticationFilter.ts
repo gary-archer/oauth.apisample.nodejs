@@ -1,17 +1,16 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {interfaces} from 'inversify-express-utils';
 import {LogEntry} from '../logging/logEntry';
 import {HttpContextAccessor} from '../utilities/httpContextAccessor';
-import {ClaimsMiddleware} from './claimsMiddleware';
 import {CoreApiClaims} from './coreApiClaims';
 import {CustomPrincipal} from './customPrincipal';
 
 /*
- * The Express entry point for authentication processing
+ * A base authentication filter that performs common plumbing
  */
 @injectable()
-export class AuthenticationFilter<TClaims extends CoreApiClaims> {
+export abstract class BaseAuthenticationFilter {
 
     // Injected dependencies
     private readonly _unsecuredPaths: string[];
@@ -23,15 +22,16 @@ export class AuthenticationFilter<TClaims extends CoreApiClaims> {
     public constructor(unsecuredPaths: string[], contextAccessor: HttpContextAccessor) {
         this._unsecuredPaths = unsecuredPaths;
         this._contextAccessor = contextAccessor;
+        this._unsecuredPaths = [];
         this._setupCallbacks();
     }
 
     /*
      * The entry point for implementing authorization
      */
-    public async authorizeAndGetClaims(request: Request, response: Response, next: NextFunction): Promise<void> {
+    public async authorizeRequestAndGetClaims(request: Request, response: Response, next: NextFunction): Promise<void> {
 
-        if (this._isUnsecuredPath(request.originalUrl.toLowerCase())) {
+        if (this.isUnsecuredPath(request.originalUrl.toLowerCase())) {
 
             // Move to controller logic if this is an unsecured API operation
             next();
@@ -43,8 +43,7 @@ export class AuthenticationFilter<TClaims extends CoreApiClaims> {
             const logEntry = LogEntry.getCurrent(httpContext);
 
             // Create the claims middleware for this request, then process the access token and get claims
-            const middleware = httpContext.container.get<ClaimsMiddleware<TClaims>>(FRAMEWORKTYPES.ClaimsMiddleware);
-            const claims = await middleware.authorizeRequestAndGetClaims(request);
+            const claims = await this.execute(request);
 
             // Set the user against the HTTP context, as expected by inversify express
             httpContext.user = new CustomPrincipal(claims);
@@ -52,27 +51,33 @@ export class AuthenticationFilter<TClaims extends CoreApiClaims> {
             // Log who called the API
             logEntry.setIdentity(claims);
 
-            // Register the claims against this requests's child container
-            // This enables the claims object to be injected into business logic classes
-            httpContext.container.bind<TClaims>(FRAMEWORKTYPES.ApiClaims).toConstantValue(claims);
-
             // On success, move on to the controller logic
             next();
         }
     }
 
+    // Concrete classes must override this
+    protected abstract async execute(request: Request): Promise<CoreApiClaims>;
+
     /*
      * Return true if this request does not use security
      */
-    private _isUnsecuredPath(path: string): boolean {
+    protected isUnsecuredPath(path: string): boolean {
         const found = this._unsecuredPaths.find((p) => path.startsWith(p));
         return !!found;
+    }
+
+    /*
+     * Return the HTTP context for the current request
+     */
+    protected getHttpContext(request: Request): interfaces.HttpContext {
+        return this._contextAccessor.getHttpContext(request);
     }
 
     /*
      * Plumbing to ensure the this parameter is available
      */
     private _setupCallbacks(): void {
-        this.authorizeAndGetClaims = this.authorizeAndGetClaims.bind(this);
+        this.authorizeRequestAndGetClaims = this.authorizeRequestAndGetClaims.bind(this);
     }
 }
