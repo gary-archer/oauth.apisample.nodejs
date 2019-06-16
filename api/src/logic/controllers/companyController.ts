@@ -30,8 +30,10 @@ export class CompanyController extends BaseApiController {
     @httpGet('/')
     public async getCompanyList(): Promise<Company[]> {
 
-        // Log the operation name, which the framework cannot derive, then call the operation
+        // Log details the framework cannot derive
         super.setOperationName(this.getCompanyList.name);
+
+        // Do the work of the operation
         return await this._repository.getCompanyList();
     }
 
@@ -41,8 +43,9 @@ export class CompanyController extends BaseApiController {
     @httpGet('/:id/transactions')
     public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
 
-        // Log the operation name, which the framework cannot derive
+        // Log details the framework cannot derive
         super.setOperationName(this.getCompanyTransactions.name);
+        super.setResourceId([id]);
 
         // Throw a 400 error if we have an invalid id
         const idValue = parseInt(id, 10);

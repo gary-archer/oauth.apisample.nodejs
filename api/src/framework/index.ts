@@ -17,12 +17,12 @@ import {ILoggerFactory} from './logging/iloggerFactory';
 import {IPerformanceBreakdown} from './logging/iperformanceBreakdown';
 import {LoggerFactory} from './logging/loggerFactory';
 import {LoggerMiddleware} from './logging/loggerMiddleware';
-import {BaseAuthenticationFilter} from './security/baseAuthenticationFilter';
+import {BaseAuthorizer} from './security/baseAuthorizer';
 import {CoreApiClaims} from './security/coreApiClaims';
 import {CustomPrincipal} from './security/customPrincipal';
 import {FrameworkInitialiser} from './startup/frameworkInitialiser';
-import {HeaderAuthenticationFilterBuilder} from './startup/headerAuthenticationFilterBuilder';
-import {OAuthAuthenticationFilterBuilder} from './startup/oauthAuthenticationFilterBuilder';
+import {HeaderAuthorizerBuilder} from './startup/headerAuthorizerBuilder';
+import {OAuthAuthorizerBuilder} from './startup/oauthAuthorizerBuilder';
 import {CustomHeaderMiddleware} from './utilities/customHeaderMiddleware';
 import {DebugProxyAgent} from './utilities/debugProxyAgent';
 import {HttpContextAccessor} from './utilities/httpContextAccessor';
@@ -45,9 +45,9 @@ export {
     IPerformanceBreakdown,
     LoggerFactory,
     LoggerMiddleware,
-    BaseAuthenticationFilter,
-    HeaderAuthenticationFilterBuilder,
-    OAuthAuthenticationFilterBuilder,
+    BaseAuthorizer,
+    HeaderAuthorizerBuilder,
+    OAuthAuthorizerBuilder,
     CoreApiClaims,
     CustomPrincipal,
     CustomHeaderMiddleware,

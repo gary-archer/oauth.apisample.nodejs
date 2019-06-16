@@ -116,6 +116,13 @@ export class LogEntry implements ILogEntry {
     }
 
     /*
+     * Business logic must set the resource id from path segments, since we cannot derive them generically
+     */
+    public setResourceId(resourceId: string): void {
+        this._data.resourceId = resourceId;
+    }
+
+    /*
      * Create a child performance breakdown when requested
      */
     public createPerformanceBreakdown(name: string): IPerformanceBreakdown {

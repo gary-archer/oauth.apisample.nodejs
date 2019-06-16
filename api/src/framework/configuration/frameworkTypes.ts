@@ -12,7 +12,6 @@ export const FRAMEWORKTYPES = {
 
     // The framework manages core security classes
     IssuerMetadata: Symbol.for('IssuerMetadata'),
-    ClaimsMiddleware: Symbol.for('ClaimsMiddleware'),
     ClaimsCache: Symbol.for('ClaimsCache'),
     ClaimsSupplier: Symbol.for('ClaimsSupplier'),
     OAuthAuthenticator: Symbol.for('OAuthAuthenticator'),

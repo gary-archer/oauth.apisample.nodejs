@@ -10,7 +10,7 @@ import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
 import {ILoggerFactory} from '../framework/logging/iloggerFactory';
 import {FrameworkInitialiser} from '../framework/startup/frameworkInitialiser';
-import {OAuthAuthenticationFilterBuilder} from '../framework/startup/oauthAuthenticationFilterBuilder';
+import {OAuthAuthorizerBuilder} from '../framework/startup/oauthAuthorizerBuilder';
 import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvider';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 
@@ -62,8 +62,8 @@ export class HttpServerConfiguration {
                 .withApiBasePath('/api/')
                 .prepare();
 
-        // Create the authentication filter
-        const authenticationFilter = await new OAuthAuthenticationFilterBuilder<BasicApiClaims>(framework)
+        // Create a class to do OAuth authorization
+        const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(framework)
             .withClaimsSupplier(BasicApiClaims)
             .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
             .build();
@@ -85,7 +85,7 @@ export class HttpServerConfiguration {
             this._configureWebStaticContent(expressApp);
 
             // Configure framework cross cutting concerns
-            framework.configureMiddleware(expressApp, authenticationFilter);
+            framework.configureMiddleware(expressApp, authorizer);
         });
 
         // Configure framework error handling last

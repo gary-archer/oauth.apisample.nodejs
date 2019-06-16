@@ -37,7 +37,7 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
         this._logger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
-        const defaultExpirySeconds = configuration.maxClaimsCacheMinutes * 60;
+        const defaultExpirySeconds = configuration.oauth.maxClaimsCacheMinutes * 60;
         this._cache = new NodeCache({
             stdTTL: defaultExpirySeconds,
         });

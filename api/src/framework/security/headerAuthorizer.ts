@@ -1,14 +1,14 @@
 import {Request} from 'express';
 import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
 import {HttpContextAccessor} from '../utilities/httpContextAccessor';
-import {BaseAuthenticationFilter} from './baseAuthenticationFilter';
+import {BaseAuthorizer} from './baseAuthorizer';
 import {CoreApiClaims} from './coreApiClaims';
 import {HeaderAuthenticator} from './headerAuthenticator';
 
 /*
- * A simple authentication filter for private subnet APIs, to receive claims via headers
+ * A simple authorizer for private subnet APIs, to receive claims via headers
  */
-export class HeaderAuthenticationFilter extends BaseAuthenticationFilter {
+export class HeaderAuthorizer extends BaseAuthorizer {
 
     /*
      * Receive dependencies
@@ -18,7 +18,7 @@ export class HeaderAuthenticationFilter extends BaseAuthenticationFilter {
     }
 
     /*
-     * Do the work to process headers and extracting claims
+     * Do the work to process headers and extract claims
      */
     protected async execute(request: Request): Promise<CoreApiClaims> {
 
@@ -29,8 +29,7 @@ export class HeaderAuthenticationFilter extends BaseAuthenticationFilter {
         const authenticator = container.get<HeaderAuthenticator>(FRAMEWORKTYPES.HeaderAuthenticator);
         const claims = await authenticator.authorizeRequestAndGetClaims(request);
 
-        // Register the claims against this requests's child container
-        // This enables the claims object to be injected into business logic classes
+        // Rebind claims to this requests's child container so that they are injectable into business logic
         container.bind<CoreApiClaims>(FRAMEWORKTYPES.ApiClaims).toConstantValue(claims);
         return claims;
     }

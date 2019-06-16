@@ -3,21 +3,20 @@ import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
 import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
 import {ICustomClaimsProvider} from '../extensibility/icustomClaimsProvider';
 import {ILoggerFactory} from '../logging/iloggerFactory';
-import {BaseAuthenticationFilter} from '../security/baseAuthenticationFilter';
+import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {ClaimsCache} from '../security/claimsCache';
-import {ClaimsMiddleware} from '../security/claimsMiddleware';
 import {ClaimsSupplier} from '../security/claimsSupplier';
 import {CoreApiClaims} from '../security/coreApiClaims';
 import {IssuerMetadata} from '../security/issuerMetadata';
-import {OAuthAuthenticationFilter} from '../security/oauthAuthenticationFilter';
 import {OAuthAuthenticator} from '../security/oauthAuthenticator';
+import {OAuthAuthorizer} from '../security/oauthAuthorizer';
 import {HttpContextAccessor} from '../utilities/httpContextAccessor';
 import {FrameworkInitialiser} from './frameworkInitialiser';
 
 /*
  * A builder style class for configuring OAuth security
  */
-export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
+export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
 
     // Injected dependencies
     private readonly _container: Container;
@@ -44,7 +43,7 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
     /*
      * Consumers of the builder class must provide a constructor function for creating claims
      */
-    public withClaimsSupplier(construct: new () => TClaims): OAuthAuthenticationFilterBuilder<TClaims> {
+    public withClaimsSupplier(construct: new () => TClaims): OAuthAuthorizerBuilder<TClaims> {
         this._claimsSupplier = () => new construct();
         return this;
     }
@@ -53,7 +52,7 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
      * Consumers of the builder class can provide a constructor function for injecting custom claims
      */
     public withCustomClaimsProviderSupplier(construct: new () => ICustomClaimsProvider<TClaims>)
-            : OAuthAuthenticationFilterBuilder<TClaims> {
+            : OAuthAuthorizerBuilder<TClaims> {
 
         this._customClaimsProviderSupplier = () => new construct();
         return this;
@@ -62,7 +61,7 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
     /*
      * Configure any API paths that return unsecured content, such as /api/unsecured
      */
-    public addUnsecuredPath(unsecuredPath: string): OAuthAuthenticationFilterBuilder<TClaims> {
+    public addUnsecuredPath(unsecuredPath: string): OAuthAuthorizerBuilder<TClaims> {
         this._unsecuredPaths.push(unsecuredPath.toLowerCase());
         return this;
     }
@@ -70,7 +69,7 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
     /*
      * Build and return the filter
      */
-    public async build(): Promise<BaseAuthenticationFilter> {
+    public async build(): Promise<BaseAuthorizer> {
 
         // Load Open Id Connect metadata
         const issuerMetadata = new IssuerMetadata(this._configuration);
@@ -93,7 +92,7 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
         this._registerDependencies(issuerMetadata, claimsCache, claimsSupplier);
 
         // Create an object to access the child container per request via the HTTP context
-        return new OAuthAuthenticationFilter<TClaims>(this._unsecuredPaths, new HttpContextAccessor());
+        return new OAuthAuthorizer<TClaims>(this._unsecuredPaths, new HttpContextAccessor());
     }
 
     /*
@@ -116,11 +115,9 @@ export class OAuthAuthenticationFilterBuilder<TClaims extends CoreApiClaims> {
 
         /*** PER REQUEST OBJECTS ***/
 
-        // Register the authenticator and the claims middleware
+        // Register the authenticator
         this._container.bind<OAuthAuthenticator>(FRAMEWORKTYPES.OAuthAuthenticator)
                        .to(OAuthAuthenticator).inRequestScope();
-        this._container.bind<ClaimsMiddleware<TClaims>>(FRAMEWORKTYPES.ClaimsMiddleware)
-                       .to(ClaimsMiddleware).inRequestScope();
 
         // Register dummy values that are overridden by middleware later
         this._container.bind<TClaims>(FRAMEWORKTYPES.ApiClaims)

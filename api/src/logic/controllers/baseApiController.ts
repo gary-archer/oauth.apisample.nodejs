@@ -19,8 +19,15 @@ export class BaseApiController extends BaseHttpController {
      * Get the current log entry and give it the calling method name
      */
     protected setOperationName(name: string): void {
-
         const logEntry = this.httpContext.container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
         logEntry.setOperationName(name);
+    }
+
+    /*
+     * Get the current log entry and give it the runtime path segment details
+     */
+    protected setResourceId(pathSegments: string[]): void {
+        const logEntry = this.httpContext.container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
+        logEntry.setResourceId(pathSegments.join('/'));
     }
 }

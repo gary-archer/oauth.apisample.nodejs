@@ -7,10 +7,10 @@ import {CoreApiClaims} from './coreApiClaims';
 import {CustomPrincipal} from './customPrincipal';
 
 /*
- * A base authentication filter that performs common plumbing
+ * A base authorizer class that manages common plumbing
  */
 @injectable()
-export abstract class BaseAuthenticationFilter {
+export abstract class BaseAuthorizer {
 
     // Injected dependencies
     private readonly _unsecuredPaths: string[];

@@ -8,7 +8,7 @@ import {ILogEntry} from '../logging/ilogEntry';
 import {ILoggerFactory} from '../logging/iloggerFactory';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {LoggerMiddleware} from '../logging/loggerMiddleware';
-import {BaseAuthenticationFilter} from '../security/baseAuthenticationFilter';
+import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {CustomHeaderMiddleware} from '../utilities/customHeaderMiddleware';
 import {HttpContextAccessor} from '../utilities/httpContextAccessor';
 
@@ -79,7 +79,7 @@ export class FrameworkInitialiser {
      */
     public configureMiddleware(
         expressApp: Application,
-        authenticationFilter: BaseAuthenticationFilter): FrameworkInitialiser {
+        authorizer: BaseAuthorizer): FrameworkInitialiser {
 
         // The first middleware starts structured logging of API requests
         const logger = new LoggerMiddleware(this._httpContextAccessor, this._loggerFactory);
@@ -87,10 +87,10 @@ export class FrameworkInitialiser {
             `${this._apiBasePath}*`,
             this._unhandledPromiseRejectionHandler.apply(logger.logRequest));
 
-        // The second middleware manages authentication and claims
+        // The second middleware manages authorization
         expressApp.use(
             `${this._apiBasePath}*`,
-            this._unhandledPromiseRejectionHandler.apply(authenticationFilter.authorizeRequestAndGetClaims));
+            this._unhandledPromiseRejectionHandler.apply(authorizer.authorizeRequestAndGetClaims));
 
         // The third middleware provides non functional testing behaviour
         const handler = new CustomHeaderMiddleware(this._configuration.apiName);

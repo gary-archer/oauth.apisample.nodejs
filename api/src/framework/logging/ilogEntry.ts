@@ -10,6 +10,9 @@ export interface ILogEntry {
     // Business logic must set the operation name, since we cannot derive it generically
     setOperationName(name: string): void;
 
+    // Business logic must set the resource id from path segments, since we cannot derive them generically
+    setResourceId(resourceId: string): void;
+
     // Create a performance breakdown for business logic
     createPerformanceBreakdown(name: string): IPerformanceBreakdown;
 

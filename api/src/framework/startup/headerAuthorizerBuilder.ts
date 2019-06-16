@@ -1,17 +1,16 @@
 import {Container} from 'inversify';
-import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
 import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
-import {BaseAuthenticationFilter} from '../security/baseAuthenticationFilter';
+import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {CoreApiClaims} from '../security/coreApiClaims';
-import {HeaderAuthenticationFilter} from '../security/headerAuthenticationFilter';
 import {HeaderAuthenticator} from '../security/headerAuthenticator';
+import {HeaderAuthorizer} from '../security/headerAuthorizer';
 import {HttpContextAccessor} from '../utilities/httpContextAccessor';
 import {FrameworkInitialiser} from './frameworkInitialiser';
 
 /*
- * A builder style class for configuring header authentication
+ * A builder style class for configuring header based authorization
  */
-export class HeaderAuthenticationFilterBuilder {
+export class HeaderAuthorizerBuilder {
 
     // Injected dependencies
     private readonly _container: Container;
@@ -34,7 +33,7 @@ export class HeaderAuthenticationFilterBuilder {
     /*
      * Configure any API paths that return unsecured content, such as /api/unsecured
      */
-    public addUnsecuredPath(unsecuredPath: string): HeaderAuthenticationFilterBuilder {
+    public addUnsecuredPath(unsecuredPath: string): HeaderAuthorizerBuilder {
         this._unsecuredPaths.push(unsecuredPath.toLowerCase());
         return this;
     }
@@ -42,13 +41,13 @@ export class HeaderAuthenticationFilterBuilder {
     /*
      * Build and return the filter
      */
-    public build(): BaseAuthenticationFilter {
+    public build(): BaseAuthorizer {
 
         // Register OAuth related dependencies
         this._registerDependencies();
 
         // Create an object to access the child container per request via the HTTP context
-        return new HeaderAuthenticationFilter(this._unsecuredPaths, new HttpContextAccessor());
+        return new HeaderAuthorizer(this._unsecuredPaths, new HttpContextAccessor());
     }
 
     /*
