@@ -38,7 +38,7 @@ export class Authenticator {
             loadUserInfo: false,
             automaticSilentRenew: true,
             monitorSession: false,
-        };
+        } as Oidc.UserManagerSettings;
 
         // Create the user manager
         this._userManager = new Oidc.UserManager(settings);
