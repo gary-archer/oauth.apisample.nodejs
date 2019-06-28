@@ -13,7 +13,7 @@ export class UserInfoController extends BaseApiController {
      * Return any user claims needed by the UI
      */
     @httpGet('/current')
-    private getUserClaims(): UserInfoClaims {
+    public getUserClaims(): UserInfoClaims {
 
         // Log the operation name, which the framework cannot derive
         super.setOperationName(this.getUserClaims.name);
