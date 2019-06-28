@@ -32,6 +32,9 @@ class App {
      * The entry point for the SPA
      */
     public async execute(): Promise<void> {
+        
+        // Set initial state
+        $('.initiallydisabled').prop('disabled', true);
 
         // Set up click handlers
         $('#btnHome').click(this._onHome);
