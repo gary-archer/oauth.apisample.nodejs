@@ -1,4 +1,4 @@
-# authguidance.apisample.node
+# authguidance.apisample.nodejs
 
 ### Overview
 
