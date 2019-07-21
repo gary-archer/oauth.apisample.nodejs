@@ -1,5 +1,3 @@
-.gitignore
 node_modules
-dist
 logs
 .DS_Store

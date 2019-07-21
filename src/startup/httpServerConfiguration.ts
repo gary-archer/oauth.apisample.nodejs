@@ -15,9 +15,9 @@ import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvi
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 
 /*
- * The relative path to web files
+ * The relative path to web files, from the standalone SPA code sample
  */
-const WEB_FILES_ROOT = '../../..';
+const WEB_FILES_ROOT = '../../../authguidance.websample.final';
 
 /*
  * Configure HTTP behaviour at application startup
@@ -147,7 +147,7 @@ export class HttpServerConfiguration {
            resourcePath = 'index.html';
         }
 
-        const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/spa/${resourcePath}`);
+        const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/${resourcePath}`);
         response.sendFile(webFilePath);
     }
 
@@ -156,7 +156,7 @@ export class HttpServerConfiguration {
      */
     private _getWebRootResource(request: Request, response: Response): void {
 
-        const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/spa/index.html`);
+        const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/index.html`);
         response.sendFile(webFilePath);
     }
 
@@ -165,7 +165,7 @@ export class HttpServerConfiguration {
      */
     private _getFavicon(request: Request, response: Response): void {
 
-        const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/spa/favicon.ico`);
+        const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/favicon.ico`);
         response.sendFile(webFilePath);
     }
 }
