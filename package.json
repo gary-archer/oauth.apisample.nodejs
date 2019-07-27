@@ -1,7 +1,7 @@
 {
   "name": "basicapi",
   "version": "3.0.0",
-  "description": "A Basic OAuth secured API",
+  "description": "A Basic OAuth secured API with frameworkised code for NFRs",
   "main": "app.ts",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
@@ -18,11 +18,11 @@
     "guid-typescript": "^1.0.9",
     "https": "^1.0.0",
     "inversify": "^5.0.1",
-    "inversify-express-utils": "^6.3.2",
     "js-sha256": "^0.9.0",
     "node-cache": "^4.2.0",
     "openid-client": "^2.4.5",
     "reflect-metadata": "^0.1.13",
+    "tsoa": "^2.4.3",
     "tunnel-agent": "^0.6.0",
     "url": "^0.11.0",
     "winston": "^3.2.1",

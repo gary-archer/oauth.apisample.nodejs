@@ -8,9 +8,9 @@ import {ILogEntry} from '../logging/ilogEntry';
 import {ILoggerFactory} from '../logging/iloggerFactory';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {LoggerMiddleware} from '../logging/loggerMiddleware';
+import {ChildContainerMiddleware} from '../middleware/childContainerMiddleware';
+import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
-import {CustomHeaderMiddleware} from '../utilities/customHeaderMiddleware';
-import {HttpContextAccessor} from '../utilities/httpContextAccessor';
 
 /*
  * A builder style class to configure framework behaviour and to register its dependencies
@@ -21,7 +21,6 @@ export class FrameworkInitialiser {
     private readonly _container: Container;
     private readonly _configuration: FrameworkConfiguration;
     private readonly _loggerFactory: ILoggerFactory;
-    private readonly _httpContextAccessor: HttpContextAccessor;
 
     // Properties set via builder methods
     private _apiBasePath: string;
@@ -41,7 +40,6 @@ export class FrameworkInitialiser {
         this._container = container;
         this._configuration = configuration;
         this._loggerFactory = loggerFactory;
-        this._httpContextAccessor = new HttpContextAccessor();
         this._apiBasePath = '/';
     }
 
@@ -59,12 +57,12 @@ export class FrameworkInitialiser {
     }
 
     /*
-     * Prepare the framework
+     * Prepare framework dependencies
      */
-    public prepare(): FrameworkInitialiser {
+    public registerDependencies(): FrameworkInitialiser {
 
         // Create the unhandled exception handler for API requests
-        this._exceptionHandler = new UnhandledExceptionHandler(this._configuration, this._httpContextAccessor);
+        this._exceptionHandler = new UnhandledExceptionHandler(this._configuration);
 
         // Create an object to handle unpromised rejection exceptions in Express middleware
         this._unhandledPromiseRejectionHandler = new UnhandledPromiseRejectionHandler(this._exceptionHandler);
@@ -81,31 +79,24 @@ export class FrameworkInitialiser {
         expressApp: Application,
         authorizer: BaseAuthorizer): FrameworkInitialiser {
 
-        // The first middleware starts structured logging of API requests
-        const logger = new LoggerMiddleware(this._httpContextAccessor, this._loggerFactory);
-        expressApp.use(
-            `${this._apiBasePath}*`,
-            this._unhandledPromiseRejectionHandler.apply(logger.logRequest));
+        // First configure middleware to create a child container per request
+        const childContainerMiddleware = new ChildContainerMiddleware(this._container);
+        expressApp.use(`${this._apiBasePath}*`, childContainerMiddleware.create);
 
-        // The second middleware manages authorization
+        // The first real middleware starts structured logging of API requests
+        const logger = new LoggerMiddleware(this._loggerFactory);
+        expressApp.use(`${this._apiBasePath}*`, logger.logRequest);
+
+        // The second middleware manages authorization, and we need to catch unhandled promise exceptions
         expressApp.use(
             `${this._apiBasePath}*`,
             this._unhandledPromiseRejectionHandler.apply(authorizer.authorizeRequestAndGetClaims));
 
-        // The third middleware provides non functional testing behaviour
+        // The third middleware supports non functional testing via headers
         const handler = new CustomHeaderMiddleware(this._configuration.apiName);
-        expressApp.use(
-            `${this._apiBasePath}*`,
-            this._unhandledPromiseRejectionHandler.apply(handler.processHeaders));
+        expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
 
-        return this;
-    }
-
-    /*
-     * Express error middleware is configured last, to catch unhandled exceptions
-     */
-    public configureExceptionHandler(expressApp: Application): FrameworkInitialiser {
-
+        // An unhandled exception middleware is configured last
         expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler.handleException);
         return this;
     }

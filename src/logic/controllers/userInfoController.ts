@@ -1,31 +1,30 @@
-import {controller, httpGet} from 'inversify-express-utils';
+import {Controller, Get, Path, Route} from 'tsoa';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {UserInfoClaims} from '../entities/userInfoClaims';
-import {BaseApiController} from './baseApiController';
 
 /*
  * A controller class to return user info
  */
-@controller('/userclaims')
-export class UserInfoController extends BaseApiController {
+@Route('/userclaims')
+export class UserInfoController extends Controller {
+
+    private readonly _claims: BasicApiClaims;
+
+    public constructor(claims: BasicApiClaims) {
+        super();
+        this._claims = claims;
+    }
 
     /*
      * Return any user claims needed by the UI
      */
-    @httpGet('/current')
+    @Get('/current')
     public getUserClaims(): UserInfoClaims {
 
-        // Log the operation name, which the framework cannot derive
-        super.setOperationName(this.getUserClaims.name);
-
-        // We can get claims from the HTTP context
-        const claims = super.getHttpContext().user.details as BasicApiClaims;
-
-        // Return user info to the UI
         return {
-            givenName: claims.givenName,
-            familyName: claims.familyName,
-            email: claims.email,
+            givenName: this._claims.givenName,
+            familyName: this._claims.familyName,
+            email: this._claims.email,
         } as UserInfoClaims;
     }
 }

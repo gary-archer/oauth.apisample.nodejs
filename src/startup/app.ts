@@ -24,8 +24,8 @@ import {HttpServerConfiguration} from './httpServerConfiguration';
 
         // Configure then start the HTTP server
         const httpServer = new HttpServerConfiguration(configuration, container, loggerFactory);
-        const app = await httpServer.configure();
-        httpServer.start(app);
+        await httpServer.configure();
+        httpServer.start();
 
     } catch (e) {
 

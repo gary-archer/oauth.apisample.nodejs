@@ -1,13 +1,13 @@
 import {Request, Response} from 'express';
 import {Guid} from 'guid-typescript';
 import {injectable} from 'inversify';
-import {interfaces} from 'inversify-express-utils';
 import * as os from 'os';
 import {Logger} from 'winston';
 import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
 import {ApiError} from '../errors/apiError';
 import {IClientError} from '../extensibility/iclientError';
 import {CoreApiClaims} from '../security/coreApiClaims';
+import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {IDisposable} from '../utilities/idisposable';
 import {ChildLogEntry} from './childLogEntry';
 import {ILogEntry} from './ilogentry';
@@ -24,9 +24,9 @@ export class LogEntry implements ILogEntry {
     /*
      * Return the current log entry's full implementation type to the framework
      */
-    public static getCurrent(httpContext: interfaces.HttpContext): LogEntry {
+    public static getCurrent(request: Request): LogEntry {
 
-        const found = httpContext.container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
+        const found = ChildContainerHelper.resolve(request).get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
         if (found && found instanceof LogEntry) {
             return found as LogEntry;
         }

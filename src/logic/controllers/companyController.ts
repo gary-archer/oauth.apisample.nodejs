@@ -1,24 +1,19 @@
 import {inject} from 'inversify';
-import {controller, httpGet, requestParam} from 'inversify-express-utils';
+import {Controller, Get, Path, Route} from 'tsoa';
 import {TYPES} from '../../dependencies/types';
 import {ClientError} from '../../framework';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
 import {CompanyRepository} from '../repositories/companyRepository';
-import {BaseApiController} from './baseApiController';
 
 /*
  * Our API controller runs after claims handling has completed
  */
-@controller('/companies')
-export class CompanyController extends BaseApiController {
+@Route('/companies')
+export class CompanyController extends Controller {
 
-    // Injected dependencies
     private readonly _repository: CompanyRepository;
 
-    /*
-     * Receive dependencies
-     */
     public constructor(@inject(TYPES.CompanyRepository) repository: CompanyRepository) {
         super();
         this._repository = repository;
@@ -27,25 +22,16 @@ export class CompanyController extends BaseApiController {
     /*
      * Return the list of companies
      */
-    @httpGet('/')
+    @Get('/')
     public async getCompanyList(): Promise<Company[]> {
-
-        // Log details the framework cannot derive
-        super.setOperationName(this.getCompanyList.name);
-
-        // Do the work of the operation
         return await this._repository.getCompanyList();
     }
 
     /*
      * Return the transaction details for a company
      */
-    @httpGet('/:id/transactions')
-    public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
-
-        // Log details the framework cannot derive
-        super.setOperationName(this.getCompanyTransactions.name);
-        super.setResourceId([id]);
+    @Get('/{id}/transactions')
+    public async getCompanyTransactions(@Path('id') id: string): Promise<CompanyTransactions> {
 
         // Throw a 400 error if we have an invalid id
         const idValue = parseInt(id, 10);

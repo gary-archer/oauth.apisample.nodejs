@@ -1,6 +1,6 @@
 import {Request} from 'express';
 import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
-import {HttpContextAccessor} from '../utilities/httpContextAccessor';
+import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {BaseAuthorizer} from './baseAuthorizer';
 import {CoreApiClaims} from './coreApiClaims';
 import {HeaderAuthenticator} from './headerAuthenticator';
@@ -13,8 +13,8 @@ export class HeaderAuthorizer extends BaseAuthorizer {
     /*
      * Receive dependencies
      */
-    public constructor(unsecuredPaths: string[], contextAccessor: HttpContextAccessor) {
-        super(unsecuredPaths, contextAccessor);
+    public constructor(unsecuredPaths: string[]) {
+        super(unsecuredPaths);
     }
 
     /*
@@ -23,7 +23,7 @@ export class HeaderAuthorizer extends BaseAuthorizer {
     protected async execute(request: Request): Promise<CoreApiClaims> {
 
         // Get the child container for this HTTP request
-        const container = super.getHttpContext(request).container;
+        const container = ChildContainerHelper.resolve(request);
 
         // Resolve the authenticator class and ask it to do the work
         const authenticator = container.get<HeaderAuthenticator>(FRAMEWORKTYPES.HeaderAuthenticator);

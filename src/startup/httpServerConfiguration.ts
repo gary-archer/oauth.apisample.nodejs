@@ -1,9 +1,8 @@
 import * as cors from 'cors';
-import {Application, Request, Response} from 'express';
+import * as express from 'express';
 import * as fs from 'fs';
 import * as https from 'https';
 import {Container} from 'inversify';
-import {InversifyExpressServer, TYPE} from 'inversify-express-utils';
 import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
@@ -30,6 +29,7 @@ export class HttpServerConfiguration {
     private readonly _configuration: Configuration;
     private readonly _container: Container;
     private readonly _loggerFactory: ILoggerFactory;
+    private readonly _expressApp: express.Application;
 
     /*
      * Receive the configuration and the container
@@ -38,69 +38,50 @@ export class HttpServerConfiguration {
         this._configuration = configuration;
         this._container = container;
         this._loggerFactory = loggerFactory;
+        this._expressApp = express();
     }
 
     /*
      * Configure behaviour before starting the server
      */
-    public async configure(): Promise<Application> {
+    public async configure(): Promise<void> {
 
-        // Create the server, which will use registered @controller attributes to set up Express routes
-        // Note that we do not use the final parameter as an auth provider due to dependency injection limitations
-        const server = new InversifyExpressServer(
+        // Create a class to do OAuth authorization
+        const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(
             this._container,
-            null,
-            {rootPath: '/api/'},
-            null,
-            null);
+            this._configuration.framework,
+            this._loggerFactory)
+                .withClaimsSupplier(BasicApiClaims)
+                .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
+                .build();
 
-        // Prepare the framework
-        const framework = new FrameworkInitialiser(
+        // Initialise the framework
+        new FrameworkInitialiser(
             this._container,
             this._configuration.framework,
             this._loggerFactory)
                 .withApiBasePath('/api/')
-                .prepare();
-
-        // Create a class to do OAuth authorization
-        const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(framework)
-            .withClaimsSupplier(BasicApiClaims)
-            .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
-            .build();
+                .registerDependencies()
+                .configureMiddleware(this._expressApp, authorizer);
 
         // Next register the API's business logic dependencies
         CompositionRoot.registerDependencies(this._container);
 
-        // Configure middleware
-        server.setConfig((expressApp: Application) => {
+        // Our API requests are not designed for caching
+        this._expressApp.set('etag', false);
 
-            // Our API requests are not designed for caching
-            expressApp.set('etag', false);
+        // Allow cross origin requests from the SPA
+        const corsOptions = { origin: this._configuration.api.trustedOrigins };
+        this._expressApp.use('/api/*', cors(corsOptions));
 
-            // Allow cross origin requests from the SPA
-            const corsOptions = { origin: this._configuration.api.trustedOrigins };
-            expressApp.use('/api/*', cors(corsOptions));
-
-            // Configure how web static content is served
-            this._configureWebStaticContent(expressApp);
-
-            // Configure framework cross cutting concerns
-            framework.configureMiddleware(expressApp, authorizer);
-        });
-
-        // Configure framework error handling last
-        server.setErrorConfig((expressApp: Application) => {
-            framework.configureExceptionHandler(expressApp);
-        });
-
-        // Build and return the express app
-        return server.build();
+        // Configure how web static content is served
+        this._configureWebStaticContent();
     }
 
     /*
      * Start listening for requests
      */
-    public start(expressApp: Application): void {
+    public start(): void {
 
         // Use the web URL to determine the port
         const webUrl = url.parse(this._configuration.api.trustedOrigins[0]);
@@ -118,7 +99,7 @@ export class HttpServerConfiguration {
         };
 
         // Start listening on HTTPS
-        const httpsServer = https.createServer(sslOptions, expressApp);
+        const httpsServer = https.createServer(sslOptions, this._expressApp);
         httpsServer.listen(port, () => {
 
             // Show a startup message
@@ -130,17 +111,17 @@ export class HttpServerConfiguration {
     /*
      * Handle requests for static web content
      */
-    private _configureWebStaticContent(expressApp: Application): void {
+    private _configureWebStaticContent(): void {
 
-        expressApp.get('/spa/*', this._getWebResource);
-        expressApp.get('/spa', this._getWebRootResource);
-        expressApp.get('/favicon.ico', this._getFavicon);
+        this._expressApp.get('/spa/*', this._getWebResource);
+        this._expressApp.get('/spa', this._getWebRootResource);
+        this._expressApp.get('/favicon.ico', this._getFavicon);
     }
 
     /*
      * Serve up the requested web file
      */
-    private _getWebResource(request: Request, response: Response): void {
+    private _getWebResource(request: express.Request, response: express.Response): void {
 
         let resourcePath = request.path.replace('spa/', '');
         if (resourcePath === '/') {
@@ -154,7 +135,7 @@ export class HttpServerConfiguration {
     /*
      * Serve up the requested web file
      */
-    private _getWebRootResource(request: Request, response: Response): void {
+    private _getWebRootResource(request: express.Request, response: express.Response): void {
 
         const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/index.html`);
         response.sendFile(webFilePath);
@@ -163,7 +144,7 @@ export class HttpServerConfiguration {
     /*
      * Serve up our favicon
      */
-    private _getFavicon(request: Request, response: Response): void {
+    private _getFavicon(request: express.Request, response: express.Response): void {
 
         const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/favicon.ico`);
         response.sendFile(webFilePath);

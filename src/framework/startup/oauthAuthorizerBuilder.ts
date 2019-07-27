@@ -10,33 +10,23 @@ import {CoreApiClaims} from '../security/coreApiClaims';
 import {IssuerMetadata} from '../security/issuerMetadata';
 import {OAuthAuthenticator} from '../security/oauthAuthenticator';
 import {OAuthAuthorizer} from '../security/oauthAuthorizer';
-import {HttpContextAccessor} from '../utilities/httpContextAccessor';
-import {FrameworkInitialiser} from './frameworkInitialiser';
 
 /*
  * A builder style class for configuring OAuth security
  */
 export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
 
-    // Injected dependencies
     private readonly _container: Container;
     private readonly _configuration: FrameworkConfiguration;
     private readonly _loggerFactory: ILoggerFactory;
-
-    // Properties set via builder methods
     private _claimsSupplier!: () => TClaims;
     private _customClaimsProviderSupplier!: () => ICustomClaimsProvider<TClaims>;
     private _unsecuredPaths: string[];
 
-    /*
-     * Receive dependencies
-     */
-    public constructor(framework: FrameworkInitialiser) {
-
-        // Get properties from the framework
-        [this._container, this._configuration, this._loggerFactory] = framework.getProperties();
-
-        // Initialise other properties
+    public constructor(container: Container, configuration: FrameworkConfiguration, loggerFactory: ILoggerFactory) {
+        this._container = container;
+        this._configuration = configuration;
+        this._loggerFactory = loggerFactory;
         this._unsecuredPaths = [];
     }
 
@@ -92,7 +82,7 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
         this._registerDependencies(issuerMetadata, claimsCache, claimsSupplier);
 
         // Create an object to access the child container per request via the HTTP context
-        return new OAuthAuthorizer<TClaims>(this._unsecuredPaths, new HttpContextAccessor());
+        return new OAuthAuthorizer<TClaims>(this._unsecuredPaths);
     }
 
     /*

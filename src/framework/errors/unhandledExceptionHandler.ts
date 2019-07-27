@@ -1,7 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
 import {LogEntry} from '../logging/logEntry';
-import {HttpContextAccessor} from '../utilities/httpContextAccessor';
 import {ResponseWriter} from '../utilities/responseWriter';
 import {ApiError} from './apiError';
 import {ExceptionHelper} from './exceptionHelper';
@@ -12,15 +11,13 @@ import {ExceptionHelper} from './exceptionHelper';
 export class UnhandledExceptionHandler {
 
     private readonly _configuration: FrameworkConfiguration;
-    private readonly _contextAccessor: HttpContextAccessor;
 
     /*
      * Receive dependencies
      */
-    public constructor(configuration: FrameworkConfiguration, contextAccessor: HttpContextAccessor) {
+    public constructor(configuration: FrameworkConfiguration) {
 
         this._configuration = configuration;
-        this._contextAccessor = contextAccessor;
         this._setupCallbacks();
     }
 
@@ -30,8 +27,7 @@ export class UnhandledExceptionHandler {
     public handleException(exception: any, request: Request, response: Response, next: NextFunction): void {
 
         // Get the log entry for this API request
-        const httpContext = this._contextAccessor.getHttpContext(request);
-        const logEntry = LogEntry.getCurrent(httpContext);
+        const logEntry = LogEntry.getCurrent(request);
 
         // Get the error into a known object
         const error = ExceptionHelper.fromException(exception, this._configuration.apiName);

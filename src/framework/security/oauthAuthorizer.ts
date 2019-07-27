@@ -1,7 +1,7 @@
 import {Request} from 'express';
 import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
 import {ClientError} from '../errors/clientError';
-import {HttpContextAccessor} from '../utilities/httpContextAccessor';
+import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {BaseAuthorizer} from './baseAuthorizer';
 import {ClaimsCache} from './claimsCache';
 import {ClaimsSupplier} from './claimsSupplier';
@@ -16,8 +16,8 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
     /*
      * Receive dependencies
      */
-    public constructor(unsecuredPaths: string[], contextAccessor: HttpContextAccessor) {
-        super(unsecuredPaths, contextAccessor);
+    public constructor(unsecuredPaths: string[]) {
+        super(unsecuredPaths);
     }
 
     /*
@@ -32,7 +32,7 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         }
 
         // Get the child container for this HTTP request
-        const container = super.getHttpContext(request).container;
+        const container = ChildContainerHelper.resolve(request);
 
         // Bypass and use cached results if they exist
         const cache = container.get<ClaimsCache<TClaims>>(FRAMEWORKTYPES.ClaimsCache);
