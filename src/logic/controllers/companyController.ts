@@ -1,5 +1,5 @@
-import {inject} from 'inversify';
-import {Controller, Get, Path, Route} from 'tsoa';
+import {inject, injectable} from 'inversify';
+import {Get, JsonController, Param} from 'routing-controllers';
 import {TYPES} from '../../dependencies/types';
 import {ClientError} from '../../framework';
 import {Company} from '../entities/company';
@@ -9,13 +9,13 @@ import {CompanyRepository} from '../repositories/companyRepository';
 /*
  * Our API controller runs after claims handling has completed
  */
-@Route('/companies')
-export class CompanyController extends Controller {
+@injectable()
+@JsonController('/api/companies')
+export class CompanyController {
 
     private readonly _repository: CompanyRepository;
 
     public constructor(@inject(TYPES.CompanyRepository) repository: CompanyRepository) {
-        super();
         this._repository = repository;
     }
 
@@ -30,8 +30,8 @@ export class CompanyController extends Controller {
     /*
      * Return the transaction details for a company
      */
-    @Get('/{id}/transactions')
-    public async getCompanyTransactions(@Path('id') id: string): Promise<CompanyTransactions> {
+    @Get('/:id/transactions')
+    public async getCompanyTransactions(@Param('id') id: string): Promise<CompanyTransactions> {
 
         // Throw a 400 error if we have an invalid id
         const idValue = parseInt(id, 10);

@@ -1,17 +1,26 @@
-import {Controller, Get, Path, Route} from 'tsoa';
+import {inject, injectable} from 'inversify';
+import {Get, JsonController} from 'routing-controllers';
+import {FRAMEWORKTYPES} from '../../framework';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {UserInfoClaims} from '../entities/userInfoClaims';
-
 /*
  * A controller class to return user info
  */
-@Route('/userclaims')
-export class UserInfoController extends Controller {
+@injectable()
+@JsonController('/api/userclaims')
+export class UserInfoController {
 
     private readonly _claims: BasicApiClaims;
 
-    public constructor(claims: BasicApiClaims) {
-        super();
+    public constructor(@inject(FRAMEWORKTYPES.ApiClaims) claims: BasicApiClaims) {
+
+        // TODO: We get the default empty object claims so recreate them here
+        // https://github.com/typestack/routing-controllers/pull/497
+        claims = new BasicApiClaims();
+        claims.setTokenInfo('USERID', 'CLIENTID', ['openid']);
+        claims.setCentralUserInfo('Fred', 'Flintstone', 'fred@bedrock.com');
+        claims.accountsCovered = [1, 2, 4];
+
         this._claims = claims;
     }
 

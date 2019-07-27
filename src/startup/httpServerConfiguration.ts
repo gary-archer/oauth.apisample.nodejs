@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as https from 'https';
 import {Container} from 'inversify';
 import * as path from 'path';
+import {useContainer, useExpressServer} from 'routing-controllers';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
@@ -11,6 +12,8 @@ import {ILoggerFactory} from '../framework';
 import {FrameworkInitialiser} from '../framework';
 import {OAuthAuthorizerBuilder} from '../framework';
 import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvider';
+import {CompanyController} from '../logic/controllers/companyController';
+import {UserInfoController} from '../logic/controllers/userInfoController';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 
 /*
@@ -46,7 +49,35 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Create a class to do OAuth authorization
+        // First register the middleware to allow cross origin requests from the SPA
+        // This prevents other middleware firing for OPTIONS requests
+        const corsOptions = { origin: this._configuration.api.trustedOrigins };
+        this._expressApp.use('/api/*', cors(corsOptions));
+
+        // Our API requests are not designed for caching
+        this._expressApp.set('etag', false);
+
+        // Configure how web static content is served
+        this._configureWebStaticContent();
+
+        // Register the API's business logic dependencies
+        CompositionRoot.registerDependencies(this._container);
+
+        // Wire up 'Routing Controllers' and the annotations we've applied to controllers
+        useExpressServer(
+            this._expressApp, {
+                controllers: [CompanyController, UserInfoController],
+            });
+
+        // TODO: This does not work for items in a child container per request
+        // For auto wiring to work we must use the resolve method rather than get
+        useContainer({
+            get: (someClass: any) => {
+                return this._container.resolve(someClass);
+            },
+        });
+
+        // Create a framework class to do OAuth authorization
         const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(
             this._container,
             this._configuration.framework,
@@ -55,7 +86,7 @@ export class HttpServerConfiguration {
                 .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
                 .build();
 
-        // Initialise the framework
+        // Initialise the framework and its cross cutting middleware classes
         new FrameworkInitialiser(
             this._container,
             this._configuration.framework,
@@ -63,19 +94,6 @@ export class HttpServerConfiguration {
                 .withApiBasePath('/api/')
                 .registerDependencies()
                 .configureMiddleware(this._expressApp, authorizer);
-
-        // Next register the API's business logic dependencies
-        CompositionRoot.registerDependencies(this._container);
-
-        // Our API requests are not designed for caching
-        this._expressApp.set('etag', false);
-
-        // Allow cross origin requests from the SPA
-        const corsOptions = { origin: this._configuration.api.trustedOrigins };
-        this._expressApp.use('/api/*', cors(corsOptions));
-
-        // Configure how web static content is served
-        this._configureWebStaticContent();
     }
 
     /*

@@ -1,7 +1,7 @@
 {
   "name": "basicapi",
   "version": "3.0.0",
-  "description": "A Basic OAuth secured API with frameworkised code for NFRs",
+  "description": "A Basic OAuth secured API with shared code for security, logging and error handling",
   "main": "app.ts",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
@@ -22,7 +22,7 @@
     "node-cache": "^4.2.0",
     "openid-client": "^2.4.5",
     "reflect-metadata": "^0.1.13",
-    "tsoa": "^2.4.3",
+    "routing-controllers": "^0.7.7",
     "tunnel-agent": "^0.6.0",
     "url": "^0.11.0",
     "winston": "^3.2.1",

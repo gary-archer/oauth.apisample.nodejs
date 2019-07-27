@@ -22,7 +22,7 @@ import {HttpServerConfiguration} from './httpServerConfiguration';
         // Initialize HTTP debugging
         DebugProxyAgent.initialize(configuration.api.useProxy, configuration.api.proxyUrl);
 
-        // Configure then start the HTTP server
+        // Configure the API behaviour at startup
         const httpServer = new HttpServerConfiguration(configuration, container, loggerFactory);
         await httpServer.configure();
         httpServer.start();

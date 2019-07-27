@@ -26,12 +26,13 @@ export class LogEntry implements ILogEntry {
      */
     public static getCurrent(request: Request): LogEntry {
 
+        // TODO: Cannot resolve child container when there is a 403 request to company 3
         const found = ChildContainerHelper.resolve(request).get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
         if (found && found instanceof LogEntry) {
             return found as LogEntry;
         }
 
-        throw new Error('Unable to get the log entry from the HTTP context');
+        throw new Error('Unable to get the log entry from the request child container');
     }
 
     // Data logged
@@ -73,6 +74,7 @@ export class LogEntry implements ILogEntry {
         this._data.requestVerb = request.method;
         this._data.requestPath = request.originalUrl;
 
+        // TODO
         // I would like to set resource id here from request.params, which should contain URL path segments
         // However, inversify express breaks this, and params are set to the entire path instead
         // https://stackoverflow.com/questions/43170095/how-to-access-url-segments-in-expressjs
