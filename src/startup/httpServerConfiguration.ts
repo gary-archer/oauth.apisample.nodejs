@@ -8,9 +8,9 @@ import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
-import {ILoggerFactory} from '../framework/logging/iloggerFactory';
-import {FrameworkInitialiser} from '../framework/startup/frameworkInitialiser';
-import {OAuthAuthorizerBuilder} from '../framework/startup/oauthAuthorizerBuilder';
+import {ILoggerFactory} from '../framework';
+import {FrameworkInitialiser} from '../framework';
+import {OAuthAuthorizerBuilder} from '../framework';
 import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvider';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 
