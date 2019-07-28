@@ -6,9 +6,10 @@ export const FRAMEWORKTYPES = {
     // The framework manages its own configuration
     Configuration: Symbol.for('Configuration'),
 
-    // The framework manages logging objects
+    // The framework manages objects for logging and exception handling
     LoggerFactory: Symbol.for('LoggerFactory'),
     ILogEntry: Symbol.for('ILogEntry'),
+    UnhandledExceptionHandler: Symbol.for('UnhandledExceptionHandler'),
 
     // The framework manages core security classes
     IssuerMetadata: Symbol.for('IssuerMetadata'),

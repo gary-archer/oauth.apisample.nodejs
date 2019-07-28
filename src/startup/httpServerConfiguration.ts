@@ -8,9 +8,7 @@ import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
 import {TYPES} from '../dependencies/types';
-import {ILoggerFactory} from '../framework';
-import {FrameworkInitialiser} from '../framework';
-import {OAuthAuthorizerBuilder} from '../framework';
+import * as framework from '../framework';
 import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvider';
 import {CompanyController} from '../logic/controllers/companyController';
 import {UserInfoController} from '../logic/controllers/userInfoController';
@@ -31,13 +29,13 @@ export class HttpServerConfiguration {
      */
     private readonly _configuration: Configuration;
     private readonly _container: Container;
-    private readonly _loggerFactory: ILoggerFactory;
+    private readonly _loggerFactory: framework.ILoggerFactory;
     private readonly _expressApp: express.Application;
 
     /*
      * Receive the configuration and the container
      */
-    public constructor(configuration: Configuration, container: Container, loggerFactory: ILoggerFactory) {
+    public constructor(configuration: Configuration, container: Container, loggerFactory: framework.ILoggerFactory) {
         this._configuration = configuration;
         this._container = container;
         this._loggerFactory = loggerFactory;
@@ -49,30 +47,13 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
+        // TODO: Give consumer control over middleware - make it explicit - and allow error middleware last
+        // Add a comment to indicate 'app middleware goes here'
+
         // First register the middleware to allow cross origin requests from the SPA
         // This prevents other middleware firing for OPTIONS requests
         const corsOptions = { origin: this._configuration.api.trustedOrigins };
         this._expressApp.use('/api/*', cors(corsOptions));
-
-        // Configure framework security first
-        const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(
-            this._container,
-            this._configuration.framework,
-            this._loggerFactory)
-                .withClaimsSupplier(BasicApiClaims)
-                .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
-                .build();
-
-        // Configure framework base behaviour
-        new FrameworkInitialiser(
-            this._container,
-            this._configuration.framework,
-            this._loggerFactory)
-                .withApiBasePath('/api/')
-                .build(this._expressApp, authorizer);
-
-        // Register the API's business logic dependencies
-        CompositionRoot.registerDependencies(this._container);
 
         // Our API requests are not designed for caching
         this._expressApp.set('etag', false);
@@ -80,8 +61,33 @@ export class HttpServerConfiguration {
         // Configure how web static content is served
         this._configureWebStaticContent();
 
-        // Finally configure API routes to call our controllers
+        // Register base framework dependencies
+        const frameworkInitialiser = new framework.FrameworkInitialiser(
+            this._container,
+            this._configuration.framework,
+            this._loggerFactory)
+                .withApiBasePath('/api/')
+                .register();
+
+        // Create an authorizer and register its dependencies
+        const authorizer = await new framework.OAuthAuthorizerBuilder<BasicApiClaims>(
+            this._container,
+            this._configuration.framework,
+            this._loggerFactory)
+                .withClaimsSupplier(BasicApiClaims)
+                .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
+                .build();
+
+        // Register the API's business logic dependencies
+        CompositionRoot.registerDependencies(this._container);
+
+        // TODO: Still problems with ordering since exceptions are handled by the default express handler first
+        // Compare this with master branch
+
+        // Configure middleware, then API routes, then exception handling
+        frameworkInitialiser.configureMiddleware(this._expressApp, authorizer);
         this._configureApiRoutes();
+        frameworkInitialiser.configureExceptionHandler(this._expressApp);
     }
 
     /*
@@ -115,19 +121,21 @@ export class HttpServerConfiguration {
     }
 
     /*
-     * We do our own controller resolution, rather than using annotation based libraries that change core behaviour
-     * This makes our core framework logging easier to implement without library behaviour getting in the way
+     * We do our own controller resolution, rather than using annotation based libraries
+     * This keeps our sample's coding model focused on Express only
      */
     private _configureApiRoutes(): void {
 
+        const router = new framework.Router(this._container);
+
         this._expressApp.get('/api/userclaims/current',
-            this._container.get<UserInfoController>(TYPES.UserInfoController).getUserClaims);
+            router.getHandler<UserInfoController>(TYPES.UserInfoController, (c) => c.getUserClaims));
 
         this._expressApp.get('/api/companies',
-            this._container.get<CompanyController>(TYPES.CompanyController).getCompanyList);
+            router.getAsyncHandler<CompanyController>(TYPES.CompanyController, (c) => c.getCompanyList));
 
         this._expressApp.get('/api/companies/:id/transactions',
-            this._container.get<CompanyController>(TYPES.CompanyController).getCompanyTransactions);
+            router.getAsyncHandler<CompanyController>(TYPES.CompanyController, (c) => c.getCompanyTransactions));
     }
 
     /*

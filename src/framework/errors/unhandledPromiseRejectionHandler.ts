@@ -18,6 +18,7 @@ export class UnhandledPromiseRejectionHandler {
      */
     public apply(fn: any): any {
 
+        // TODO: Improve this
         return (request: Request, response: Response, next: NextFunction) => {
 
             Promise

@@ -19,9 +19,11 @@ import {CoreApiClaims} from './security/coreApiClaims';
 import {FrameworkInitialiser} from './startup/frameworkInitialiser';
 import {HeaderAuthorizerBuilder} from './startup/headerAuthorizerBuilder';
 import {OAuthAuthorizerBuilder} from './startup/oauthAuthorizerBuilder';
+import {ChildContainerHelper} from './utilities/childContainerHelper';
 import {DebugProxyAgent} from './utilities/debugProxyAgent';
 import {IDisposable} from './utilities/idisposable';
 import {ResponseWriter} from './utilities/responseWriter';
+import {Router} from './utilities/router';
 import {using} from './utilities/using';
 
 export {
@@ -42,8 +44,10 @@ export {
     HeaderAuthorizerBuilder,
     OAuthAuthorizerBuilder,
     CoreApiClaims,
+    ChildContainerHelper,
     DebugProxyAgent,
     IDisposable,
     ResponseWriter,
+    Router,
     using,
 };

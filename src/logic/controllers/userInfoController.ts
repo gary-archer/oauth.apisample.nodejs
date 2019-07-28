@@ -13,6 +13,7 @@ export class UserInfoController {
 
     public constructor(@inject(FRAMEWORKTYPES.ApiClaims) claims: BasicApiClaims) {
         this._claims = claims;
+        this._setupCallbacks();
     }
 
     /*
@@ -26,5 +27,12 @@ export class UserInfoController {
             email: this._claims.email,
         } as UserInfoClaims;
         new ResponseWriter().writeObjectResponse(response, 200, userInfo);
+    }
+
+    /*
+     * Plumbing to ensure the this parameter is available
+     */
+    private _setupCallbacks(): void {
+        this.getUserClaims = this.getUserClaims.bind(this);
     }
 }

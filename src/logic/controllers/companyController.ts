@@ -14,6 +14,7 @@ export class CompanyController {
 
     public constructor(@inject(TYPES.CompanyRepository) repository: CompanyRepository) {
         this._repository = repository;
+        this._setupCallbacks();
     }
 
     /*
@@ -37,5 +38,13 @@ export class CompanyController {
 
         const transactions = await this._repository.getCompanyTransactions(id);
         new ResponseWriter().writeObjectResponse(response, 200, transactions);
+    }
+
+    /*
+     * Plumbing to ensure the this parameter is available
+     */
+    private _setupCallbacks(): void {
+        this.getCompanyList = this.getCompanyList.bind(this);
+        this.getCompanyTransactions = this.getCompanyTransactions.bind(this);
     }
 }

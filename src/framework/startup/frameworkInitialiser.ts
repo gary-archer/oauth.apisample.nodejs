@@ -57,9 +57,9 @@ export class FrameworkInitialiser {
     }
 
     /*
-     * Prepare depenceni
+     * Register dependencies
      */
-    public build(expressApp: Application, authorizer: BaseAuthorizer): FrameworkInitialiser {
+    public register(): FrameworkInitialiser {
 
         // Create the unhandled exception handler for API requests
         this._exceptionHandler = new UnhandledExceptionHandler(this._configuration);
@@ -69,38 +69,15 @@ export class FrameworkInitialiser {
 
         // Register framework dependencies as part of preparing the framework
         this._registerDependencies();
-
-        // Configure Express middleware including that for authorization
-        this._configureMiddleware(expressApp, authorizer);
-
         return this;
-    }
-
-    /*
-     * Register framework dependencies used for aspects such as logging
-     */
-    private _registerDependencies(): void {
-
-        /*** SINGLETONS ***/
-
-        this._container.bind<FrameworkConfiguration>(FRAMEWORKTYPES.Configuration)
-                       .toConstantValue(this._configuration);
-        this._container.bind<ILoggerFactory>(FRAMEWORKTYPES.LoggerFactory)
-                        .toConstantValue(this._loggerFactory);
-
-        /*** PER REQUEST OBJECTS ***/
-
-        this._container.bind<ILogEntry>(FRAMEWORKTYPES.ILogEntry)
-                       .toDynamicValue(() =>
-                            (this._loggerFactory as LoggerFactory).createLogEntry()).inRequestScope();
     }
 
     /*
      * Set up cross cutting concerns as Express middleware, passing in singleton objects
      */
-    private _configureMiddleware(
+    public configureMiddleware(
         expressApp: Application,
-        authorizer: BaseAuthorizer): void {
+        authorizer: BaseAuthorizer): FrameworkInitialiser {
 
         // First configure middleware to create a child container per request
         const childContainerMiddleware = new ChildContainerMiddleware(this._container);
@@ -118,8 +95,37 @@ export class FrameworkInitialiser {
         // The third middleware supports non functional testing via headers
         const handler = new CustomHeaderMiddleware(this._configuration.apiName);
         expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
-
-        // An unhandled exception middleware is configured last
-        expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler.handleException);
+        return this;
     }
+
+    /*
+     * The unhandled exception middleware is configured last
+     */
+    public configureExceptionHandler(expressApp: Application): FrameworkInitialiser {
+        expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler.handleException);
+        return this;
+    }
+
+    /*
+     * Register framework dependencies used for aspects such as logging
+     */
+    private _registerDependencies(): void {
+
+        /*** SINGLETONS ***/
+
+        this._container.bind<FrameworkConfiguration>(FRAMEWORKTYPES.Configuration)
+                       .toConstantValue(this._configuration);
+        this._container.bind<ILoggerFactory>(FRAMEWORKTYPES.LoggerFactory)
+                        .toConstantValue(this._loggerFactory);
+        this._container.bind<UnhandledExceptionHandler>(FRAMEWORKTYPES.UnhandledExceptionHandler)
+                        .toConstantValue(this._exceptionHandler);
+
+        /*** PER REQUEST OBJECTS ***/
+
+        this._container.bind<ILogEntry>(FRAMEWORKTYPES.ILogEntry)
+                       .toDynamicValue(() =>
+                            (this._loggerFactory as LoggerFactory).createLogEntry()).inRequestScope();
+    }
+
+    
 }

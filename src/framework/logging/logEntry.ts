@@ -26,10 +26,12 @@ export class LogEntry implements ILogEntry {
      */
     public static getCurrent(request: Request): LogEntry {
 
-        // TODO: Cannot resolve child container when there is a 403 request to company 3
-        const found = ChildContainerHelper.resolve(request).get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
-        if (found && found instanceof LogEntry) {
-            return found as LogEntry;
+        const container = ChildContainerHelper.resolve(request);
+        if (container) {
+            const logEntry = container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
+            if (logEntry instanceof LogEntry) {
+                return logEntry as LogEntry;
+            }
         }
 
         throw new Error('Unable to get the log entry from the request child container');
@@ -75,9 +77,9 @@ export class LogEntry implements ILogEntry {
         this._data.requestPath = request.originalUrl;
 
         // TODO
-        // I would like to set resource id here from request.params, which should contain URL path segments
-        // However, inversify express breaks this, and params are set to the entire path instead
+        // Store runtime URL path segments as the resource id
         // https://stackoverflow.com/questions/43170095/how-to-access-url-segments-in-expressjs
+        // this._setResourceId((request.params as string[]).join('/'));
 
         // Our callers can supply a custom header so that we can keep track of who is calling each API
         const callingApplicationName = request.header('x-sample-api-client');
@@ -120,7 +122,7 @@ export class LogEntry implements ILogEntry {
     /*
      * Business logic must set the resource id from path segments, since we cannot derive them generically
      */
-    public setResourceId(resourceId: string): void {
+    public _setResourceId(resourceId: string): void {
         this._data.resourceId = resourceId;
     }
 

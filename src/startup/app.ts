@@ -8,6 +8,7 @@ import {HttpServerConfiguration} from './httpServerConfiguration';
 // The application entry point
 (async () => {
 
+    // TODO: Create something with only app focused methods instead
     // Create initial objects
     const loggerFactory = new LoggerFactory();
     const container = new Container();

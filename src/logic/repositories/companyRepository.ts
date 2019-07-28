@@ -30,6 +30,7 @@ export class CompanyRepository {
         this._claims = claims;
         this._jsonReader = jsonReader;
         this._logEntry = logEntry;
+        this._setupCallbacks();
     }
 
     /*
@@ -97,5 +98,13 @@ export class CompanyRepository {
      */
     private _unauthorizedError(companyId: number): ClientError {
         return new ClientError(404, 'company_not_found', `Company ${companyId} was not found for this user`);
+    }
+
+    /*
+     * Plumbing to ensure the this parameter is available
+     */
+    private _setupCallbacks(): void {
+        this.getCompanyList = this.getCompanyList.bind(this);
+        this.getCompanyTransactions = this.getCompanyTransactions.bind(this);
     }
 }
