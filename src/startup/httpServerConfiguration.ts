@@ -4,10 +4,10 @@ import * as fs from 'fs';
 import * as https from 'https';
 import {Container} from 'inversify';
 import * as path from 'path';
-import {useContainer, useExpressServer} from 'routing-controllers';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
+import {TYPES} from '../dependencies/types';
 import {ILoggerFactory} from '../framework';
 import {FrameworkInitialiser} from '../framework';
 import {OAuthAuthorizerBuilder} from '../framework';
@@ -54,30 +54,7 @@ export class HttpServerConfiguration {
         const corsOptions = { origin: this._configuration.api.trustedOrigins };
         this._expressApp.use('/api/*', cors(corsOptions));
 
-        // Our API requests are not designed for caching
-        this._expressApp.set('etag', false);
-
-        // Configure how web static content is served
-        this._configureWebStaticContent();
-
-        // Register the API's business logic dependencies
-        CompositionRoot.registerDependencies(this._container);
-
-        // Wire up 'Routing Controllers' and the annotations we've applied to controllers
-        useExpressServer(
-            this._expressApp, {
-                controllers: [CompanyController, UserInfoController],
-            });
-
-        // TODO: This does not work for items in a child container per request
-        // For auto wiring to work we must use the resolve method rather than get
-        useContainer({
-            get: (someClass: any) => {
-                return this._container.resolve(someClass);
-            },
-        });
-
-        // Create a framework class to do OAuth authorization
+        // Configure framework security first
         const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(
             this._container,
             this._configuration.framework,
@@ -86,14 +63,25 @@ export class HttpServerConfiguration {
                 .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
                 .build();
 
-        // Initialise the framework and its cross cutting middleware classes
+        // Configure framework base behaviour
         new FrameworkInitialiser(
             this._container,
             this._configuration.framework,
             this._loggerFactory)
                 .withApiBasePath('/api/')
-                .registerDependencies()
-                .configureMiddleware(this._expressApp, authorizer);
+                .build(this._expressApp, authorizer);
+
+        // Register the API's business logic dependencies
+        CompositionRoot.registerDependencies(this._container);
+
+        // Our API requests are not designed for caching
+        this._expressApp.set('etag', false);
+
+        // Configure how web static content is served
+        this._configureWebStaticContent();
+
+        // Finally configure API routes to call our controllers
+        this._configureApiRoutes();
     }
 
     /*
@@ -124,6 +112,22 @@ export class HttpServerConfiguration {
             const logger = this._loggerFactory.createStartupConsoleLogger('HTTP Server');
             logger.info(`Listening on HTTPS port ${port}`);
         });
+    }
+
+    /*
+     * We do our own controller resolution, rather than using annotation based libraries that change core behaviour
+     * This makes our core framework logging easier to implement without library behaviour getting in the way
+     */
+    private _configureApiRoutes(): void {
+
+        this._expressApp.get('/api/userclaims/current',
+            this._container.get<UserInfoController>(TYPES.UserInfoController).getUserClaims);
+
+        this._expressApp.get('/api/companies',
+            this._container.get<CompanyController>(TYPES.CompanyController).getCompanyList);
+
+        this._expressApp.get('/api/companies/:id/transactions',
+            this._container.get<CompanyController>(TYPES.CompanyController).getCompanyTransactions);
     }
 
     /*

@@ -21,6 +21,7 @@ import {HeaderAuthorizerBuilder} from './startup/headerAuthorizerBuilder';
 import {OAuthAuthorizerBuilder} from './startup/oauthAuthorizerBuilder';
 import {DebugProxyAgent} from './utilities/debugProxyAgent';
 import {IDisposable} from './utilities/idisposable';
+import {ResponseWriter} from './utilities/responseWriter';
 import {using} from './utilities/using';
 
 export {
@@ -43,5 +44,6 @@ export {
     CoreApiClaims,
     DebugProxyAgent,
     IDisposable,
+    ResponseWriter,
     using,
 };

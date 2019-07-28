@@ -1,16 +1,13 @@
+import {Request, Response} from 'express';
 import {inject, injectable} from 'inversify';
-import {Get, JsonController, Param} from 'routing-controllers';
 import {TYPES} from '../../dependencies/types';
-import {ClientError} from '../../framework';
-import {Company} from '../entities/company';
-import {CompanyTransactions} from '../entities/companyTransactions';
+import {ClientError, ResponseWriter} from '../../framework';
 import {CompanyRepository} from '../repositories/companyRepository';
 
 /*
  * Our API controller runs after claims handling has completed
  */
 @injectable()
-@JsonController('/api/companies')
 export class CompanyController {
 
     private readonly _repository: CompanyRepository;
@@ -22,23 +19,23 @@ export class CompanyController {
     /*
      * Return the list of companies
      */
-    @Get('/')
-    public async getCompanyList(): Promise<Company[]> {
-        return await this._repository.getCompanyList();
+    public async getCompanyList(request: Request, response: Response): Promise<void> {
+        const companies = await this._repository.getCompanyList();
+        new ResponseWriter().writeObjectResponse(response, 200, companies);
     }
 
     /*
      * Return the transaction details for a company
      */
-    @Get('/:id/transactions')
-    public async getCompanyTransactions(@Param('id') id: string): Promise<CompanyTransactions> {
+    public async getCompanyTransactions(request: Request, response: Response): Promise<void> {
 
-        // Throw a 400 error if we have an invalid id
-        const idValue = parseInt(id, 10);
-        if (isNaN(idValue) || idValue <= 0) {
+        // Get the supplied id as a number, and return 400 if invalid input was received
+        const id = parseInt(request.params.id, 10);
+        if (isNaN(id) || id <= 0) {
             throw new ClientError(400, 'invalid_company_id', 'The company id must be a positive numeric integer');
         }
 
-        return await this._repository.getCompanyTransactions(idValue);
+        const transactions = await this._repository.getCompanyTransactions(id);
+        new ResponseWriter().writeObjectResponse(response, 200, transactions);
     }
 }

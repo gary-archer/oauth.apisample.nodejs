@@ -27,13 +27,6 @@ export class CompanyRepository {
         @inject(FRAMEWORKTYPES.ApiClaims) claims: BasicApiClaims,
         @inject(FRAMEWORKTYPES.ILogEntry) logEntry: ILogEntry) {
 
-        // TODO: We get the default empty object claims so recreate them here
-        // https://github.com/typestack/routing-controllers/pull/497
-        claims = new BasicApiClaims();
-        claims.setTokenInfo('USERID', 'CLIENTID', ['openid']);
-        claims.setCentralUserInfo('Fred', 'Flintstone', 'fred@bedrock.com');
-        claims.accountsCovered = [1, 2, 4];
-
         this._claims = claims;
         this._jsonReader = jsonReader;
         this._logEntry = logEntry;
