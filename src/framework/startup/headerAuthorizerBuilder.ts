@@ -29,7 +29,7 @@ export class HeaderAuthorizerBuilder {
     /*
      * Build and return the filter
      */
-    public build(): BaseAuthorizer {
+    public register(): BaseAuthorizer {
 
         // Register OAuth related dependencies
         this._registerDependencies();

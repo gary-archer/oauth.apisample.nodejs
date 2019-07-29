@@ -23,9 +23,9 @@ import {ChildContainerHelper} from './utilities/childContainerHelper';
 import {DebugProxyAgent} from './utilities/debugProxyAgent';
 import {IDisposable} from './utilities/idisposable';
 import {ResponseWriter} from './utilities/responseWriter';
-import {Router} from './utilities/router';
 import {using} from './utilities/using';
 
+// TODO: Review exports, including exception handlers
 export {
     FrameworkConfiguration,
     FrameworkInitialiser,
@@ -48,6 +48,5 @@ export {
     DebugProxyAgent,
     IDisposable,
     ResponseWriter,
-    Router,
     using,
 };

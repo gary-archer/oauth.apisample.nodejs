@@ -1,22 +1,18 @@
 import {Request} from 'express';
-import {Container} from 'inversify';
+import * as inversify from 'inversify';
 
 /*
- * A simple helper to manage the child container per request
+ * Inversify Express creates the child container per request by calling createChild on our inversify container
+ * See the _createHttpContext method in this source file:
+ * https://github.com/inversify/inversify-express-utils/blob/master/src/server.ts
  */
 export class ChildContainerHelper {
 
     /*
-     * Store the per request container in the Express request object, as for other frameworks
+     * Resolve a per request dependency from the child container
      */
-    public static create(parent: Container, request: Request): void {
-        (request as any).container = parent.createChild();
-    }
-
-    /*
-     * Store the per request container in the Express request object, as for other frameworks
-     */
-    public static resolve(request: Request): Container {
-        return (request as any).container;
+    public static resolve<T>(request: Request): inversify.interfaces.Container {
+        const httpContext = Reflect.getMetadata('inversify-express-utils:httpcontext', request);
+        return httpContext.container;
     }
 }

@@ -59,7 +59,7 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
     /*
      * Build and return the filter
      */
-    public async build(): Promise<BaseAuthorizer> {
+    public async register(): Promise<BaseAuthorizer> {
 
         // Load Open Id Connect metadata
         const issuerMetadata = new IssuerMetadata(this._configuration);

@@ -1,50 +1,61 @@
 import {Request, Response} from 'express';
-import {inject, injectable} from 'inversify';
+import {inject} from 'inversify';
+import {controller, httpGet} from 'inversify-express-utils';
 import {TYPES} from '../../dependencies/types';
-import {ClientError, ResponseWriter} from '../../framework';
+import {ClientError} from '../../framework';
+import {Company} from '../entities/company';
+import {CompanyTransactions} from '../entities/companyTransactions';
 import {CompanyRepository} from '../repositories/companyRepository';
+import {BaseApiController} from './baseApiController';
 
 /*
  * Our API controller runs after claims handling has completed
  */
-@injectable()
-export class CompanyController {
+@controller('/companies')
+export class CompanyController extends BaseApiController {
 
+    // Injected dependencies
     private readonly _repository: CompanyRepository;
 
+    /*
+     * Receive dependencies
+     */
     public constructor(@inject(TYPES.CompanyRepository) repository: CompanyRepository) {
+        super();
         this._repository = repository;
-        this._setupCallbacks();
     }
 
     /*
      * Return the list of companies
      */
-    public async getCompanyList(request: Request, response: Response): Promise<void> {
-        const companies = await this._repository.getCompanyList();
-        new ResponseWriter().writeObjectResponse(response, 200, companies);
+    @httpGet('/')
+    public async getCompanyList(request: Request, response: Response): Promise<Company[]> {
+
+        // Log details the framework cannot derive
+        super.setOperationName(request, this.getCompanyList.name);
+
+        // Do the work of the operation
+        return await this._repository.getCompanyList();
     }
 
     /*
      * Return the transaction details for a company
      */
-    public async getCompanyTransactions(request: Request, response: Response): Promise<void> {
+    @httpGet('/:id/transactions')
+    public async getCompanyTransactions(request: Request, response: Response): Promise<CompanyTransactions> {
 
-        // Get the supplied id as a number, and return 400 if invalid input was received
-        const id = parseInt(request.params.id, 10);
-        if (isNaN(id) || id <= 0) {
+        const id = request.params.id;
+
+        // Log details the framework cannot derive
+        super.setOperationName(request, this.getCompanyTransactions.name);
+        super.setResourceId(request, [id]);
+
+        // Throw a 400 error if we have an invalid id
+        const idValue = parseInt(id, 10);
+        if (isNaN(idValue) || idValue <= 0) {
             throw new ClientError(400, 'invalid_company_id', 'The company id must be a positive numeric integer');
         }
 
-        const transactions = await this._repository.getCompanyTransactions(id);
-        new ResponseWriter().writeObjectResponse(response, 200, transactions);
-    }
-
-    /*
-     * Plumbing to ensure the this parameter is available
-     */
-    private _setupCallbacks(): void {
-        this.getCompanyList = this.getCompanyList.bind(this);
-        this.getCompanyTransactions = this.getCompanyTransactions.bind(this);
+        return await this._repository.getCompanyTransactions(idValue);
     }
 }

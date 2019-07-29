@@ -8,7 +8,6 @@ import {ILogEntry} from '../logging/ilogEntry';
 import {ILoggerFactory} from '../logging/iloggerFactory';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {LoggerMiddleware} from '../logging/loggerMiddleware';
-import {ChildContainerMiddleware} from '../middleware/childContainerMiddleware';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 
@@ -73,17 +72,13 @@ export class FrameworkInitialiser {
     }
 
     /*
-     * Set up cross cutting concerns as Express middleware, passing in singleton objects
+     * Set up framework cross cutting concerns as Express middleware, passing in singleton objects
      */
     public configureMiddleware(
         expressApp: Application,
         authorizer: BaseAuthorizer): FrameworkInitialiser {
 
-        // First configure middleware to create a child container per request
-        const childContainerMiddleware = new ChildContainerMiddleware(this._container);
-        expressApp.use(`${this._apiBasePath}*`, childContainerMiddleware.create);
-
-        // The first real middleware starts structured logging of API requests
+        // The first middleware starts structured logging of API requests
         const logger = new LoggerMiddleware(this._loggerFactory);
         expressApp.use(`${this._apiBasePath}*`, logger.logRequest);
 
@@ -99,7 +94,7 @@ export class FrameworkInitialiser {
     }
 
     /*
-     * The unhandled exception middleware is configured last
+     * The unhandled exception middleware is configured after any non framework middleware
      */
     public configureExceptionHandler(expressApp: Application): FrameworkInitialiser {
         expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler.handleException);
@@ -126,6 +121,4 @@ export class FrameworkInitialiser {
                        .toDynamicValue(() =>
                             (this._loggerFactory as LoggerFactory).createLogEntry()).inRequestScope();
     }
-
-    
 }

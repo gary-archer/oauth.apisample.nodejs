@@ -26,12 +26,13 @@ export class LogEntry implements ILogEntry {
      */
     public static getCurrent(request: Request): LogEntry {
 
-        const container = ChildContainerHelper.resolve(request);
-        if (container) {
-            const logEntry = container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
-            if (logEntry instanceof LogEntry) {
-                return logEntry as LogEntry;
-            }
+        // Get the child container for this request
+        const container = ChildContainerHelper.resolve(request); 
+
+        // Resolve the log entry, which will create it the first time
+        const logEntry = container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
+        if (logEntry instanceof LogEntry) {
+            return logEntry as LogEntry;
         }
 
         throw new Error('Unable to get the log entry from the request child container');
@@ -76,11 +77,6 @@ export class LogEntry implements ILogEntry {
         this._data.requestVerb = request.method;
         this._data.requestPath = request.originalUrl;
 
-        // TODO
-        // Store runtime URL path segments as the resource id
-        // https://stackoverflow.com/questions/43170095/how-to-access-url-segments-in-expressjs
-        // this._setResourceId((request.params as string[]).join('/'));
-
         // Our callers can supply a custom header so that we can keep track of who is calling each API
         const callingApplicationName = request.header('x-sample-api-client');
         if (callingApplicationName) {
@@ -122,7 +118,7 @@ export class LogEntry implements ILogEntry {
     /*
      * Business logic must set the resource id from path segments, since we cannot derive them generically
      */
-    public _setResourceId(resourceId: string): void {
+    public setResourceId(resourceId: string): void {
         this._data.resourceId = resourceId;
     }
 
