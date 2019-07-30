@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {inject} from 'inversify';
 import {controller, httpGet} from 'inversify-express-utils';
-import {FRAMEWORKTYPES} from '../../framework';
+import {FRAMEWORKPUBLICTYPES} from '../../framework';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {UserInfoClaims} from '../entities/userInfoClaims';
 import {BaseApiController} from './baseApiController';
@@ -15,7 +15,7 @@ export class UserInfoController extends BaseApiController {
     private readonly _claims: BasicApiClaims;
 
     public constructor(
-        @inject(FRAMEWORKTYPES.ApiClaims) claims: BasicApiClaims) {
+        @inject(FRAMEWORKPUBLICTYPES.ApiClaims) claims: BasicApiClaims) {
         super();
         this._claims = claims;
     }

@@ -1,6 +1,8 @@
 import {Container} from 'inversify';
 import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
+import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {ICustomClaimsProvider} from '../extensibility/icustomClaimsProvider';
 import {ILoggerFactory} from '../logging/iloggerFactory';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
@@ -17,16 +19,12 @@ import {OAuthAuthorizer} from '../security/oauthAuthorizer';
 export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
 
     private readonly _container: Container;
-    private readonly _configuration: FrameworkConfiguration;
-    private readonly _loggerFactory: ILoggerFactory;
     private _claimsSupplier!: () => TClaims;
     private _customClaimsProviderSupplier!: () => ICustomClaimsProvider<TClaims>;
     private _unsecuredPaths: string[];
 
-    public constructor(container: Container, configuration: FrameworkConfiguration, loggerFactory: ILoggerFactory) {
+    public constructor(container: Container) {
         this._container = container;
-        this._configuration = configuration;
-        this._loggerFactory = loggerFactory;
         this._unsecuredPaths = [];
     }
 
@@ -61,16 +59,24 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
      */
     public async register(): Promise<BaseAuthorizer> {
 
+        // Get base framework dependencies
+        const configuration = this._container.get<FrameworkConfiguration>(
+            FRAMEWORKINTERNALTYPES.Configuration);
+        const loggerFactory = this._container.get<ILoggerFactory>(
+            FRAMEWORKPUBLICTYPES.ILoggerFactory);
+        const exceptionHandler = this._container.get<UnhandledExceptionHandler>(
+            FRAMEWORKPUBLICTYPES.UnhandledExceptionHandler);
+
         // Load Open Id Connect metadata
-        const issuerMetadata = new IssuerMetadata(this._configuration);
+        const issuerMetadata = new IssuerMetadata(configuration);
         await issuerMetadata.load();
 
         // Create the cache used to store claims results after authentication processing
         // Use a constructor function as the first parameter, as required by TypeScript generics
         const claimsCache = ClaimsCache.createInstance<ClaimsCache<TClaims>>(
             ClaimsCache,
-            this._configuration,
-            this._loggerFactory);
+            configuration,
+            loggerFactory);
 
         // Create an injectable object to enable the framework to create claims objects of a concrete type at runtime
         const claimsSupplier = ClaimsSupplier.createInstance<ClaimsSupplier<TClaims>, TClaims>(
@@ -82,7 +88,7 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
         this._registerDependencies(issuerMetadata, claimsCache, claimsSupplier);
 
         // Create an object to access the child container per request via the HTTP context
-        return new OAuthAuthorizer<TClaims>(this._unsecuredPaths);
+        return new OAuthAuthorizer<TClaims>(this._unsecuredPaths, exceptionHandler);
     }
 
     /*
@@ -96,21 +102,21 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
         /*** SINGLETONS ***/
 
         // Register security objects
-        this._container.bind<IssuerMetadata>(FRAMEWORKTYPES.IssuerMetadata)
+        this._container.bind<IssuerMetadata>(FRAMEWORKINTERNALTYPES.IssuerMetadata)
                        .toConstantValue(issuerMetadata);
-        this._container.bind<ClaimsCache<TClaims>>(FRAMEWORKTYPES.ClaimsCache)
+        this._container.bind<ClaimsCache<TClaims>>(FRAMEWORKINTERNALTYPES.ClaimsCache)
                        .toConstantValue(claimsCache);
-        this._container.bind<ClaimsSupplier<TClaims>>(FRAMEWORKTYPES.ClaimsSupplier)
+        this._container.bind<ClaimsSupplier<TClaims>>(FRAMEWORKINTERNALTYPES.ClaimsSupplier)
                        .toConstantValue(claimsSupplier);
 
         /*** PER REQUEST OBJECTS ***/
 
         // Register the authenticator
-        this._container.bind<OAuthAuthenticator>(FRAMEWORKTYPES.OAuthAuthenticator)
+        this._container.bind<OAuthAuthenticator>(FRAMEWORKINTERNALTYPES.OAuthAuthenticator)
                        .to(OAuthAuthenticator).inRequestScope();
 
         // Register a dummy value that is overridden by the authorizer middleware later
-        this._container.bind<TClaims>(FRAMEWORKTYPES.ApiClaims)
+        this._container.bind<TClaims>(FRAMEWORKPUBLICTYPES.ApiClaims)
                        .toConstantValue({} as any);
     }
 }

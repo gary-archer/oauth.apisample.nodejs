@@ -1,5 +1,7 @@
 import {Request} from 'express';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
+import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {BaseAuthorizer} from './baseAuthorizer';
 import {CoreApiClaims} from './coreApiClaims';
@@ -10,11 +12,8 @@ import {HeaderAuthenticator} from './headerAuthenticator';
  */
 export class HeaderAuthorizer extends BaseAuthorizer {
 
-    /*
-     * Receive dependencies
-     */
-    public constructor(unsecuredPaths: string[]) {
-        super(unsecuredPaths);
+    public constructor(unsecuredPaths: string[], exceptionHandler: UnhandledExceptionHandler) {
+        super(unsecuredPaths, exceptionHandler);
     }
 
     /*
@@ -26,11 +25,11 @@ export class HeaderAuthorizer extends BaseAuthorizer {
         const container = ChildContainerHelper.resolve(request);
 
         // Resolve the authenticator class and ask it to do the work
-        const authenticator = container.get<HeaderAuthenticator>(FRAMEWORKTYPES.HeaderAuthenticator);
+        const authenticator = container.get<HeaderAuthenticator>(FRAMEWORKINTERNALTYPES.HeaderAuthenticator);
         const claims = await authenticator.authorizeRequestAndGetClaims(request);
 
         // Rebind claims to this requests's child container so that they are injectable into business logic
-        container.bind<CoreApiClaims>(FRAMEWORKTYPES.ApiClaims).toConstantValue(claims);
+        container.bind<CoreApiClaims>(FRAMEWORKPUBLICTYPES.ApiClaims).toConstantValue(claims);
         return claims;
     }
 }

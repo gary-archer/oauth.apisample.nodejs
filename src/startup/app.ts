@@ -2,15 +2,16 @@ import * as fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
 import {Configuration} from '../configuration/configuration';
-import {DebugProxyAgent, LoggerFactory} from '../framework';
+import {DebugProxyAgent, LoggerFactoryBuilder} from '../framework';
 import {HttpServerConfiguration} from './httpServerConfiguration';
 
-// The application entry point
+/*
+ * The application entry point
+ */
 (async () => {
 
-    // TODO: Create a logger factory with only app focused methods instead
     // Create initial objects
-    const loggerFactory = new LoggerFactory();
+    const loggerFactory = LoggerFactoryBuilder.Create();
     const container = new Container();
 
     try {

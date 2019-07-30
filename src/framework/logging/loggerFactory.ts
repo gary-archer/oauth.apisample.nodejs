@@ -15,6 +15,13 @@ const PRODUCTION_LOGGER_NAME = 'production';
  */
 export class LoggerFactory implements ILoggerFactory {
 
+    /*
+     * A factory method that does not return the implementation type
+     */
+    public static Create(): ILoggerFactory {
+        return new LoggerFactory();
+    }
+
     // Base details
     private _logConfiguration: any;
     private _apiName: string;

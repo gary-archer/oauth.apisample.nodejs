@@ -1,6 +1,6 @@
 import {inject, injectable} from 'inversify';
 import {TYPES} from '../../dependencies/types';
-import {ClientError, FRAMEWORKTYPES, ILogEntry, using} from '../../framework';
+import {ClientError, FRAMEWORKPUBLICTYPES, ILogEntry, using} from '../../framework';
 import {JsonFileReader} from '../../utilities/jsonFileReader';
 import {BasicApiClaims} from '../entities/basicApiClaims';
 import {Company} from '../entities/company';
@@ -24,8 +24,8 @@ export class CompanyRepository {
      */
     public constructor(
         @inject(TYPES.JsonFileReader) jsonReader: JsonFileReader,
-        @inject(FRAMEWORKTYPES.ApiClaims) claims: BasicApiClaims,
-        @inject(FRAMEWORKTYPES.ILogEntry) logEntry: ILogEntry) {
+        @inject(FRAMEWORKPUBLICTYPES.ApiClaims) claims: BasicApiClaims,
+        @inject(FRAMEWORKPUBLICTYPES.ILogEntry) logEntry: ILogEntry) {
 
         this._claims = claims;
         this._jsonReader = jsonReader;

@@ -1,5 +1,7 @@
 import {Container} from 'inversify';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
+import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {CoreApiClaims} from '../security/coreApiClaims';
 import {HeaderAuthenticator} from '../security/headerAuthenticator';
@@ -31,11 +33,15 @@ export class HeaderAuthorizerBuilder {
      */
     public register(): BaseAuthorizer {
 
+        // Get base framework dependencies
+        const exceptionHandler = this._container.get<UnhandledExceptionHandler>(
+            FRAMEWORKPUBLICTYPES.UnhandledExceptionHandler);
+
         // Register OAuth related dependencies
         this._registerDependencies();
 
         // Create an object to access the child container per request via the HTTP context
-        return new HeaderAuthorizer(this._unsecuredPaths);
+        return new HeaderAuthorizer(this._unsecuredPaths, exceptionHandler);
     }
 
     /*
@@ -44,11 +50,11 @@ export class HeaderAuthorizerBuilder {
     private _registerDependencies(): void {
 
         // Register the authenticator
-        this._container.bind<HeaderAuthenticator>(FRAMEWORKTYPES.HeaderAuthenticator)
+        this._container.bind<HeaderAuthenticator>(FRAMEWORKINTERNALTYPES.HeaderAuthenticator)
                        .to(HeaderAuthenticator).inRequestScope();
 
         // Register a dummy value that is overridden by the authorizer middleware later
-        this._container.bind<CoreApiClaims>(FRAMEWORKTYPES.ApiClaims)
+        this._container.bind<CoreApiClaims>(FRAMEWORKPUBLICTYPES.ApiClaims)
                        .toConstantValue({} as any);
     }
 }

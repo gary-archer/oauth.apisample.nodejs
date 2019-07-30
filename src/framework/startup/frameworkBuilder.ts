@@ -1,30 +1,28 @@
 import {Application} from 'express';
 import {Container} from 'inversify';
 import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
 import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
-import {UnhandledPromiseRejectionHandler} from '../errors/unhandledPromiseRejectionHandler';
 import {ILogEntry} from '../logging/ilogEntry';
 import {ILoggerFactory} from '../logging/iloggerFactory';
 import {LoggerMiddleware} from '../logging/loggerMiddleware';
+import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 
 /*
  * A builder style class to configure framework behaviour and to register its dependencies
  */
-export class FrameworkInitialiser {
+export class FrameworkBuilder {
 
     // Injected properties
     private readonly _container: Container;
     private readonly _configuration: FrameworkConfiguration;
     private readonly _loggerFactory: ILoggerFactory;
 
-    // Properties set via builder methods
-    private _apiBasePath: string;
-
     // Calculated properties
+    private _apiBasePath: string;
     private _exceptionHandler!: UnhandledExceptionHandler;
-    private _unhandledPromiseRejectionHandler!: UnhandledPromiseRejectionHandler;
 
     /*
      * Receive base details
@@ -43,7 +41,7 @@ export class FrameworkInitialiser {
     /*
      * Set the API base path, such as /api/
      */
-    public withApiBasePath(apiBasePath: string): FrameworkInitialiser {
+    public withApiBasePath(apiBasePath: string): FrameworkBuilder {
 
         this._apiBasePath = apiBasePath.toLowerCase();
         if (!apiBasePath.endsWith('/')) {
@@ -56,13 +54,10 @@ export class FrameworkInitialiser {
     /*
      * Register dependencies
      */
-    public register(): FrameworkInitialiser {
+    public register(): FrameworkBuilder {
 
         // Create the unhandled exception handler for API requests
         this._exceptionHandler = new UnhandledExceptionHandler(this._configuration);
-
-        // Create an object to handle unpromised rejection exceptions in Express middleware
-        this._unhandledPromiseRejectionHandler = new UnhandledPromiseRejectionHandler(this._exceptionHandler);
 
         // Register framework dependencies as part of preparing the framework
         this._registerDependencies();
@@ -74,27 +69,25 @@ export class FrameworkInitialiser {
      */
     public configureMiddleware(
         expressApp: Application,
-        authorizer: BaseAuthorizer): FrameworkInitialiser {
+        authorizer: BaseAuthorizer): FrameworkBuilder {
 
         // The first middleware starts structured logging of API requests
         const logger = new LoggerMiddleware(this._loggerFactory);
         expressApp.use(`${this._apiBasePath}*`, logger.logRequest);
 
-        // The second middleware manages authorization, and we need to catch unhandled promise exceptions
-        expressApp.use(
-            `${this._apiBasePath}*`,
-            this._unhandledPromiseRejectionHandler.apply(authorizer.authorizeRequestAndGetClaims));
+        // The second middleware manages authorization
+        expressApp.use(`${this._apiBasePath}*`, authorizer.authorizeRequestAndGetClaims);
 
         // The third middleware supports non functional testing via headers
-        // const handler = new CustomHeaderMiddleware(this._configuration.apiName);
-        // expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
+        const handler = new CustomHeaderMiddleware(this._configuration.apiName);
+        expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
         return this;
     }
 
     /*
      * The unhandled exception middleware is configured after any non framework middleware
      */
-    public configureExceptionHandler(expressApp: Application): FrameworkInitialiser {
+    public configureExceptionHandler(expressApp: Application): FrameworkBuilder {
         expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler.handleException);
         return this;
     }
@@ -106,17 +99,17 @@ export class FrameworkInitialiser {
 
         /*** SINGLETONS ***/
 
-        this._container.bind<FrameworkConfiguration>(FRAMEWORKTYPES.Configuration)
-                       .toConstantValue(this._configuration);
-        this._container.bind<ILoggerFactory>(FRAMEWORKTYPES.LoggerFactory)
-                        .toConstantValue(this._loggerFactory);
-        this._container.bind<UnhandledExceptionHandler>(FRAMEWORKTYPES.UnhandledExceptionHandler)
+        this._container.bind<UnhandledExceptionHandler>(FRAMEWORKPUBLICTYPES.UnhandledExceptionHandler)
                         .toConstantValue(this._exceptionHandler);
+        this._container.bind<ILoggerFactory>(FRAMEWORKPUBLICTYPES.ILoggerFactory)
+                        .toConstantValue(this._loggerFactory);
+        this._container.bind<FrameworkConfiguration>(FRAMEWORKINTERNALTYPES.Configuration)
+                        .toConstantValue(this._configuration);
 
         /*** PER REQUEST OBJECTS ***/
 
         // Register a dummy value that is overridden by the logger middleware later
-        this._container.bind<ILogEntry>(FRAMEWORKTYPES.ILogEntry)
+        this._container.bind<ILogEntry>(FRAMEWORKPUBLICTYPES.ILogEntry)
                        .toConstantValue({} as any);
     }
 }

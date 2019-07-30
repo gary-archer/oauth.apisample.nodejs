@@ -1,7 +1,8 @@
 import {Request} from 'express';
 import {inject, injectable} from 'inversify';
 import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
 import {ClientError} from '../errors/clientError';
 import {OAuthErrorHandler} from '../errors/oauthErrorHandler';
 import {ILogEntry} from '../logging/ilogEntry';
@@ -24,9 +25,9 @@ export class OAuthAuthenticator {
      * Receive dependencies
      */
     public constructor(
-        @inject(FRAMEWORKTYPES.Configuration) configuration: FrameworkConfiguration,
-        @inject(FRAMEWORKTYPES.IssuerMetadata) metadata: IssuerMetadata,
-        @inject(FRAMEWORKTYPES.ILogEntry) logEntry: ILogEntry) {
+        @inject(FRAMEWORKINTERNALTYPES.Configuration) configuration: FrameworkConfiguration,
+        @inject(FRAMEWORKINTERNALTYPES.IssuerMetadata) metadata: IssuerMetadata,
+        @inject(FRAMEWORKPUBLICTYPES.ILogEntry) logEntry: ILogEntry) {
 
         this._configuration = configuration;
         this._issuer = metadata.issuer;

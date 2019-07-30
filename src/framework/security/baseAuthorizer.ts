@@ -1,5 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
+import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {LogEntry} from '../logging/logEntry';
 import {CoreApiClaims} from './coreApiClaims';
 
@@ -9,15 +10,12 @@ import {CoreApiClaims} from './coreApiClaims';
 @injectable()
 export abstract class BaseAuthorizer {
 
-    // Injected dependencies
     private readonly _unsecuredPaths: string[];
+    private readonly _exceptionHandler: UnhandledExceptionHandler;
 
-    /*
-     * Receive dependencies
-     */
-    public constructor(unsecuredPaths: string[]) {
+    public constructor(unsecuredPaths: string[], exceptionHandler: UnhandledExceptionHandler) {
         this._unsecuredPaths = unsecuredPaths;
-        this._unsecuredPaths = [];
+        this._exceptionHandler = exceptionHandler;
         this._setupCallbacks();
     }
 
@@ -33,17 +31,24 @@ export abstract class BaseAuthorizer {
 
         } else {
 
-            // Get the log entry for this API request
-            const logEntry = LogEntry.getCurrent(request);
+            try {
+                // Get the log entry for this API request
+                const logEntry = LogEntry.getCurrent(request);
 
-            // Create the claims middleware for this request, then process the access token and get claims
-            const claims = await this.execute(request);
+                // Create the claims middleware for this request, then process the access token and get claims
+                const claims = await this.execute(request);
 
-            // Log who called the API
-            logEntry.setIdentity(claims);
+                // Log who called the API
+                logEntry.setIdentity(claims);
 
-            // On success, move on to the controller logic
-            next();
+                // On success, move on to the controller logic
+                next();
+
+            } catch (e) {
+
+                // We must not let unhandled promises escape
+                this._exceptionHandler.handleException(e, request, response, next);
+            }
         }
     }
 

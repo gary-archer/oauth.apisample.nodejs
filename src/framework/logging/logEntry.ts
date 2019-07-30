@@ -3,7 +3,7 @@ import {Guid} from 'guid-typescript';
 import {injectable} from 'inversify';
 import * as os from 'os';
 import {Logger} from 'winston';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
 import {ApiError} from '../errors/apiError';
 import {IClientError} from '../extensibility/iclientError';
 import {CoreApiClaims} from '../security/coreApiClaims';
@@ -27,10 +27,10 @@ export class LogEntry implements ILogEntry {
     public static getCurrent(request: Request): LogEntry {
 
         // Get the child container for this request
-        const container = ChildContainerHelper.resolve(request); 
+        const container = ChildContainerHelper.resolve(request);
 
         // Resolve the log entry, which will create it the first time
-        const logEntry = container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
+        const logEntry = container.get<ILogEntry>(FRAMEWORKPUBLICTYPES.ILogEntry);
         if (logEntry instanceof LogEntry) {
             return logEntry as LogEntry;
         }

@@ -1,6 +1,8 @@
 import {Request} from 'express';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
 import {ClientError} from '../errors/clientError';
+import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {BaseAuthorizer} from './baseAuthorizer';
 import {ClaimsCache} from './claimsCache';
@@ -13,11 +15,8 @@ import {OAuthAuthenticator} from './oauthAuthenticator';
  */
 export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthorizer {
 
-    /*
-     * Receive dependencies
-     */
-    public constructor(unsecuredPaths: string[]) {
-        super(unsecuredPaths);
+    public constructor(unsecuredPaths: string[], exceptionHandler: UnhandledExceptionHandler) {
+        super(unsecuredPaths, exceptionHandler);
     }
 
     /*
@@ -35,18 +34,18 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         const container = ChildContainerHelper.resolve(request);
 
         // Bypass and use cached results if they exist
-        const cache = container.get<ClaimsCache<TClaims>>(FRAMEWORKTYPES.ClaimsCache);
+        const cache = container.get<ClaimsCache<TClaims>>(FRAMEWORKINTERNALTYPES.ClaimsCache);
         const cachedClaims = await cache.getClaimsForToken(accessToken);
         if (cachedClaims) {
 
             // Rebind claims to this requests's child container so that they are injectable into business logic
-            container.bind<TClaims>(FRAMEWORKTYPES.ApiClaims).toConstantValue(cachedClaims);
+            container.bind<TClaims>(FRAMEWORKPUBLICTYPES.ApiClaims).toConstantValue(cachedClaims);
             return cachedClaims;
         }
 
         // Resolve dependencies needed for authorization
-        const claimsSupplier = container.get<ClaimsSupplier<TClaims>>(FRAMEWORKTYPES.ClaimsSupplier);
-        const authenticator = container.get<OAuthAuthenticator>(FRAMEWORKTYPES.OAuthAuthenticator);
+        const claimsSupplier = container.get<ClaimsSupplier<TClaims>>(FRAMEWORKINTERNALTYPES.ClaimsSupplier);
+        const authenticator = container.get<OAuthAuthenticator>(FRAMEWORKINTERNALTYPES.OAuthAuthenticator);
 
         // Create new claims which we will then populate
         const claims = claimsSupplier.createEmptyClaims();
@@ -62,7 +61,7 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         await cache.addClaimsForToken(accessToken, expiry, claims);
 
         // Rebind claims to this requests's child container so that they are injectable into business logic
-        container.bind<TClaims>(FRAMEWORKTYPES.ApiClaims).toConstantValue(claims);
+        container.bind<TClaims>(FRAMEWORKPUBLICTYPES.ApiClaims).toConstantValue(claims);
         return claims;
     }
 

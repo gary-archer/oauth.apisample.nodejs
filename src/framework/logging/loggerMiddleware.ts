@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {Logger} from 'winston';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKPUBLICTYPES} from '../configuration/frameworkPublicTypes';
 import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {ILogEntry} from './ilogEntry';
 import {ILoggerFactory} from './iloggerFactory';
@@ -19,7 +19,7 @@ export class LoggerMiddleware {
      */
     public constructor(loggerFactory: ILoggerFactory) {
         this._loggerFactory = loggerFactory as LoggerFactory;
-        this._logger = loggerFactory.getProductionLogger();
+        this._logger = this._loggerFactory.getProductionLogger();
         this._setupCallbacks();
     }
 
@@ -32,8 +32,8 @@ export class LoggerMiddleware {
         const logEntry = this._loggerFactory.createLogEntry();
 
         // Register it against this request's child container so that it can be injected into other places
-        const container = ChildContainerHelper.resolve(request); 
-        container.bind<ILogEntry>(FRAMEWORKTYPES.ILogEntry).toConstantValue(logEntry);
+        const container = ChildContainerHelper.resolve(request);
+        container.bind<ILogEntry>(FRAMEWORKPUBLICTYPES.ILogEntry).toConstantValue(logEntry);
 
         // Start the log entry for this API request
         logEntry.start(request);

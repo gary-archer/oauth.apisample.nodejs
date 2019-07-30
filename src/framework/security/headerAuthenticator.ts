@@ -1,7 +1,7 @@
 import {Request} from 'express';
 import {inject, injectable} from 'inversify';
 import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
-import {FRAMEWORKTYPES} from '../configuration/frameworkTypes';
+import {FRAMEWORKINTERNALTYPES} from '../configuration/frameworkInternalTypes';
 import {OAuthErrorHandler} from '../errors/oauthErrorHandler';
 import {CoreApiClaims} from './coreApiClaims';
 
@@ -18,7 +18,7 @@ export class HeaderAuthenticator  {
      * Receive dependencies
      */
     public constructor(
-        @inject(FRAMEWORKTYPES.Configuration) configuration: FrameworkConfiguration) {
+        @inject(FRAMEWORKINTERNALTYPES.Configuration) configuration: FrameworkConfiguration) {
         this._configuration = configuration;
     }
 

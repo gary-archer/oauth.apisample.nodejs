@@ -8,7 +8,7 @@ import * as path from 'path';
 import * as url from 'url';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
-import * as framework from '../framework';
+import {FrameworkBuilder, ILoggerFactory, OAuthAuthorizerBuilder} from '../framework';
 import {BasicApiClaimsProvider} from '../logic/authorization/basicApiClaimsProvider';
 import {BasicApiClaims} from '../logic/entities/basicApiClaims';
 
@@ -27,13 +27,13 @@ export class HttpServerConfiguration {
      */
     private readonly _configuration: Configuration;
     private readonly _container: Container;
-    private readonly _loggerFactory: framework.ILoggerFactory;
+    private readonly _loggerFactory: ILoggerFactory;
     private readonly _expressApp: express.Application;
 
     /*
      * Receive the configuration and the container
      */
-    public constructor(configuration: Configuration, container: Container, loggerFactory: framework.ILoggerFactory) {
+    public constructor(configuration: Configuration, container: Container, loggerFactory: ILoggerFactory) {
         this._configuration = configuration;
         this._container = container;
         this._loggerFactory = loggerFactory;
@@ -45,22 +45,16 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Create an authorizer and register its dependencies
-        const authorizer = await new framework.OAuthAuthorizerBuilder<BasicApiClaims>(
-            this._container,
-            this._configuration.framework,
-            this._loggerFactory)
-                .withClaimsSupplier(BasicApiClaims)
-                .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
-                .register();
-
         // Register base framework dependencies
-        const frameworkInitialiser = new framework.FrameworkInitialiser(
-            this._container,
-            this._configuration.framework,
-            this._loggerFactory)
-                .withApiBasePath('/api/')
-                .register();
+        const framework = new FrameworkBuilder(this._container, this._configuration.framework, this._loggerFactory)
+            .withApiBasePath('/api/')
+            .register();
+
+        // Register authorizer dependencies
+        const authorizer = await new OAuthAuthorizerBuilder<BasicApiClaims>(this._container)
+            .withClaimsSupplier(BasicApiClaims)
+            .withCustomClaimsProviderSupplier(BasicApiClaimsProvider)
+            .register();
 
         // Register the API's business logic dependencies
         CompositionRoot.registerDependencies(this._container);
@@ -85,10 +79,10 @@ export class HttpServerConfiguration {
             this._configureWebStaticContent();
 
             // Configure framework middleware
-            frameworkInitialiser.configureMiddleware(this._expressApp, authorizer);
+            framework.configureMiddleware(this._expressApp, authorizer);
         })
         .setErrorConfig(() => {
-            frameworkInitialiser.configureExceptionHandler(this._expressApp);
+            framework.configureExceptionHandler(this._expressApp);
         })
         .build();
     }
