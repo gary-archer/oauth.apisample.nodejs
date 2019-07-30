@@ -3,7 +3,7 @@ import {CoreApiClaims} from './coreApiClaims';
 
 /*
  * This class is injected into framework authentication handling
- * Due to TypeScript type erasure the framework is unable to new up TClaims related items itself
+ * Due to generic type erasure at runtime, the framework is unable to new up TClaims related items itself
  */
 export class ClaimsSupplier<TClaims extends CoreApiClaims> {
 
@@ -11,10 +11,10 @@ export class ClaimsSupplier<TClaims extends CoreApiClaims> {
      * Plumbing to enable the framework to create the correct generic type at runtime
      * We need to pass in a constructor function plus paremters for constructor arguments
      */
-    public static createInstance<TClaimsSupplier, TClaimsX extends CoreApiClaims>(
-        construct: new (c: () => TClaimsX, cp: () => ICustomClaimsProvider<TClaimsX>) => TClaimsSupplier,
-        claimsSupplier: () => TClaimsX,
-        customClaimsProviderSupplier: () => ICustomClaimsProvider<TClaimsX>): TClaimsSupplier {
+    public static createInstance<TClaimsSupplier, TClaims extends CoreApiClaims>(
+        construct: new (c: () => TClaims, cp: () => ICustomClaimsProvider<TClaims>) => TClaimsSupplier,
+        claimsSupplier: () => TClaims,
+        customClaimsProviderSupplier: () => ICustomClaimsProvider<TClaims>): TClaimsSupplier {
 
         return new construct(claimsSupplier, customClaimsProviderSupplier);
     }

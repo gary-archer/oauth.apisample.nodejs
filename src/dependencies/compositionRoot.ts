@@ -11,12 +11,11 @@ import {TYPES} from './types';
 export class CompositionRoot {
 
     /*
-     * Regster business objects as per request dependencies, recreated for each API request
+     * Register business objects as per request dependencies, recreated for each API request
+     * Note that Inversify instantiates each per request object at application startup to create a dependency graph
      */
     public static registerDependencies(container: Container): void {
 
-        // Note also that Inversify creates an instance of each object at application startup
-        // This is done to create the dependency graph definition
         container.bind<JsonFileReader>(TYPES.JsonFileReader).to(JsonFileReader).inRequestScope();
         container.bind<CompanyRepository>(TYPES.CompanyRepository).to(CompanyRepository).inRequestScope();
         container.bind<CompanyController>(TYPES.CompanyController).to(CompanyController).inRequestScope();

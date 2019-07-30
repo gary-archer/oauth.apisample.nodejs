@@ -121,7 +121,6 @@ export class HttpServerConfiguration {
      * Handle requests for static web content
      */
     private _configureWebStaticContent(): void {
-
         this._expressApp.get('/spa/*', this._getWebResource);
         this._expressApp.get('/spa', this._getWebRootResource);
         this._expressApp.get('/favicon.ico', this._getFavicon);
@@ -145,7 +144,6 @@ export class HttpServerConfiguration {
      * Serve up the requested web file
      */
     private _getWebRootResource(request: express.Request, response: express.Response): void {
-
         const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/index.html`);
         response.sendFile(webFilePath);
     }
@@ -154,7 +152,6 @@ export class HttpServerConfiguration {
      * Serve up our favicon
      */
     private _getFavicon(request: express.Request, response: express.Response): void {
-
         const webFilePath = path.join(`${__dirname}/${WEB_FILES_ROOT}/favicon.ico`);
         response.sendFile(webFilePath);
     }

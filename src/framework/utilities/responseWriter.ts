@@ -1,7 +1,7 @@
 import {Response} from 'express';
 
 /*
- * Helper methods to write the response
+ * A helper object for writing standard responses
  */
 export class ResponseWriter {
 

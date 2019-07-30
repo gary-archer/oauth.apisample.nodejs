@@ -1,7 +1,6 @@
-/*
- * A range for random error ids
- */
 import {ClientError} from './clientError';
+
+// Ranges for random error ids
 const MIN_ERROR_ID = 10000;
 const MAX_ERROR_ID = 99999;
 

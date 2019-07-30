@@ -9,7 +9,7 @@ import * as inversify from 'inversify';
 export class ChildContainerHelper {
 
     /*
-     * Resolve a per request dependency from the child container
+     * Resolve the per request container that Inversify Express creates, using the Express request object
      */
     public static resolve<T>(request: Request): inversify.interfaces.Container {
         const httpContext = Reflect.getMetadata('inversify-express-utils:httpcontext', request);

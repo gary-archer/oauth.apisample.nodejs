@@ -9,7 +9,7 @@ export class BasicApiClaimsProvider implements ICustomClaimsProvider<BasicApiCla
 
     /*
      * The interface supports returning results based on the user id from the token
-     * This might involve a database lookup or a call to another service
+     * A real world implementation might involve a database lookup or a call to another service
      */
     public async addCustomClaims(accessToken: string, request: Request, claims: BasicApiClaims): Promise<void> {
 
