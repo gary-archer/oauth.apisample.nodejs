@@ -109,7 +109,7 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
         this._container.bind<OAuthAuthenticator>(FRAMEWORKTYPES.OAuthAuthenticator)
                        .to(OAuthAuthenticator).inRequestScope();
 
-        // Register dummy values that are overridden by middleware later
+        // Register a dummy value that is overridden by the authorizer middleware later
         this._container.bind<TClaims>(FRAMEWORKTYPES.ApiClaims)
                        .toConstantValue({} as any);
     }

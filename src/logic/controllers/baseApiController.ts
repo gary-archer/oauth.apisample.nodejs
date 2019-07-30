@@ -12,6 +12,8 @@ export class BaseApiController extends BaseHttpController {
      * Get the current log entry and give it the calling method name
      */
     protected setOperationName(request: Request, name: string): void {
+
+        // TODO: Avoid the need for a base controller
         const logEntry = this.httpContext.container.get<ILogEntry>(FRAMEWORKTYPES.ILogEntry);
         logEntry.setOperationName(name);
     }

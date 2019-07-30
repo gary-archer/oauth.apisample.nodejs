@@ -47,7 +47,7 @@ export class HeaderAuthorizerBuilder {
         this._container.bind<HeaderAuthenticator>(FRAMEWORKTYPES.HeaderAuthenticator)
                        .to(HeaderAuthenticator).inRequestScope();
 
-        // Register dummy per request values that are overridden by middleware later
+        // Register a dummy value that is overridden by the authorizer middleware later
         this._container.bind<CoreApiClaims>(FRAMEWORKTYPES.ApiClaims)
                        .toConstantValue({} as any);
     }

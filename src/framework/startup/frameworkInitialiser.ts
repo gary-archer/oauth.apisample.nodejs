@@ -6,9 +6,7 @@ import {UnhandledExceptionHandler} from '../errors/unhandledExceptionHandler';
 import {UnhandledPromiseRejectionHandler} from '../errors/unhandledPromiseRejectionHandler';
 import {ILogEntry} from '../logging/ilogEntry';
 import {ILoggerFactory} from '../logging/iloggerFactory';
-import {LoggerFactory} from '../logging/loggerFactory';
 import {LoggerMiddleware} from '../logging/loggerMiddleware';
-import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 
 /*
@@ -88,8 +86,8 @@ export class FrameworkInitialiser {
             this._unhandledPromiseRejectionHandler.apply(authorizer.authorizeRequestAndGetClaims));
 
         // The third middleware supports non functional testing via headers
-        const handler = new CustomHeaderMiddleware(this._configuration.apiName);
-        expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
+        // const handler = new CustomHeaderMiddleware(this._configuration.apiName);
+        // expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
         return this;
     }
 
@@ -117,8 +115,8 @@ export class FrameworkInitialiser {
 
         /*** PER REQUEST OBJECTS ***/
 
+        // Register a dummy value that is overridden by the logger middleware later
         this._container.bind<ILogEntry>(FRAMEWORKTYPES.ILogEntry)
-                       .toDynamicValue(() =>
-                            (this._loggerFactory as LoggerFactory).createLogEntry()).inRequestScope();
+                       .toConstantValue({} as any);
     }
 }
