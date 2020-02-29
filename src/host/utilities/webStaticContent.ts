@@ -41,7 +41,7 @@ export class WebStaticContent {
      */
     public handleDesktopLoopbackRequests(): void {
 
-        this._expressApp.get('/desktop/postlogin.html', this._loopbackPostLoginPage);
+        this._expressApp.get('/loopback/postlogin.html', this._loopbackPostLoginPage);
     }
 
     /*
@@ -105,6 +105,7 @@ export class WebStaticContent {
      * Serve up the loopback post login page
      */
     private _loopbackPostLoginPage(request: express.Request, response: express.Response): void {
+
         const webFilePath = path.join(`${__dirname}/${LOOPBACK_FILES_ROOT}/postlogin.html`);
         response.sendFile(webFilePath);
     }

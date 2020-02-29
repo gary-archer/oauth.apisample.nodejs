@@ -119,6 +119,7 @@ export class HttpServerConfiguration {
 
         const content = new WebStaticContent(this._expressApp);
         content.handleWebRequests();
+        content.handleDesktopLoopbackRequests();
         content.handleDesktopRequests();
         content.handleAndroidRequests();
     }
