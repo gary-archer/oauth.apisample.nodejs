@@ -122,5 +122,6 @@ export class HttpServerConfiguration {
         content.handleDesktopLoopbackRequests();
         content.handleDesktopRequests();
         content.handleAndroidRequests();
+        content.handleIosRequests();
     }
 }

@@ -7,7 +7,8 @@ import path from 'path';
 const WEB_FILES_ROOT = '../../../../authguidance.websample.final/spa';
 const LOOPBACK_FILES_ROOT = '../../../../authguidance.desktopsample1/web';
 const DESKTOP_FILES_ROOT = '../../../../authguidance.desktopsample.final/web';
-const MOBILE_FILES_ROOT = '../../../../authguidance.mobilesample.android';
+const ANDROID_FILES_ROOT = '../../../../authguidance.mobilesample.android';
+const IOS_FILES_ROOT = '../../../../authguidance.mobilesample.ios';
 
 /*
  * For demo purposes our API also hosts some web static content
@@ -58,8 +59,17 @@ export class WebStaticContent {
      */
     public handleAndroidRequests(): void {
 
-        this._expressApp.get('/mobile/postlogin.html', this._androidPostLoginPage);
-        this._expressApp.get('/mobile/postlogout.html', this._androidPostLogoutPage);
+        this._expressApp.get('/android/postlogin.html', this._androidPostLoginPage);
+        this._expressApp.get('/android/postlogout.html', this._androidPostLogoutPage);
+    }
+
+    /*
+     * When our iOS app is run against a local API, serve mobile web content
+     */
+    public handleIosRequests(): void {
+
+        this._expressApp.get('/ios/postlogin.html', this._iosPostLoginPage);
+        this._expressApp.get('/ios/postlogout.html', this._iosPostLogoutPage);
     }
 
     /*
@@ -130,7 +140,7 @@ export class WebStaticContent {
      * Serve up the Android post login page
      */
     private _androidPostLoginPage(request: express.Request, response: express.Response): void {
-        const webFilePath = path.join(`${__dirname}/${MOBILE_FILES_ROOT}/web/postLogin.html`);
+        const webFilePath = path.join(`${__dirname}/${ANDROID_FILES_ROOT}/web/postLogin.html`);
         response.sendFile(webFilePath);
     }
 
@@ -138,7 +148,23 @@ export class WebStaticContent {
      * Serve up the Android post logout page
      */
     private _androidPostLogoutPage(request: express.Request, response: express.Response): void {
-        const webFilePath = path.join(`${__dirname}/${MOBILE_FILES_ROOT}/web/postLogout.html`);
+        const webFilePath = path.join(`${__dirname}/${ANDROID_FILES_ROOT}/web/postLogout.html`);
+        response.sendFile(webFilePath);
+    }
+
+    /*
+     * Serve up the iOS post login page
+     */
+    private _iosPostLoginPage(request: express.Request, response: express.Response): void {
+        const webFilePath = path.join(`${__dirname}/${IOS_FILES_ROOT}/web/postLogin.html`);
+        response.sendFile(webFilePath);
+    }
+
+    /*
+     * Serve up the iOS post logout page
+     */
+    private _iosPostLogoutPage(request: express.Request, response: express.Response): void {
+        const webFilePath = path.join(`${__dirname}/${IOS_FILES_ROOT}/web/postLogout.html`);
         response.sendFile(webFilePath);
     }
 }
