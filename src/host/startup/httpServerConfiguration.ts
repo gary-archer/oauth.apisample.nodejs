@@ -5,13 +5,13 @@ import https from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
 import url from 'url';
-import {FrameworkBuilder, LoggerFactory} from '../../framework-api-base';
-import {OAuthAuthorizerBuilder} from '../../framework-api-oauth';
-import {SampleApiClaimsProvider} from '../authorization/sampleApiClaimsProvider';
+import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
+import {FrameworkBuilder} from '../../plumbing/startup/frameworkBuilder';
+import {OAuthAuthorizerBuilder} from '../../plumbing/startup/oauthAuthorizerBuilder';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
-import {CompositionRoot} from '../configuration/compositionRoot';
+import {SampleApiClaimsProvider} from '../claims/sampleApiClaimsProvider';
+import {CompositionRoot} from '../dependencies/compositionRoot';
 import {Configuration} from '../configuration/configuration';
-import {RestErrorTranslator} from '../errors/restErrorTranslator';
 import {WebStaticContent} from '../utilities/webStaticContent';
 
 /*

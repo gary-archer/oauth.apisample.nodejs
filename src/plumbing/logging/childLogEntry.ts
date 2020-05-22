@@ -1,4 +1,4 @@
-import {Disposable} from '../../../framework-base';
+import {Disposable} from '../utilities/disposable';
 import {LogEntryImpl} from './logEntryImpl';
 
 /*

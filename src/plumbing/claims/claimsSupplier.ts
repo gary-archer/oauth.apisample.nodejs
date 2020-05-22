@@ -1,4 +1,4 @@
-import {CoreApiClaims} from '../../../framework-api-base';
+import {CoreApiClaims} from './coreApiClaims';
 import {CustomClaimsProvider} from './customClaimsProvider';
 
 /*

@@ -1,5 +1,5 @@
 /*
- * A list of base framework error codes
+ * A list of error codes used within plumbing code
  */
 export class BaseErrorCodes {
 

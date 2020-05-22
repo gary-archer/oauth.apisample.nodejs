@@ -5,7 +5,6 @@ export const BASETYPES = {
     ClaimsCache: Symbol.for('ClaimsCache'),
     ClaimsSupplier: Symbol.for('ClaimsSupplier'),
     CoreApiClaims: Symbol.for('CoreApiClaims'),
-    HeaderAuthenticator: Symbol.for('HeaderAuthenticator'),
     IssuerMetadata: Symbol.for('IssuerMetadata'),
     LogEntry: Symbol.for('LogEntry'),
     LoggerFactory: Symbol.for('LoggerFactory'),

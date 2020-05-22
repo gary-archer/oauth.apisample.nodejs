@@ -1,11 +1,11 @@
 import {Request} from 'express';
-import {BaseAuthorizer,
-        ChildContainerHelper,
-        CoreApiClaims,
-        ErrorFactory} from '../../../framework-api-base';
+import {BaseAuthorizer} from './baseAuthorizer';
 import {ClaimsCache} from '../claims/claimsCache';
 import {ClaimsSupplier} from '../claims/claimsSupplier';
-import {INTERNALTYPES} from '../configuration/internalTypes';
+import {CoreApiClaims} from '../claims/coreApiClaims';
+import {BASETYPES} from '../dependencies/baseTypes';
+import {ChildContainerHelper} from '../dependencies/childContainerHelper'
+import {ErrorFactory} from '../errors/errorFactory';
 import {OAuthAuthenticator} from './oauthAuthenticator';
 
 /*
@@ -25,25 +25,25 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         // First read the access token
         const accessToken = this._readAccessToken(request);
         if (!accessToken) {
-            throw ErrorFactory.create401Error('No access token was supplied in the bearer header');
+            throw ErrorFactory.createClient401Error('No access token was supplied in the bearer header');
         }
 
         // Get the child container for this HTTP request
         const perRequestContainer = ChildContainerHelper.resolve(request);
 
         // Bypass and use cached results if they exist
-        const cache = perRequestContainer.get<ClaimsCache<TClaims>>(INTERNALTYPES.ClaimsCache);
+        const cache = perRequestContainer.get<ClaimsCache<TClaims>>(BASETYPES.ClaimsCache);
         const cachedClaims = await cache.getClaimsForToken(accessToken);
         if (cachedClaims) {
             return cachedClaims;
         }
 
         // Create new claims which we will then populate
-        const claimsSupplier = perRequestContainer.get<ClaimsSupplier<TClaims>>(INTERNALTYPES.ClaimsSupplier);
+        const claimsSupplier = perRequestContainer.get<ClaimsSupplier<TClaims>>(BASETYPES.ClaimsSupplier);
         const claims = claimsSupplier.createEmptyClaims();
 
         // Resolve the authenticator for this request
-        const authenticator = perRequestContainer.get<OAuthAuthenticator>(INTERNALTYPES.OAuthAuthenticator);
+        const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
 
         // Do the authentication work to get claims, which in our case means OAuth processing
         const expiry = await authenticator.authenticateAndSetClaims(accessToken, request, claims);

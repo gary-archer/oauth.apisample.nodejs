@@ -2,8 +2,9 @@ import {injectable} from 'inversify';
 import hasher from 'js-sha256';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
-import {CoreApiClaims, LoggerFactory} from '../../../framework-api-base';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
+import {LoggerFactory} from '../logging/loggerFactory';
+import {CoreApiClaims} from './coreApiClaims';
 
 /*
  * A simple in memory claims cache for our API

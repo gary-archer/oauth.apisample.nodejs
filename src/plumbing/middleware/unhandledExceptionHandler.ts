@@ -1,8 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
-import {BASEFRAMEWORKTYPES} from '../../../framework-base';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
+import {BASETYPES} from '../dependencies/baseTypes';
 import {ApiError} from '../errors/apiError';
-import {ApplicationExceptionHandler} from '../errors/applicationExceptionHandler';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntryImpl} from '../logging/logEntryImpl';
 import {ChildContainerHelper} from '../utilities/childContainerHelper';
@@ -14,14 +13,10 @@ import {ResponseWriter} from '../utilities/responseWriter';
 export class UnhandledExceptionHandler {
 
     private readonly _configuration: LoggingConfiguration;
-    private readonly _applicationExceptionHandler: ApplicationExceptionHandler;
 
-    public constructor(
-        configuration: LoggingConfiguration,
-        appExceptionHandler: ApplicationExceptionHandler) {
+    public constructor(configuration: LoggingConfiguration) {
 
         this._configuration = configuration;
-        this._applicationExceptionHandler = appExceptionHandler;
         this._setupCallbacks();
     }
 
@@ -30,16 +25,12 @@ export class UnhandledExceptionHandler {
      */
     public handleException(exception: any, request: Request, response: Response, next: NextFunction): void {
 
-        // Get the exception to handle and allow the application to implement its own error logic first
-        let exceptionToHandle = exception;
-        exceptionToHandle = this._applicationExceptionHandler.translate(exception);
-
         // Get the log entry for this API request
         const perRequestContainer = ChildContainerHelper.resolve(request);
-        const logEntry = perRequestContainer.get<LogEntryImpl>(BASEFRAMEWORKTYPES.LogEntry);
+        const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
 
         // Get the error into a known object
-        const error = ErrorUtils.fromException(exceptionToHandle);
+        const error = ErrorUtils.fromException(exception);
 
         // Log and convert to the client error
         let clientError;

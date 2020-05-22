@@ -1,12 +1,13 @@
 import {Request} from 'express';
 import {inject, injectable} from 'inversify';
 import {Client, IntrospectionResponse, Issuer, UserinfoResponse} from 'openid-client';
-import {CoreApiClaims, ErrorFactory} from '../../../framework-api-base';
-import {BASEFRAMEWORKTYPES, LogEntry} from '../../../framework-base';
-import {using} from '../../../framework-base';
-import {INTERNALTYPES} from '../configuration/internalTypes';
+import {CoreApiClaims} from '../claims/coreApiClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
-import {OAuthErrorUtils} from '../errors/oauthErrorUtils';
+import {BASETYPES} from '../dependencies/baseTypes';
+import {ErrorFactory} from '../errors/errorFactory';
+import {ErrorUtils} from '../errors/errorUtils';
+import {LogEntry} from '../logging/logEntry';
+import {using} from '../utilities/using';
 import {IssuerMetadata} from './issuerMetadata';
 
 /*
@@ -20,9 +21,9 @@ export class OAuthAuthenticator {
     private readonly _logEntry: LogEntry;
 
     public constructor(
-        @inject(INTERNALTYPES.Configuration) configuration: OAuthConfiguration,
-        @inject(INTERNALTYPES.IssuerMetadata) metadata: IssuerMetadata,
-        @inject(BASEFRAMEWORKTYPES.LogEntry) logEntry: LogEntry) {
+        @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
+        @inject(BASETYPES.IssuerMetadata) metadata: IssuerMetadata,
+        @inject(BASETYPES.LogEntry) logEntry: LogEntry) {
 
         this._configuration = configuration;
         this._issuer = metadata.issuer;
@@ -73,7 +74,7 @@ export class OAuthAuthenticator {
                 // Make a client request to do the introspection
                 const tokenData: IntrospectionResponse = await client.introspect(accessToken);
                 if (!tokenData.active) {
-                    throw ErrorFactory.create401Error('Access token is expired and failed introspection');
+                    throw ErrorFactory.createClient401Error('Access token is expired and failed introspection');
                 }
 
                 // Read protocol claims and we will use the immutable user id as the subject claim
@@ -91,7 +92,7 @@ export class OAuthAuthenticator {
             } catch (e) {
 
                 // Sanitize introspection errors to ensure they are reported clearly
-                throw OAuthErrorUtils.fromIntrospectionError(e, (this._issuer as any).introspection_endpoint);
+                throw ErrorUtils.fromIntrospectionError(e, (this._issuer as any).introspection_endpoint);
             }
         });
     }
@@ -123,7 +124,7 @@ export class OAuthAuthenticator {
             } catch (e) {
 
                 // Sanitize user info errors to ensure they are reported clearly
-                throw OAuthErrorUtils.fromUserInfoError(e, this._issuer.metadata.userinfo_endpoint!!);
+                throw ErrorUtils.fromUserInfoError(e, this._issuer.metadata.userinfo_endpoint!!);
             }
         });
     }
@@ -134,7 +135,7 @@ export class OAuthAuthenticator {
     private _getClaim(claim: string | undefined, name: string): string {
 
         if (!claim) {
-            throw OAuthErrorUtils.fromMissingClaim(name);
+            throw ErrorUtils.fromMissingClaim(name);
         }
 
         return claim;

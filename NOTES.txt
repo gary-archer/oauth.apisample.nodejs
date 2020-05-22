@@ -1,0 +1,9 @@
+1. Fix up imports across project
+   Remove references to crap classes
+
+2. Rename ApiError to ServerError
+   Search on ApiError and 'Api Error'
+
+3. Startup to use classes termed composition root
+
+4. Search for and remove 'framework' wording

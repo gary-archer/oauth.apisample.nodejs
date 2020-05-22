@@ -1,7 +1,8 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
-import {APIFRAMEWORKTYPES, ErrorFactory} from '../../framework-api-base';
-import {LOGICTYPES} from '../../logic/configuration/logicTypes';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
+import {ErrorFactory} from '../../plumbing/errors/errorFactory';
+import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes';
 import {Company} from '../../logic/entities/company';
 import {CompanyTransactions} from '../../logic/entities/companyTransactions';
 import {ErrorCodes} from '../../logic/errors/errorCodes';
@@ -18,8 +19,8 @@ export class CompanyController extends BaseHttpController {
     private readonly _claims: SampleApiClaims;
 
     public constructor(
-        @inject(APIFRAMEWORKTYPES.CoreApiClaims) claims: SampleApiClaims,
-        @inject(LOGICTYPES.CompanyService) service: CompanyService) {
+        @inject(BASETYPES.CoreApiClaims) claims: SampleApiClaims,
+        @inject(SAMPLETYPES.CompanyService) service: CompanyService) {
 
         super();
         this._service = service;

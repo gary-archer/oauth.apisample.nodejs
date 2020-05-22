@@ -1,4 +1,4 @@
-import {Disposable} from '../..';
+import {Disposable} from '../utilities/disposable';
 import {PerformanceBreakdown} from './performanceBreakdown';
 
 /*

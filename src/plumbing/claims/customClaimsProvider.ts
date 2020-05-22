@@ -1,5 +1,5 @@
 import {Request} from 'express';
-import {CoreApiClaims} from '../../../framework-api-base';
+import {CoreApiClaims} from './coreApiClaims';
 
 /*
  * Concrete APIs can override this class to add custom claims to the cache after OAuth processing

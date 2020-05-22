@@ -1,17 +1,15 @@
 import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
-import {BASEFRAMEWORKTYPES, LogEntry} from '../../../framework-base';
-import {APIFRAMEWORKTYPES} from '../configuration/apiFrameworkTypes';
-import {INTERNALTYPES} from '../configuration/internalTypes';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
-import {ApplicationExceptionHandler} from '../errors/applicationExceptionHandler';
+import {BASETYPES} from '../dependencies/baseTypes';
+import {LogEntry} from '../logging/logEntry';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
-import {BaseAuthorizer} from '../security/baseAuthorizer';
+import {BaseAuthorizer} from '../oauth/baseAuthorizer';
 
 /*
  * A builder style class to configure framework behaviour and to register its dependencies
@@ -25,7 +23,6 @@ export class FrameworkBuilder {
     private _apiBasePath: string;
     private _frameworkExceptionHandler!: UnhandledExceptionHandler;
     private _loggerMiddleware!: LoggerMiddleware;
-    private _applicationExceptionHandler: ApplicationExceptionHandler;
 
     /*
      * Receive base details
@@ -39,7 +36,6 @@ export class FrameworkBuilder {
         this._configuration = configuration;
         this._loggerFactory = loggerFactory;
         this._apiBasePath = '/';
-        this._applicationExceptionHandler = new ApplicationExceptionHandler();
     }
 
     /*
@@ -56,22 +52,12 @@ export class FrameworkBuilder {
     }
 
     /*
-     * Allow an application handler to translate errors before the framework handler runs
-     */
-    public withApplicationExceptionHandler(appExceptionHandler: ApplicationExceptionHandler): FrameworkBuilder {
-        this._applicationExceptionHandler = appExceptionHandler;
-        return this;
-    }
-
-    /*
      * Do the main builder work of registering dependencies
      */
     public register(): FrameworkBuilder {
 
         // Create the unhandled exception handler for API requests
-        this._frameworkExceptionHandler = new UnhandledExceptionHandler(
-            this._configuration,
-            this._applicationExceptionHandler);
+        this._frameworkExceptionHandler = new UnhandledExceptionHandler(this._configuration);
 
         // Register framework dependencies as part of preparing the framework
         this._registerDependencies();
@@ -120,19 +106,16 @@ export class FrameworkBuilder {
      */
     private _registerDependencies(): void {
 
-        /*** SINGLETONS ***/
-
-        this._container.bind<UnhandledExceptionHandler>(APIFRAMEWORKTYPES.UnhandledExceptionHandler)
+        // Singletons
+        this._container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
                         .toConstantValue(this._frameworkExceptionHandler);
-        this._container.bind<LoggerFactory>(APIFRAMEWORKTYPES.LoggerFactory)
+        this._container.bind<LoggerFactory>(BASETYPES.LoggerFactory)
                         .toConstantValue(this._loggerFactory);
-        this._container.bind<LoggingConfiguration>(INTERNALTYPES.Configuration)
+        this._container.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
                         .toConstantValue(this._configuration);
 
-        /*** PER REQUEST OBJECTS ***/
-
-        // Register a dummy value that is overridden by the logger middleware later
-        this._container.bind<LogEntry>(BASEFRAMEWORKTYPES.LogEntry)
+        // Register a per request dummy value that is overridden by the logger middleware later
+        this._container.bind<LogEntry>(BASETYPES.LogEntry)
                        .toConstantValue({} as any);
     }
 }

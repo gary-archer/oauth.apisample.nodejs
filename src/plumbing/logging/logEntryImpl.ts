@@ -3,12 +3,14 @@ import {Guid} from 'guid-typescript';
 import {injectable} from 'inversify';
 import os from 'os';
 import {Logger} from 'winston';
-import {Disposable, LogEntry, PerformanceBreakdown} from '../../../framework-base';
+import {CoreApiClaims} from '../claims/coreApiClaims';
 import {ApiError} from '../errors/apiError';
 import {ClientError} from '../errors/clientError';
-import {CoreApiClaims} from '../security/coreApiClaims';
+import {Disposable} from '../utilities/disposable';
 import {ChildLogEntry} from './childLogEntry';
+import {LogEntry} from './logEntry';
 import {LogEntryData} from './logEntryData';
+import {PerformanceBreakdown} from './performanceBreakdown'
 import {RouteMetadataHandler} from './routeMetadataHandler';
 
 /*

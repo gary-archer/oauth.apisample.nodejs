@@ -1,11 +1,10 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
-import {BASEFRAMEWORKTYPES} from '../../../framework-base';
-import {APIFRAMEWORKTYPES} from '../configuration/apiFrameworkTypes';
+import {CoreApiClaims} from '../claims/coreApiClaims';
+import {BASETYPES} from '../dependencies/baseTypes';
 import {LogEntryImpl} from '../logging/logEntryImpl';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 import {ChildContainerHelper} from '../utilities/childContainerHelper';
-import {CoreApiClaims} from './coreApiClaims';
 
 /*
  * A base authorizer class that manages common plumbing
@@ -39,10 +38,10 @@ export abstract class BaseAuthorizer {
             const claims = await this.execute(request);
 
             // Bind claims to this requests's child container so that they are injectable into business logic
-            perRequestContainer.bind<CoreApiClaims>(APIFRAMEWORKTYPES.CoreApiClaims).toConstantValue(claims);
+            perRequestContainer.bind<CoreApiClaims>(BASETYPES.CoreApiClaims).toConstantValue(claims);
 
             // Log who called the API
-            const logEntry = perRequestContainer.get<LogEntryImpl>(BASEFRAMEWORKTYPES.LogEntry);
+            const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
             logEntry.setIdentity(claims);
 
             // On success, move on to the controller logic
@@ -52,7 +51,7 @@ export abstract class BaseAuthorizer {
 
             // Handle OAuth related exceptions
             const exceptionHandler = perRequestContainer.get<UnhandledExceptionHandler>(
-                APIFRAMEWORKTYPES.UnhandledExceptionHandler);
+                BASETYPES.UnhandledExceptionHandler);
             exceptionHandler.handleException(e, request, response, next);
         }
     }

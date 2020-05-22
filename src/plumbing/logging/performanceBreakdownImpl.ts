@@ -1,4 +1,4 @@
-import {PerformanceBreakdown} from '../../../framework-base';
+import {PerformanceBreakdown} from './performanceBreakdown';
 
 /*
  * The full implementation class is private to the framework and excluded from the index.ts file

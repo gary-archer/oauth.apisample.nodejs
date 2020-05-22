@@ -1,8 +1,7 @@
-import {ErrorFactory} from '../../../framework-api-base';
-import {ExtendedError} from '../../../framework-base';
 import {ApiError} from './apiError';
 import {BaseErrorCodes} from './baseErrorCodes';
 import {ClientError} from './clientError';
+import {ErrorFactory} from './errorFactory';
 
 /*
  * General error utility functions
@@ -46,26 +45,16 @@ export class ErrorUtils {
     }
 
     /*
-     * The error thrown if we cannot find an expected claim during security handling
-     */
-    public static fromMissingClaim(claimName: string): ApiError {
-
-        const apiError = ErrorFactory.createApiError(BaseErrorCodes.claimsFailure, 'Authorization Data Not Found');
-        apiError.setDetails(`An empty value was found for the expected claim ${claimName}`);
-        return apiError;
-    }
-
-    /*
      * Handle metadata lookup failures
      */
     public static fromMetadataError(responseError: any, url: string): ApiError {
 
         const apiError = ErrorFactory.createApiError(
-            OAuthErrorCodes.metadataLookupFailure,
+            BaseErrorCodes.metadataLookupFailure,
             'Metadata lookup failed',
             responseError.stack);
 
-        OAuthErrorUtils._setErrorDetails(apiError, null, responseError, url);
+        ErrorUtils._setErrorDetails(apiError, null, responseError, url);
         return apiError;
     }
 
@@ -82,14 +71,14 @@ export class ErrorUtils {
             return responseError;
         }
 
-        const [code, description] = OAuthErrorUtils._readOAuthErrorResponse(responseError);
-        const apiError = OAuthErrorUtils._createOAuthApiError(
-            OAuthErrorCodes.introspectionFailure,
+        const [code, description] = ErrorUtils._readOAuthErrorResponse(responseError);
+        const apiError = ErrorUtils._createOAuthApiError(
+            BaseErrorCodes.introspectionFailure,
             'Token validation failed',
             code,
             responseError.stack);
 
-        OAuthErrorUtils._setErrorDetails(apiError, description, responseError, url);
+        ErrorUtils._setErrorDetails(apiError, description, responseError, url);
         return apiError;
     }
 
@@ -100,7 +89,7 @@ export class ErrorUtils {
 
         // Handle a race condition where the access token expires during user info lookup
         if (responseError.error && responseError.error === 'invalid_token') {
-            throw ErrorFactory.create401Error('Access token expired during user info lookup');
+            throw ErrorFactory.createClient401Error('Access token expired during user info lookup');
         }
 
         // Avoid reprocessing
@@ -108,14 +97,14 @@ export class ErrorUtils {
             return responseError;
         }
 
-        const [code, description] = OAuthErrorUtils._readOAuthErrorResponse(responseError);
-        const apiError = OAuthErrorUtils._createOAuthApiError(
-            OAuthErrorCodes.userinfoFailure,
+        const [code, description] = ErrorUtils._readOAuthErrorResponse(responseError);
+        const apiError = ErrorUtils._createOAuthApiError(
+            BaseErrorCodes.userinfoFailure,
             'User info lookup failed',
             code,
             responseError.stack);
 
-        OAuthErrorUtils._setErrorDetails(apiError, description, responseError, url);
+        ErrorUtils._setErrorDetails(apiError, description, responseError, url);
         return apiError;
     }
 
@@ -182,7 +171,7 @@ export class ErrorUtils {
         if (oauthDetails) {
             detailsText += oauthDetails;
         } else {
-            detailsText += OAuthErrorUtils._getExceptionDetailsMessage(responseError);
+            detailsText += ErrorUtils._getExceptionDetailsMessage(responseError);
         }
 
         if (url) {
@@ -192,24 +181,7 @@ export class ErrorUtils {
     }
 
     /*
-     * Get the message from an exception and avoid returning [object Object]
-     */
-    private static _getExceptionDetailsMessage(e: any): string {
-
-        if (e.message) {
-            return e.message;
-        } else {
-            const details = e.toString();
-            if (details !== {}.toString()) {
-                return details;
-            } else {
-                return '';
-            }
-        }
-    }
-
-    /*
-     * See if the exception is convertible to a REST API error
+     * See if the exception is convertible to a server error
      */
     private static tryConvertToApiError(exception: any): ApiError | null {
 
@@ -218,27 +190,11 @@ export class ErrorUtils {
             return exception as ApiError;
         }
 
-        // Convert from our technology neutral custom exception to an API specific error
-        if (exception instanceof ExtendedError) {
-            const error = exception as ExtendedError;
-
-            const apiError = ErrorFactory.createApiError(
-                error.code,
-                error.message,
-                error.stack);
-
-            if (error.details) {
-                apiError.setDetails(error.details);
-            }
-
-            return apiError;
-        }
-
         return null;
     }
 
     /*
-     * Try to convert an exception to a ClientError
+     * Try to convert an exception to a client error
      */
     private static tryConvertToClientError(exception: any): ClientError | null {
 

@@ -1,11 +1,10 @@
 import {Container} from 'inversify';
-import {LOGICTYPES} from '../../logic/configuration/logicTypes';
+import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes';
 import {CompanyRepository} from '../../logic/repositories/companyRepository';
 import {CompanyService} from '../../logic/services/companyService';
 import {JsonFileReader} from '../../logic/utilities/jsonFileReader';
 import {CompanyController} from '../controllers/companyController';
 import {UserInfoController} from '../controllers/userInfoController';
-import {HOSTTYPES} from './hostTypes';
 
 /*
  * Compose the application's business dependencies
@@ -19,12 +18,12 @@ export class CompositionRoot {
     public static registerDependencies(container: Container): void {
 
         // Controller classes have a REST based request scope
-        container.bind<CompanyController>(HOSTTYPES.CompanyController).to(CompanyController).inRequestScope();
-        container.bind<UserInfoController>(HOSTTYPES.UserInfoController).to(UserInfoController).inRequestScope();
+        container.bind<CompanyController>(SAMPLETYPES.CompanyController).to(CompanyController).inRequestScope();
+        container.bind<UserInfoController>(SAMPLETYPES.UserInfoController).to(UserInfoController).inRequestScope();
 
         // Business logic classes use a non REST based transient scope
-        container.bind<CompanyService>(LOGICTYPES.CompanyService).to(CompanyService).inTransientScope();
-        container.bind<CompanyRepository>(LOGICTYPES.CompanyRepository).to(CompanyRepository).inTransientScope();
-        container.bind<JsonFileReader>(LOGICTYPES.JsonFileReader).to(JsonFileReader).inTransientScope();
+        container.bind<CompanyService>(SAMPLETYPES.CompanyService).to(CompanyService).inTransientScope();
+        container.bind<CompanyRepository>(SAMPLETYPES.CompanyRepository).to(CompanyRepository).inTransientScope();
+        container.bind<JsonFileReader>(SAMPLETYPES.JsonFileReader).to(JsonFileReader).inTransientScope();
     }
 }

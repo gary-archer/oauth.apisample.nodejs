@@ -1,6 +1,6 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
-import {APIFRAMEWORKTYPES} from '../../framework-api-base';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 
@@ -12,7 +12,7 @@ export class UserInfoController extends BaseHttpController {
 
     private readonly _claims: SampleApiClaims;
 
-    public constructor(@inject(APIFRAMEWORKTYPES.CoreApiClaims) claims: SampleApiClaims) {
+    public constructor(@inject(BASETYPES.CoreApiClaims) claims: SampleApiClaims) {
         super();
         this._claims = claims;
     }

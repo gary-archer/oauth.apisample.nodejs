@@ -1,8 +1,7 @@
 import {inject, injectable} from 'inversify';
-import {LOGICTYPES} from '../configuration/logicTypes';
+import {SAMPLETYPES} from '../dependencies/sampleTypes';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
-import {BusinessError} from '../errors/businessError';
 import {ErrorCodes} from '../errors/errorCodes';
 import {CompanyRepository} from '../repositories/companyRepository';
 
@@ -14,7 +13,7 @@ export class CompanyService {
 
     private readonly _repository: CompanyRepository;
 
-    public constructor(@inject(LOGICTYPES.CompanyRepository) repository: CompanyRepository) {
+    public constructor(@inject(SAMPLETYPES.CompanyRepository) repository: CompanyRepository) {
         this._repository = repository;
     }
 

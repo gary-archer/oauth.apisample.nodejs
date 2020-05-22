@@ -1,5 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
-import {BASEFRAMEWORKTYPES, LogEntry} from '../../../framework-base';
+import {BASETYPES} from '../dependencies/baseTypes';
+import {LogEntry} from '../logging/logEntry';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl';
 import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
@@ -39,7 +40,7 @@ export class LoggerMiddleware {
 
         // Register it against this request's child container so that it can be injected into other places
         const container = ChildContainerHelper.resolve(request);
-        container.bind<LogEntry>(BASEFRAMEWORKTYPES.LogEntry).toConstantValue(logEntry);
+        container.bind<LogEntry>(BASETYPES.LogEntry).toConstantValue(logEntry);
 
         // Start the log entry for this API request
         logEntry.start(request);

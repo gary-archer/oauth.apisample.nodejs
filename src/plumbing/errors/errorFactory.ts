@@ -40,7 +40,7 @@ export class ErrorFactory {
     /*
      * Create a 401 error with the reason
      */
-    public static create401Error(reason: string): ClientError {
+    public static createClient401Error(reason: string): ClientError {
 
         const error = new ClientErrorImpl(
             401,

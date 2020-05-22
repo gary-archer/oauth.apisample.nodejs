@@ -1,5 +1,5 @@
 /*
- * Types used with dependency injection
+ * This API's types used with dependency injection
  */
 export const SAMPLETYPES = {
     CompanyController: Symbol.for('CompanyController'),

@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
-import {DebugProxyAgent, LoggerFactoryBuilder} from '../../framework-api-base';
+import {LoggerFactoryBuilder} from '../../plumbing/logging/loggerFactoryBuilder';
+import {DebugProxyAgent} from '../../plumbing/utilities/debugProxyAgent'
 import {Configuration} from '../configuration/configuration';
 import {HttpServerConfiguration} from './httpServerConfiguration';
 

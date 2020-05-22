@@ -1,5 +1,5 @@
 import {Request} from 'express';
-import {CustomClaimsProvider} from '../../framework-api-oauth';
+import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
 
 /*

@@ -1,16 +1,15 @@
 import {Container} from 'inversify';
-import {APIFRAMEWORKTYPES,
-        BaseAuthorizer,
-        CoreApiClaims,
-        LoggerFactory} from '../../../framework-api-base';
+import {BASETYPES} from '../dependencies/baseTypes';
 import {ClaimsCache} from '../claims/claimsCache';
 import {ClaimsSupplier} from '../claims/claimsSupplier';
+import {CoreApiClaims} from '../claims/coreApiClaims';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
-import {INTERNALTYPES} from '../configuration/internalTypes';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
-import {IssuerMetadata} from '../security/issuerMetadata';
-import {OAuthAuthenticator} from '../security/oauthAuthenticator';
-import {OAuthAuthorizer} from '../security/oauthAuthorizer';
+import {LoggerFactory} from '../logging/loggerFactory';
+import {BaseAuthorizer} from '../oauth/baseAuthorizer';
+import {IssuerMetadata} from '../oauth/issuerMetadata';
+import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
+import {OAuthAuthorizer} from '../oauth/oauthAuthorizer';
 
 /*
  * A builder style class for configuring OAuth security
@@ -61,8 +60,7 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
     public async register(): Promise<BaseAuthorizer> {
 
         // Get base framework dependencies
-        const loggerFactory = this._container.get<LoggerFactory>(
-            APIFRAMEWORKTYPES.LoggerFactory);
+        const loggerFactory = this._container.get<LoggerFactory>(BASETYPES.LoggerFactory);
 
         // Load Open Id Connect metadata
         const issuerMetadata = new IssuerMetadata(this._configuration);
@@ -98,22 +96,22 @@ export class OAuthAuthorizerBuilder<TClaims extends CoreApiClaims> {
 
         /*** SINGLETONS ***/
 
-        this._container.bind<OAuthConfiguration>(INTERNALTYPES.Configuration)
+        this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
                        .toConstantValue(this._configuration);
-        this._container.bind<IssuerMetadata>(INTERNALTYPES.IssuerMetadata)
+        this._container.bind<IssuerMetadata>(BASETYPES.IssuerMetadata)
                        .toConstantValue(issuerMetadata);
-        this._container.bind<ClaimsCache<TClaims>>(INTERNALTYPES.ClaimsCache)
+        this._container.bind<ClaimsCache<TClaims>>(BASETYPES.ClaimsCache)
                        .toConstantValue(claimsCache);
-        this._container.bind<ClaimsSupplier<TClaims>>(INTERNALTYPES.ClaimsSupplier)
+        this._container.bind<ClaimsSupplier<TClaims>>(BASETYPES.ClaimsSupplier)
                        .toConstantValue(claimsSupplier);
 
         /*** PER REQUEST OBJECTS ***/
 
-        this._container.bind<OAuthAuthenticator>(INTERNALTYPES.OAuthAuthenticator)
+        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
                        .to(OAuthAuthenticator).inRequestScope();
 
         // Register a dummy value that is overridden by the authorizer middleware later
-        this._container.bind<TClaims>(APIFRAMEWORKTYPES.CoreApiClaims)
+        this._container.bind<TClaims>(BASETYPES.CoreApiClaims)
                        .toConstantValue({} as any);
     }
 }

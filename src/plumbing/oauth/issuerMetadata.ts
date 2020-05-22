@@ -1,7 +1,7 @@
 import {Client, custom, Issuer} from 'openid-client';
-import {DebugProxyAgent} from '../../../framework-api-base';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
-import {OAuthErrorUtils} from '../errors/oauthErrorUtils';
+import {ErrorUtils} from '../errors/errorUtils';
+import {DebugProxyAgent} from '../utilities/debugProxyAgent';
 
 /*
  * A singleton to read metadata at application startup
@@ -31,7 +31,7 @@ export class IssuerMetadata {
             const endpoint = `${this._configuration.authority}/.well-known/openid-configuration`;
             this._issuer = await Issuer.discover(endpoint);
         } catch (e) {
-            throw OAuthErrorUtils.fromMetadataError(e, this._configuration.authority);
+            throw ErrorUtils.fromMetadataError(e, this._configuration.authority);
         }
     }
 
