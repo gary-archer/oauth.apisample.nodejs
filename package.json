@@ -1,7 +1,7 @@
 {
   "name": "sampleapi",
   "version": "3.0.0",
-  "description": "An OAuth secured API with shared code for security, logging and error handling",
+  "description": "An OAuth secured API with claims caching and targeted logging",
   "main": "app.ts",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
@@ -14,14 +14,18 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "framework-api-base": "file:src/framework-api-base",
-    "framework-api-oauth": "file:src/framework-api-oauth",
     "fs-extra": "^8.1.0",
+    "guid-typescript": "^1.0.9",
     "inversify": "^5.0.1",
     "inversify-express-utils": "^6.3.2",
+    "js-sha256": "^0.9.0",
+    "node-cache": "^4.2.0",
+    "openid-client": "^3.8.2",
     "reflect-metadata": "^0.1.13",
+    "tunnel-agent": "^0.6.0",
     "url": "^0.11.0",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^3.9.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",
