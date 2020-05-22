@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {BASEFRAMEWORKTYPES} from '../../../framework-base';
-import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {ApiError} from '../errors/apiError';
 import {ApplicationExceptionHandler} from '../errors/applicationExceptionHandler';
 import {ErrorUtils} from '../errors/errorUtils';
@@ -13,11 +13,11 @@ import {ResponseWriter} from '../utilities/responseWriter';
  */
 export class UnhandledExceptionHandler {
 
-    private readonly _configuration: FrameworkConfiguration;
+    private readonly _configuration: LoggingConfiguration;
     private readonly _applicationExceptionHandler: ApplicationExceptionHandler;
 
     public constructor(
-        configuration: FrameworkConfiguration,
+        configuration: LoggingConfiguration,
         appExceptionHandler: ApplicationExceptionHandler) {
 
         this._configuration = configuration;

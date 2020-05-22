@@ -1,4 +1,4 @@
-import {FrameworkConfiguration} from '../../framework-api-base';
+import {LoggingConfiguration} from '../../framework-api-base';
 import {OAuthConfiguration} from '../../framework-api-oauth';
 import {ApiConfiguration} from './apiConfiguration';
 
@@ -7,6 +7,6 @@ import {ApiConfiguration} from './apiConfiguration';
  */
 export interface Configuration {
     api: ApiConfiguration;
-    framework: FrameworkConfiguration;
+    logging: LoggingConfiguration;
     oauth: OAuthConfiguration;
 }

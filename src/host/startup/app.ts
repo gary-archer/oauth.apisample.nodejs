@@ -19,7 +19,7 @@ import {HttpServerConfiguration} from './httpServerConfiguration';
         // Load our JSON configuration and configure log levels
         const configurationBuffer = await fs.readFile('api.config.json');
         const configuration = JSON.parse(configurationBuffer.toString()) as Configuration;
-        loggerFactory.configure(configuration.framework);
+        loggerFactory.configure(configuration.logging);
 
         // Initialize HTTP debugging
         DebugProxyAgent.initialize(configuration.api.useProxy, configuration.api.proxyUrl);

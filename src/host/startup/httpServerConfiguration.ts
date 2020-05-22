@@ -37,7 +37,7 @@ export class HttpServerConfiguration {
     public async configure(): Promise<void> {
 
         // Register base framework dependencies
-        const framework = new FrameworkBuilder(this._container, this._configuration.framework, this._loggerFactory)
+        const framework = new FrameworkBuilder(this._container, this._configuration.logging, this._loggerFactory)
             .withApiBasePath('/api/')
             .withApplicationExceptionHandler(new RestErrorTranslator())
             .register();

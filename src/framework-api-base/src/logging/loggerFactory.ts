@@ -1,5 +1,5 @@
 import {Logger} from 'winston';
-import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 
 /*
  * An interface that allows business logic to access logging objects
@@ -7,7 +7,7 @@ import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
 export interface LoggerFactory {
 
     // Configuration at startup
-    configure(configuration: FrameworkConfiguration): void;
+    configure(configuration: LoggingConfiguration): void;
 
     // Handle exceptions starting the API
     logStartupError(exception: any): void;

@@ -9,17 +9,17 @@ import {RouteMetadata} from './routeMetadata';
 export class RouteMetadataHandler {
 
     private readonly _basePath: string;
-    private readonly _metadata: Array<{
+    private readonly _metadata: {
         controllerMetadata: interfaces.ControllerMetadata;
         methodMetadata: interfaces.ControllerMethodMetadata[];
         parameterMetadata: interfaces.ControllerParameterMetadata;
-        }>;
+        }[];
 
-    public constructor(basePath: string, metadata: Array<{
+    public constructor(basePath: string, metadata: {
         controllerMetadata: interfaces.ControllerMetadata;
         methodMetadata: interfaces.ControllerMethodMetadata[];
         parameterMetadata: interfaces.ControllerParameterMetadata;
-        }>) {
+        }[]) {
 
         this._basePath = this._trimTrailingForwardSlash(basePath);
         this._metadata = metadata;
