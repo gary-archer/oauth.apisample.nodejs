@@ -3,8 +3,8 @@ import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
 import {BASEFRAMEWORKTYPES, LogEntry} from '../../../framework-base';
 import {APIFRAMEWORKTYPES} from '../configuration/apiFrameworkTypes';
-import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
 import {INTERNALTYPES} from '../configuration/internalTypes';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {ApplicationExceptionHandler} from '../errors/applicationExceptionHandler';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
@@ -19,7 +19,7 @@ import {BaseAuthorizer} from '../security/baseAuthorizer';
 export class FrameworkBuilder {
 
     private readonly _container: Container;
-    private readonly _configuration: FrameworkConfiguration;
+    private readonly _configuration: LoggingConfiguration;
     private readonly _loggerFactory: LoggerFactory;
 
     private _apiBasePath: string;
@@ -32,7 +32,7 @@ export class FrameworkBuilder {
      */
     public constructor(
         container: Container,
-        configuration: FrameworkConfiguration,
+        configuration: LoggingConfiguration,
         loggerFactory: LoggerFactory) {
 
         this._container = container;
@@ -126,7 +126,7 @@ export class FrameworkBuilder {
                         .toConstantValue(this._frameworkExceptionHandler);
         this._container.bind<LoggerFactory>(APIFRAMEWORKTYPES.LoggerFactory)
                         .toConstantValue(this._loggerFactory);
-        this._container.bind<FrameworkConfiguration>(INTERNALTYPES.Configuration)
+        this._container.bind<LoggingConfiguration>(INTERNALTYPES.Configuration)
                         .toConstantValue(this._configuration);
 
         /*** PER REQUEST OBJECTS ***/

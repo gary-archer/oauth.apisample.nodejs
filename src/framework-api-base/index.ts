@@ -3,7 +3,7 @@
  */
 
 import {APIFRAMEWORKTYPES} from './src/configuration/apiFrameworkTypes';
-import {FrameworkConfiguration} from './src/configuration/frameworkConfiguration';
+import {LoggingConfiguration} from './src/configuration/loggingConfiguration';
 import {ApiError} from './src/errors/apiError';
 import {ApplicationExceptionHandler} from './src/errors/applicationExceptionHandler';
 import {BaseErrorCodes} from './src/errors/baseErrorCodes';
@@ -21,19 +21,19 @@ import {DebugProxyAgent} from './src/utilities/debugProxyAgent';
 
 export {
     APIFRAMEWORKTYPES,
-    FrameworkBuilder,
-    FrameworkConfiguration,
     ApiError,
     ApplicationExceptionHandler,
+    BaseAuthorizer,
     BaseErrorCodes,
+    ChildContainerHelper,
     ClientError,
+    CoreApiClaims,
+    DebugProxyAgent,
     ErrorFactory,
+    FrameworkBuilder,
+    HeaderAuthorizerBuilder,
     LoggerFactory,
     LoggerFactoryBuilder,
+    LoggingConfiguration,
     UnhandledExceptionHandler,
-    BaseAuthorizer,
-    CoreApiClaims,
-    HeaderAuthorizerBuilder,
-    ChildContainerHelper,
-    DebugProxyAgent,
 };

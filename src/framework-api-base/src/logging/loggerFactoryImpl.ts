@@ -1,7 +1,7 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import Transport from 'winston-transport';
-import {FrameworkConfiguration} from '../configuration/frameworkConfiguration';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntryImpl} from './logEntryImpl';
 import {LoggerFactory} from './loggerFactory';
@@ -18,7 +18,6 @@ const PRODUCTION_LOGGER_NAME = 'production';
  */
 export class LoggerFactoryImpl implements LoggerFactory {
 
-    private _logConfiguration: any;
     private _apiName: string;
     private _defaultPerformanceThresholdMilliseconds: number;
     private _thresholdOverrides: PerformanceThreshold[];
@@ -47,21 +46,19 @@ export class LoggerFactoryImpl implements LoggerFactory {
     /*
      * Configure at application startup from a dynamic object
      */
-    public configure(configuration: FrameworkConfiguration): void {
+    public configure(configuration: LoggingConfiguration): void {
 
         // Initialise behaviour
-        this._logConfiguration = configuration.logging;
         this._apiName = configuration.apiName;
 
         // Create the production logger
-        const productionLogConfig = this._logConfiguration.production;
+        const productionLogConfig = configuration.production;
         this._createProductionLogger(productionLogConfig.level, productionLogConfig.transports);
-
-        // Process performance details
-        this._loadPerformanceThresholds();
+        this._loadPerformanceThresholds(productionLogConfig);
 
         // Create development loggers
-        this._createDevelopmentLoggers();
+        const developmentLogConfig = configuration.development;
+        this._createDevelopmentLoggers(developmentLogConfig);
     }
 
     /*
@@ -163,10 +160,9 @@ export class LoggerFactoryImpl implements LoggerFactory {
      * Development loggers run only on a developer PC and should be used sparingly
      * The output is not useful in production since it has insufficient context and is not queryable
      */
-    private _createDevelopmentLoggers(): void {
+    private _createDevelopmentLoggers(developmentLogConfig: any): void {
 
         // Create the root logger
-        const developmentLogConfig = this._logConfiguration.development;
         this._createDevelopmentLogger(ROOT_DEVELOPMENT_LOGGER_NAME, developmentLogConfig.level);
 
         // Add extra loggers per class if configured
@@ -231,10 +227,10 @@ export class LoggerFactoryImpl implements LoggerFactory {
     /*
      * Extract performance details from the log configuration, for use later when creating log entries
      */
-    private _loadPerformanceThresholds() {
+    private _loadPerformanceThresholds(productionLogConfig: any) {
 
         // Read the default performance threshold
-        const thresholds = this._logConfiguration.production.performanceThresholdsMilliseconds;
+        const thresholds = productionLogConfig.performanceThresholdsMilliseconds;
 
         // Update the default
         if (thresholds.default >= 0) {
