@@ -1,4 +1,4 @@
-import {ApiError} from './apiError';
+import {ServerError} from './ServerError';
 import {BaseErrorCodes} from './baseErrorCodes';
 import {ClientError} from './clientError';
 import {ErrorFactory} from './errorFactory';
@@ -11,11 +11,11 @@ export class ErrorUtils {
     /*
      * Return or create a typed error
      */
-    public static fromException(exception: any): ApiError | ClientError {
+    public static fromException(exception: any): ServerError | ClientError {
 
-        const apiError = this.tryConvertToApiError(exception);
-        if (apiError !== null) {
-            return apiError;
+        const serverError = this.tryConvertToServerError(exception);
+        if (serverError !== null) {
+            return serverError;
         }
 
         const clientError = this.tryConvertToClientError(exception);
@@ -23,20 +23,20 @@ export class ErrorUtils {
             return clientError;
         }
 
-        return ErrorUtils.createApiError(exception);
+        return ErrorUtils.createServerError(exception);
     }
 
     /*
      * Create an error from an exception
      */
-    public static createApiError(exception: any, errorCode?: string, message?: string): ApiError {
+    public static createServerError(exception: any, errorCode?: string, message?: string): ServerError {
 
         // Default details
         const defaultErrorCode = BaseErrorCodes.serverError;
         const defaultMessage = 'An unexpected exception occurred in the API';
 
         // Create the error
-        const error = ErrorFactory.createApiError(
+        const error = ErrorFactory.createServerError(
             errorCode || defaultErrorCode,
             message || defaultMessage,
             exception.stack);
@@ -47,24 +47,24 @@ export class ErrorUtils {
     /*
      * Handle metadata lookup failures
      */
-    public static fromMetadataError(responseError: any, url: string): ApiError {
+    public static fromMetadataError(responseError: any, url: string): ServerError {
 
-        const apiError = ErrorFactory.createApiError(
+        const error = ErrorFactory.createServerError(
             BaseErrorCodes.metadataLookupFailure,
             'Metadata lookup failed',
             responseError.stack);
 
-        ErrorUtils._setErrorDetails(apiError, null, responseError, url);
-        return apiError;
+        ErrorUtils._setErrorDetails(error, null, responseError, url);
+        return error;
     }
 
     /*
      * Handle introspection failures
      */
-    public static fromIntrospectionError(responseError: any, url: string): ApiError | ClientError {
+    public static fromIntrospectionError(responseError: any, url: string): ServerError | ClientError {
 
         // Avoid reprocessing
-        if (responseError instanceof ApiError) {
+        if (responseError instanceof ServerError) {
             return responseError;
         }
         if (responseError instanceof ClientError) {
@@ -72,20 +72,20 @@ export class ErrorUtils {
         }
 
         const [code, description] = ErrorUtils._readOAuthErrorResponse(responseError);
-        const apiError = ErrorUtils._createOAuthApiError(
+        const error = ErrorUtils._createOAuthServerError(
             BaseErrorCodes.introspectionFailure,
             'Token validation failed',
             code,
             responseError.stack);
 
-        ErrorUtils._setErrorDetails(apiError, description, responseError, url);
-        return apiError;
+        ErrorUtils._setErrorDetails(error, description, responseError, url);
+        return error;
     }
 
     /*
      * Handle user info lookup failures
      */
-    public static fromUserInfoError(responseError: any, url: string): ApiError {
+    public static fromUserInfoError(responseError: any, url: string): ServerError {
 
         // Handle a race condition where the access token expires during user info lookup
         if (responseError.error && responseError.error === 'invalid_token') {
@@ -93,29 +93,29 @@ export class ErrorUtils {
         }
 
         // Avoid reprocessing
-        if (responseError instanceof ApiError) {
+        if (responseError instanceof ServerError) {
             return responseError;
         }
 
         const [code, description] = ErrorUtils._readOAuthErrorResponse(responseError);
-        const apiError = ErrorUtils._createOAuthApiError(
+        const error = ErrorUtils._createOAuthServerError(
             BaseErrorCodes.userinfoFailure,
             'User info lookup failed',
             code,
             responseError.stack);
 
-        ErrorUtils._setErrorDetails(apiError, description, responseError, url);
-        return apiError;
+        ErrorUtils._setErrorDetails(error, description, responseError, url);
+        return error;
     }
 
     /*
      * The error thrown if we cannot find an expected claim during security handling
      */
-    public static fromMissingClaim(claimName: string): ApiError {
+    public static fromMissingClaim(claimName: string): ServerError {
 
-        const apiError = ErrorFactory.createApiError(BaseErrorCodes.claimsFailure, 'Authorization Data Not Found');
-        apiError.setDetails(`An empty value was found for the expected claim ${claimName}`);
-        return apiError;
+        const error = ErrorFactory.createServerError(BaseErrorCodes.claimsFailure, 'Authorization Data Not Found');
+        error.setDetails(`An empty value was found for the expected claim ${claimName}`);
+        return error;
     }
 
     /*
@@ -143,11 +143,11 @@ export class ErrorUtils {
     /*
      * Create an error object from an error code and include the OAuth error code in the user message
      */
-    private static _createOAuthApiError(
+    private static _createOAuthServerError(
         errorCode: string,
         userMessage: string,
         oauthErrorCode: string | null,
-        stack: string | undefined): ApiError {
+        stack: string | undefined): ServerError {
 
         // Include the OAuth error code in the short technical message returned
         let message = userMessage;
@@ -155,14 +155,14 @@ export class ErrorUtils {
             message += ` : ${oauthErrorCode}`;
         }
 
-        return ErrorFactory.createApiError(errorCode, message, stack);
+        return ErrorFactory.createServerError(errorCode, message, stack);
     }
 
     /*
-     * Update the API error object with technical exception details
+     * Update the error object with technical exception details
      */
     private static _setErrorDetails(
-        error: ApiError,
+        error: ServerError,
         oauthDetails: string | null,
         responseError: any,
         url: string): void {
@@ -183,11 +183,11 @@ export class ErrorUtils {
     /*
      * See if the exception is convertible to a server error
      */
-    private static tryConvertToApiError(exception: any): ApiError | null {
+    private static tryConvertToServerError(exception: any): ServerError | null {
 
         // Already handled
-        if (exception instanceof ApiError) {
-            return exception as ApiError;
+        if (exception instanceof ServerError) {
+            return exception as ServerError;
         }
 
         return null;

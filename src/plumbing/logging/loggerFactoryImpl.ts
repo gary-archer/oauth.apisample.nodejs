@@ -72,12 +72,12 @@ export class LoggerFactoryImpl implements LoggerFactory {
         }
 
         // Get the error into a loggable format
-        const error = ErrorUtils.createApiError(exception);
+        const error = ErrorUtils.createServerError(exception);
 
         // Create a log entry and set error details
         const logEntry = new LogEntryImpl(this._apiName, this._getProductionLogger(), null);
         logEntry.setOperationName('startup');
-        logEntry.setApiError(error);
+        logEntry.setServerError(error);
         logEntry.write();
     }
 

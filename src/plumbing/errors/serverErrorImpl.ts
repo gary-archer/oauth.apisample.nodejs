@@ -1,4 +1,4 @@
-import {ApiError} from './apiError';
+import {ServerError} from './ServerError';
 import {ClientError} from './clientError';
 import {ErrorFactory} from './errorFactory';
 
@@ -7,9 +7,9 @@ const MIN_ERROR_ID = 10000;
 const MAX_ERROR_ID = 99999;
 
 /*
- * The default implementation of an API error
+ * The default implementation of a server error
  */
-export class ApiErrorImpl extends ApiError {
+export class ServerErrorImpl extends ServerError {
 
     // Standard exception properties to log
     private readonly _statusCode: number;

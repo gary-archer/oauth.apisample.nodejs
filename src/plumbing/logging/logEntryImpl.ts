@@ -4,7 +4,7 @@ import {injectable} from 'inversify';
 import os from 'os';
 import {Logger} from 'winston';
 import {CoreApiClaims} from '../claims/coreApiClaims';
-import {ApiError} from '../errors/apiError';
+import {ServerError} from '../errors/ServerError';
 import {ClientError} from '../errors/clientError';
 import {Disposable} from '../utilities/disposable';
 import {ChildLogEntry} from './childLogEntry';
@@ -121,7 +121,7 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Add error details after they have been processed by the exception handler, including denormalised fields
      */
-    public setApiError(error: ApiError): void {
+    public setServerError(error: ServerError): void {
         this._current().errorData = error.toLogFormat(this._data.apiName);
         this._current().errorCode = error.getErrorCode();
         this._current().errorId = error.getInstanceId();

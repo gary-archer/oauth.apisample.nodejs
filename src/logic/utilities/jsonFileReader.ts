@@ -23,7 +23,7 @@ export class JsonFileReader {
         } catch (e) {
 
             // Report the error including an error code and exception details
-            const error = ErrorFactory.createApiError(
+            const error = ErrorFactory.createServerError(
                 ErrorCodes.fileReadError,
                 'Problem encountered reading data',
                 e.stack);

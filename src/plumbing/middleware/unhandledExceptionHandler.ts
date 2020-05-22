@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper';
-import {ApiError} from '../errors/apiError';
+import {ServerError} from '../errors/ServerError';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntryImpl} from '../logging/logEntryImpl';
 import {ResponseWriter} from '../utilities/responseWriter';
@@ -34,8 +34,8 @@ export class UnhandledExceptionHandler {
 
         // Log and convert to the client error
         let clientError;
-        if (error instanceof ApiError) {
-            logEntry.setApiError(error);
+        if (error instanceof ServerError) {
+            logEntry.setServerError(error);
             clientError = error.toClientError(this._configuration.apiName);
         } else {
             logEntry.setClientError(error);

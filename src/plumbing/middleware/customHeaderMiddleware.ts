@@ -24,7 +24,7 @@ export class CustomHeaderMiddleware {
         if (apiToBreak) {
             if (apiToBreak.toLowerCase() === this._apiName.toLowerCase()) {
 
-                throw ErrorFactory.createApiError(
+                throw ErrorFactory.createServerError(
                     BaseErrorCodes.exceptionSimulation,
                     'An unexpected exception occurred in the API');
             }

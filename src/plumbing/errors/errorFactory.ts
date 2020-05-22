@@ -1,5 +1,5 @@
-import {ApiError} from './apiError';
-import {ApiErrorImpl} from './apiErrorImpl';
+import {ServerError} from './ServerError';
+import {ServerErrorImpl} from './ServerErrorImpl';
 import {BaseErrorCodes} from './baseErrorCodes';
 import {ClientError} from './clientError';
 import {ClientErrorImpl} from './clientErrorImpl';
@@ -12,8 +12,8 @@ export class ErrorFactory {
     /*
      * Create a server error
      */
-    public static createApiError(errorCode: string, userMessage: string, stack?: string | undefined): ApiError {
-        return new ApiErrorImpl(errorCode, userMessage, stack);
+    public static createServerError(errorCode: string, userMessage: string, stack?: string | undefined): ServerError {
+        return new ServerErrorImpl(errorCode, userMessage, stack);
     }
 
     /*
