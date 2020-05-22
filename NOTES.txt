@@ -1,5 +1,0 @@
-1. Startup to use classes termed composition root
-
-2. Search for and remove 'framework' wording
-
-3. Delete this file

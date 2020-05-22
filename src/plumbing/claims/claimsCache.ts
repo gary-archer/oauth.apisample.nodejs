@@ -13,7 +13,7 @@ import {CoreApiClaims} from './coreApiClaims';
 export class ClaimsCache<TClaims extends CoreApiClaims> {
 
     /*
-     * Plumbing to enable the framework to create the correct generic type at runtime
+     * Plumbing to enable thecorrect generic type to be created at runtime
      * We need to pass in a constructor function plus paremters for constructor arguments
      */
     public static createInstance<TClaimsCache>(

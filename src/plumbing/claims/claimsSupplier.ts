@@ -2,13 +2,13 @@ import {CoreApiClaims} from './coreApiClaims';
 import {CustomClaimsProvider} from './customClaimsProvider';
 
 /*
- * This class is injected into framework authentication handling
- * Due to generic type erasure at runtime, the framework is unable to new up TClaims related items itself
+ * This class is injected into the OAuth authorizer class at runtime
+ * Due to generic type erasure, the authorizer needs a callback to 'new up' TClaims items
  */
 export class ClaimsSupplier<TClaims extends CoreApiClaims> {
 
     /*
-     * Plumbing to enable the framework to create the correct generic type at runtime
+     * Plumbing to enable common code to create the correct generic type at runtime
      * We need to pass in a constructor function plus paremters for constructor arguments
      */
     public static createInstance<TClaimsSupplier, TClaims extends CoreApiClaims>(

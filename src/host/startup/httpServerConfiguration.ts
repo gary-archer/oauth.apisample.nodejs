@@ -5,13 +5,12 @@ import https from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
 import url from 'url';
+import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
-import {FrameworkBuilder} from '../../plumbing/startup/frameworkBuilder';
-import {OAuthAuthorizerBuilder} from '../../plumbing/startup/oauthAuthorizerBuilder';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
 import {SampleApiClaimsProvider} from '../claims/sampleApiClaimsProvider';
-import {CompositionRoot} from '../dependencies/compositionRoot';
 import {Configuration} from '../configuration/configuration';
+import {CompositionRoot} from '../dependencies/compositionRoot';
 import {WebStaticContent} from '../utilities/webStaticContent';
 
 /*
@@ -36,18 +35,18 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Register base framework dependencies
-        const framework = new FrameworkBuilder(this._container, this._configuration.logging, this._loggerFactory)
-            .withApiBasePath('/api/')
-            .register();
+        // Register base dependencies for logging, error handling and OAuth security
+        const baseCompositionRoot = new BaseCompositionRoot(
+            this._container,
+            this._configuration.logging,
+            this._configuration.oauth,
+            this._loggerFactory)
+                .withApiBasePath('/api/')
+                .withClaimsSupplier(SampleApiClaims)
+                .withCustomClaimsProviderSupplier(SampleApiClaimsProvider);
+        await baseCompositionRoot.register();
 
-        // Register authorizer dependencies
-        const authorizer = await new OAuthAuthorizerBuilder<SampleApiClaims>(this._container, this._configuration.oauth)
-            .withClaimsSupplier(SampleApiClaims)
-            .withCustomClaimsProviderSupplier(SampleApiClaimsProvider)
-            .register();
-
-        // Register the API's business logic dependencies
+        // Register the API's own dependencies
         CompositionRoot.registerDependencies(this._container);
 
         // Configure Inversify Express, which will register @controller attributes and set up controller autowiring
@@ -61,24 +60,25 @@ export class HttpServerConfiguration {
             // Our API requests are not designed for caching
             this._expressApp.set('etag', false);
 
-            // First register the middleware to allow cross origin requests from the SPA
-            // This prevents other middleware firing for OPTIONS requests
+            // Allow cross origin requests from the SPA first, to prevent other middleware firing for OPTIONS requests
             const corsOptions = { origin: this._configuration.api.trustedOrigins };
             this._expressApp.use('/api/*', cors(corsOptions));
 
+            // Add Express middleware for cross cutting concerns
+            baseCompositionRoot.configureMiddleware(this._expressApp);
+
             // Configure how web static content is served
             this._configureWebStaticContent();
-
-            // Configure framework middleware
-            framework.configureMiddleware(this._expressApp, authorizer);
         })
         .setErrorConfig(() => {
-            framework.configureExceptionHandler(this._expressApp);
+
+            // Inversify Express requires us to add the middleware for exception handling here
+            baseCompositionRoot.configureExceptionHandler(this._expressApp);
         })
         .build();
 
-        // We need to finalise framework configuration in order to capture certain logging fields
-        framework.finalise();
+        // Finalise once routes are avaiilable so that we can log path based fields
+        baseCompositionRoot.finalise();
     }
 
     /*
