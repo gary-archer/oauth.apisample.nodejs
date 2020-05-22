@@ -39,7 +39,6 @@ export class HttpServerConfiguration {
         // Register base framework dependencies
         const framework = new FrameworkBuilder(this._container, this._configuration.logging, this._loggerFactory)
             .withApiBasePath('/api/')
-            .withApplicationExceptionHandler(new RestErrorTranslator())
             .register();
 
         // Register authorizer dependencies

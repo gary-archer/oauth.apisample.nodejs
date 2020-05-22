@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import {injectable} from 'inversify';
+import {ErrorFactory} from '../../plumbing/errors/errorFactory';
 import {ErrorCodes} from '../errors/errorCodes';
 
 /*
@@ -22,16 +23,16 @@ export class JsonFileReader {
         } catch (e) {
 
             // Report the error including an error code and exception details
-            const error = new ExtendedError(
+            const error = ErrorFactory.createApiError(
                 ErrorCodes.fileReadError,
                 'Problem encountered reading data',
                 e.stack);
 
             // File system errors are a JSON object with the error number
             if (e instanceof Error) {
-                error.details = e.message;
+                error.setDetails(e.message);
             } else {
-                error.details = e;
+                error.setDetails(e);
             }
 
             throw error;

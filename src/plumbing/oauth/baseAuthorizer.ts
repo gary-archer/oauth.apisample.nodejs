@@ -2,9 +2,9 @@ import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {CoreApiClaims} from '../claims/coreApiClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
+import {ChildContainerHelper} from '../dependencies/childContainerHelper';
 import {LogEntryImpl} from '../logging/logEntryImpl';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
-import {ChildContainerHelper} from '../utilities/childContainerHelper';
 
 /*
  * A base authorizer class that manages common plumbing

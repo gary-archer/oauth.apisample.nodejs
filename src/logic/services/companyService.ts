@@ -1,4 +1,6 @@
 import {inject, injectable} from 'inversify';
+import {ClientError} from '../../plumbing/errors/clientError';
+import {ErrorFactory} from '../../plumbing/errors/errorFactory';
 import {SAMPLETYPES} from '../dependencies/sampleTypes';
 import {Company} from '../entities/company';
 import {CompanyTransactions} from '../entities/companyTransactions';
@@ -58,8 +60,11 @@ export class CompanyService {
      * Return a 404 error if the user is not authorized
      * Requests for both unauthorized and non existent data are treated the same
      */
-    private _unauthorizedError(companyId: number): BusinessError {
+    private _unauthorizedError(companyId: number): ClientError {
 
-        return new BusinessError(ErrorCodes.companyNotFound, `Company ${companyId} was not found for this user`);
+        throw ErrorFactory.createClientError(
+            404,
+            ErrorCodes.companyNotFound,
+            `Company ${companyId} was not found for this user`);
     }
 }

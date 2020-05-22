@@ -1,10 +1,10 @@
 import {NextFunction, Request, Response} from 'express';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
+import {ChildContainerHelper} from '../dependencies/childContainerHelper';
 import {ApiError} from '../errors/apiError';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntryImpl} from '../logging/logEntryImpl';
-import {ChildContainerHelper} from '../utilities/childContainerHelper';
 import {ResponseWriter} from '../utilities/responseWriter';
 
 /*
