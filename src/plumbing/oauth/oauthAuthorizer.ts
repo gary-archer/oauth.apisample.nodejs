@@ -46,7 +46,7 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         // Validate the token, read token claims, and do a user info lookup
         await authenticator.validateTokenAndGetClaims(accessToken, request, claims);
 
-        // Add custom claims from product data if needed
+        // Add custom claims from the API's own data if needed
         await claimsSupplier.createCustomClaimsProvider().addCustomClaims(accessToken, request, claims);
 
         // Cache the claims against the token hash until the token's expiry time
