@@ -7,15 +7,12 @@ import {LogEntryImpl} from '../logging/logEntryImpl';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 
 /*
- * A base authorizer class that manages common plumbing
+ * A base authorizer class that could be used for both Entry Point APIs and Microservices
  */
 @injectable()
 export abstract class BaseAuthorizer {
 
-    private readonly _unsecuredPaths: string[];
-
-    public constructor(unsecuredPaths: string[]) {
-        this._unsecuredPaths = unsecuredPaths;
+    public constructor() {
         this._setupCallbacks();
     }
 
@@ -24,17 +21,11 @@ export abstract class BaseAuthorizer {
      */
     public async authorizeRequestAndGetClaims(request: Request, response: Response, next: NextFunction): Promise<void> {
 
-        // Move to controller logic if this is an unsecured API operation
-        if (this.isUnsecuredPath(request.originalUrl.toLowerCase())) {
-            next();
-            return;
-        }
-
         // Get the container for this request
         const perRequestContainer = ChildContainerHelper.resolve(request);
 
         try {
-            // Create the claims middleware for this request, then process the access token and get claims
+            // Do authorization processing for this request, to get claims
             const claims = await this.execute(request);
 
             // Bind claims to this requests's child container so that they are injectable into business logic
@@ -49,7 +40,7 @@ export abstract class BaseAuthorizer {
 
         } catch (e) {
 
-            // Handle OAuth related exceptions
+            // Handle authorization exceptions
             const exceptionHandler = perRequestContainer.get<UnhandledExceptionHandler>(
                 BASETYPES.UnhandledExceptionHandler);
             exceptionHandler.handleException(e, request, response, next);
@@ -58,14 +49,6 @@ export abstract class BaseAuthorizer {
 
     // Concrete classes must override this
     protected abstract async execute(request: Request): Promise<CoreApiClaims>;
-
-    /*
-     * Return true if this request does not use security
-     */
-    protected isUnsecuredPath(path: string): boolean {
-        const found = this._unsecuredPaths.find((p) => path.startsWith(p));
-        return !!found;
-    }
 
     /*
      * Plumbing to ensure the this parameter is available

@@ -5,12 +5,14 @@ import {ClaimsCache} from '../claims/claimsCache';
 import {ClaimsSupplier} from '../claims/claimsSupplier';
 import {CoreApiClaims} from '../claims/coreApiClaims';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
+import {ClaimsConfiguration} from '../configuration/claimsConfiguration';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {LogEntry} from '../logging/logEntry';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
+import {BaseAuthorizer} from '../middleware/baseAuthorizer';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
@@ -19,46 +21,46 @@ import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
 import {OAuthAuthorizer} from '../oauth/oauthAuthorizer';
 
 /*
- * A class to create and register dependencies for base / plumbing code
+ * A class to create and register common cross cutting concerns
  */
 export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
 
-    // Injected properties
+    // Constructor properties
     private readonly _container: Container;
     private readonly _loggingConfiguration: LoggingConfiguration;
-    private readonly _oauthConfiguration: OAuthConfiguration;
     private readonly _loggerFactory: LoggerFactory;
 
-    // Calculated properties
+    // Builder properties
     private _apiBasePath: string;
-    private _unsecuredPaths: string[];
-    private _claimsSupplier!: () => TClaims;
-    private _customClaimsProviderSupplier!: () => CustomClaimsProvider<TClaims>;
-    private _exceptionHandler!: UnhandledExceptionHandler;
-    private _authorizer!: OAuthAuthorizer<TClaims>
-    private _loggerMiddleware!: LoggerMiddleware;
+    private _oauthConfiguration?: OAuthConfiguration;
+    private _claimsConfiguration?: ClaimsConfiguration;
+    private _authorizer?: BaseAuthorizer;
+    private _claimsSupplier?: () => TClaims;
+    private _customClaimsProviderSupplier?: () => CustomClaimsProvider<TClaims>;
+    private _exceptionHandler?: UnhandledExceptionHandler;
+    private _loggerMiddleware?: LoggerMiddleware;
 
     /*
-     * Receive base details
+     * Receive details common for all APIs
      */
     public constructor(
         container: Container,
         loggingConfiguration: LoggingConfiguration,
-        oauthConfiguration: OAuthConfiguration,
         loggerFactory: LoggerFactory) {
 
+        // Store supplied values
         this._container = container;
         this._loggingConfiguration = loggingConfiguration;
-        this._oauthConfiguration = oauthConfiguration;
         this._loggerFactory = loggerFactory;
+
+        // Set defaults
         this._apiBasePath = '/';
-        this._unsecuredPaths = [];
     }
 
     /*
      * Set the API base path, such as /api/
      */
-    public withApiBasePath(apiBasePath: string): BaseCompositionRoot<TClaims> {
+    public useApiBasePath(apiBasePath: string): BaseCompositionRoot<TClaims> {
 
         this._apiBasePath = apiBasePath.toLowerCase();
         if (!apiBasePath.endsWith('/')) {
@@ -69,15 +71,24 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     }
 
     /*
-     * Configure any API paths that return unsecured content, such as /api/unsecured
+     * Indicate that we're using OAuth and receive the configuration
      */
-    public addUnsecuredPath(unsecuredPath: string): BaseCompositionRoot<TClaims> {
-        this._unsecuredPaths.push(unsecuredPath.toLowerCase());
+    public useOAuth(oauthConfiguration: OAuthConfiguration): BaseCompositionRoot<TClaims> {
+        this._oauthConfiguration = oauthConfiguration;
         return this;
     }
 
     /*
-     * Consumers of the builder class must provide a constructor function for creating claims
+     * Consumers of the builder class can provide a constructor function for injecting custom claims
+     */
+    public useClaimsCaching(claimsConfiguration: ClaimsConfiguration): BaseCompositionRoot<TClaims> {
+
+        this._claimsConfiguration = claimsConfiguration;
+        return this;
+    }
+
+    /*
+     * Consumers of the builder class can provide a constructor function for creating claims
      */
     public withClaimsSupplier(construct: new () => TClaims): BaseCompositionRoot<TClaims> {
         this._claimsSupplier = () => new construct();
@@ -97,14 +108,20 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     /*
      * Do the main builder work of registering dependencies
      */
-    public async register(): Promise<void> {
+    public async register(): Promise<BaseCompositionRoot<TClaims>> {
 
-        // Register base dependencies
+        // Register dependencies for logging
         this._exceptionHandler = new UnhandledExceptionHandler(this._loggingConfiguration);
         this._registerLoggingDependencies();
 
-        // Register OAuth specific dependencies
-        await this._registerOAuthDependencies();
+        // Register OAuth specific dependencies for Entry Point APIs
+        if (this._oauthConfiguration) {
+            await this._registerOAuthDependencies();
+        }
+
+        // Register claims dependencies for all APIs
+        this._registerClaimsDependencies();
+        return this;
     }
 
     /*
@@ -117,7 +134,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
         expressApp.use(`${this._apiBasePath}*`, this._loggerMiddleware.logRequest);
 
         // The second middleware manages authorization
-        expressApp.use(`${this._apiBasePath}*`, this._authorizer.authorizeRequestAndGetClaims);
+        expressApp.use(`${this._apiBasePath}*`, this._authorizer!.authorizeRequestAndGetClaims);
 
         // The third middleware supports non functional testing via headers
         const handler = new CustomHeaderMiddleware(this._loggingConfiguration.apiName);
@@ -128,7 +145,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
      * With Inversify Express the exception middleware must be configured after other middleware
      */
     public configureExceptionHandler(expressApp: Application): BaseCompositionRoot<TClaims> {
-        expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler.handleException);
+        expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler!.handleException);
         return this;
     }
 
@@ -138,7 +155,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
      */
     public finalise(): void {
         const routeMetadataHandler = new RouteMetadataHandler(this._apiBasePath, getRawMetadata(this._container));
-        this._loggerMiddleware.setRouteMetadataHandler(routeMetadataHandler);
+        this._loggerMiddleware!.setRouteMetadataHandler(routeMetadataHandler);
     }
 
     /*
@@ -148,7 +165,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
 
         // Singletons
         this._container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
-                        .toConstantValue(this._exceptionHandler);
+                        .toConstantValue(this._exceptionHandler!);
         this._container.bind<LoggerFactory>(BASETYPES.LoggerFactory)
                         .toConstantValue(this._loggerFactory);
         this._container.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
@@ -162,41 +179,49 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     /*
      * Register OAuth related depencencies
      */
-    public async _registerOAuthDependencies(): Promise<void> {
+    private async _registerOAuthDependencies(): Promise<void> {
 
         // Load Open Id Connect metadata
-        const issuerMetadata = new IssuerMetadata(this._oauthConfiguration);
+        const issuerMetadata = new IssuerMetadata(this._oauthConfiguration!);
         await issuerMetadata.load();
+
+        // Create the authorizer, as the entry point to validating tokens and looking up claims
+        this._authorizer = new OAuthAuthorizer<TClaims>();
+
+        // Singletons
+        this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
+                       .toConstantValue(this._oauthConfiguration!);
+        this._container.bind<IssuerMetadata>(BASETYPES.IssuerMetadata)
+                       .toConstantValue(issuerMetadata);
+
+        // Per request objects
+        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
+                       .to(OAuthAuthenticator).inRequestScope();
+    }
+
+    /*
+     * Register claims related depencencies
+     */
+    private _registerClaimsDependencies(): void {
 
         // Create the cache used to store claims results after authentication processing
         // Use a constructor function as the first parameter, as required by TypeScript generics
         const claimsCache = ClaimsCache.createInstance<ClaimsCache<TClaims>>(
             ClaimsCache,
-            this._oauthConfiguration,
+            this._claimsConfiguration!,
             this._loggerFactory);
 
         // Create an injectable object to enable run time creation of claims objects of a specific type
         const claimsSupplier = ClaimsSupplier.createInstance<ClaimsSupplier<TClaims>, TClaims>(
             ClaimsSupplier,
-            this._claimsSupplier,
-            this._customClaimsProviderSupplier);
-
-        // Create the authorizer, as the entry point to validating tokens and looking up claims
-        this._authorizer = new OAuthAuthorizer<TClaims>(this._unsecuredPaths);
+            this._claimsSupplier!,
+            this._customClaimsProviderSupplier!);
 
         // Singletons
-        this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
-                       .toConstantValue(this._oauthConfiguration);
-        this._container.bind<IssuerMetadata>(BASETYPES.IssuerMetadata)
-                       .toConstantValue(issuerMetadata);
         this._container.bind<ClaimsCache<TClaims>>(BASETYPES.ClaimsCache)
                        .toConstantValue(claimsCache);
         this._container.bind<ClaimsSupplier<TClaims>>(BASETYPES.ClaimsSupplier)
                        .toConstantValue(claimsSupplier);
-
-        // Per request objects
-        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
-                       .to(OAuthAuthenticator).inRequestScope();
 
         // Register a dummy claims value that is overridden by the authorizer middleware later
         this._container.bind<TClaims>(BASETYPES.CoreApiClaims)

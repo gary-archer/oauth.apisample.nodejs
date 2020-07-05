@@ -35,16 +35,17 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Register base dependencies for logging, error handling and OAuth security
-        const baseCompositionRoot = new BaseCompositionRoot(
+        // Register base dependencies for logging, error handling, OAuth and claims
+        const base = await new BaseCompositionRoot<SampleApiClaims>(
             this._container,
             this._configuration.logging,
-            this._configuration.oauth,
             this._loggerFactory)
-                .withApiBasePath('/api/')
+                .useApiBasePath('/api/')
+                .useOAuth(this._configuration.oauth)
+                .useClaimsCaching(this._configuration.claims)
                 .withClaimsSupplier(SampleApiClaims)
-                .withCustomClaimsProviderSupplier(SampleApiClaimsProvider);
-        await baseCompositionRoot.register();
+                .withCustomClaimsProviderSupplier(SampleApiClaimsProvider)
+                .register();
 
         // Register the API's own dependencies
         CompositionRoot.registerDependencies(this._container);
@@ -64,8 +65,8 @@ export class HttpServerConfiguration {
             const corsOptions = { origin: this._configuration.api.trustedOrigins };
             this._expressApp.use('/api/*', cors(corsOptions));
 
-            // Add Express middleware for cross cutting concerns
-            baseCompositionRoot.configureMiddleware(this._expressApp);
+            // We must configure Express cross cutting concerns during this callback
+            base.configureMiddleware(this._expressApp);
 
             // Configure how web static content is served
             this._configureWebStaticContent();
@@ -73,12 +74,12 @@ export class HttpServerConfiguration {
         .setErrorConfig(() => {
 
             // Inversify Express requires us to add the middleware for exception handling here
-            baseCompositionRoot.configureExceptionHandler(this._expressApp);
+            base.configureExceptionHandler(this._expressApp);
         })
         .build();
 
-        // Finalise once routes are avaiilable so that we can log path based fields
-        baseCompositionRoot.finalise();
+        // Finalise once routes are avaiilable, which enables us to log path based fields later
+        base.finalise();
     }
 
     /*

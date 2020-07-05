@@ -1,21 +1,18 @@
 import {Request} from 'express';
-import {BaseAuthorizer} from './baseAuthorizer';
+import hasher from 'js-sha256';
 import {ClaimsCache} from '../claims/claimsCache';
 import {ClaimsSupplier} from '../claims/claimsSupplier';
 import {CoreApiClaims} from '../claims/coreApiClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper'
 import {ErrorFactory} from '../errors/errorFactory';
+import {BaseAuthorizer} from '../middleware/baseAuthorizer';
 import {OAuthAuthenticator} from './oauthAuthenticator';
 
 /*
  * The Express entry point for OAuth token validation and claims lookup
  */
 export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthorizer {
-
-    public constructor(unsecuredPaths: string[]) {
-        super(unsecuredPaths);
-    }
 
     /*
      * Do the OAuth processing via the middleware class
@@ -31,9 +28,10 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         // Get the child container for this HTTP request
         const perRequestContainer = ChildContainerHelper.resolve(request);
 
-        // Bypass and use cached results if they exist
+        // If cached results already exist for this token then return them immediately
+        const accessTokenHash = hasher.sha256(accessToken);
         const cache = perRequestContainer.get<ClaimsCache<TClaims>>(BASETYPES.ClaimsCache);
-        const cachedClaims = await cache.getClaimsForToken(accessToken);
+        const cachedClaims = await cache.getClaimsForToken(accessTokenHash);
         if (cachedClaims) {
             return cachedClaims;
         }
@@ -45,15 +43,14 @@ export class OAuthAuthorizer<TClaims extends CoreApiClaims> extends BaseAuthoriz
         // Resolve the authenticator for this request
         const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
 
-        // Do the authentication work to get claims, which in our case means OAuth processing
-        const expiry = await authenticator.authenticateAndSetClaims(accessToken, request, claims);
+        // Validate the token, read token claims, and do a user info lookup
+        await authenticator.validateTokenAndGetClaims(accessToken, request, claims);
 
-        // Add any custom product specific custom claims if required
+        // Add custom claims from product data if needed
         await claimsSupplier.createCustomClaimsProvider().addCustomClaims(accessToken, request, claims);
 
         // Cache the claims against the token hash until the token's expiry time
-        // The next time the API is called, all of the above results can be quickly looked up
-        await cache.addClaimsForToken(accessToken, expiry, claims);
+        await cache.addClaimsForToken(accessTokenHash, claims);
         return claims;
     }
 

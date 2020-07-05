@@ -11,7 +11,4 @@ export interface OAuthConfiguration {
 
     // The client secret used for introspection requests
     clientSecret: string;
-
-    // The maximum time for which claims are cached
-    maxClaimsCacheMinutes: number;
 }

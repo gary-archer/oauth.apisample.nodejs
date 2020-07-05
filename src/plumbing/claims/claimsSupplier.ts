@@ -2,7 +2,7 @@ import {CoreApiClaims} from './coreApiClaims';
 import {CustomClaimsProvider} from './customClaimsProvider';
 
 /*
- * This class is injected into the OAuth authorizer class at runtime
+ * This class is injected into the authorizer class at runtime
  * Due to generic type erasure, the authorizer needs a callback to 'new up' TClaims items
  */
 export class ClaimsSupplier<TClaims extends CoreApiClaims> {

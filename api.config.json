@@ -41,7 +41,9 @@
     "oauth": {
         "authority":    "https://dev-843469.oktapreview.com/oauth2/default",
         "clientId":     "0oac5s69rjXE0HcZO0h7",
-        "clientSecret": "VEEe9m9WDneeUSUJUOMKZiso_X6xwKvAqRInT2kg",
-        "maxClaimsCacheMinutes": 60
+        "clientSecret": "VEEe9m9WDneeUSUJUOMKZiso_X6xwKvAqRInT2kg"
+    },
+    "claims": {
+        "maxCacheMinutes": 30
     }
 }

@@ -1,19 +1,16 @@
 import {injectable} from 'inversify';
 
 /*
- * Common API claims that our code OAuth plumbing understands
+ * Common API claims used by all APIs
  */
 @injectable()
 export class CoreApiClaims {
 
-    // The immutable user id from the access token, which may exist in the API's database
+    // Token claims
     private _userId!: string;
-
-    // The client id, which typically represents the calling application
     private _clientId!: string;
-
-    // OAuth scopes can represent high level areas of the business
     private _scopes!: string[];
+    private _expiry!: number;
 
     // Data from the OAuth user info endpoint
     private _givenName!: string;
@@ -35,6 +32,10 @@ export class CoreApiClaims {
         return this._scopes;
     }
 
+    public get expiry(): number {
+        return this._expiry;
+    }
+
     public get givenName(): string {
         return this._givenName;
     }
@@ -50,10 +51,11 @@ export class CoreApiClaims {
     /*
      * Set token claims after introspection
      */
-    public setTokenInfo(userId: string, clientId: string, scopes: string[]) {
+    public setTokenInfo(userId: string, clientId: string, scopes: string[], expiry: number) {
         this._userId = userId;
         this._clientId = clientId;
         this._scopes = scopes;
+        this._expiry = expiry;
     }
 
     /*

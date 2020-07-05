@@ -32,34 +32,31 @@ export class OAuthAuthenticator {
     }
 
     /*
-     * Our form of authentication performs introspection and user info lookup
+     * Introspect the token to validate it and read its claims
      */
-    public async authenticateAndSetClaims(
+    public async validateTokenAndGetClaims(
         accessToken: string,
         request: Request,
-        claims: CoreApiClaims): Promise<number> {
+        claims: CoreApiClaims): Promise<void> {
 
         // Create a child log entry for authentication related work
         // This ensures that any errors and performances in this area are reported separately to business logic
         const authorizationLogEntry = this._logEntry.createChild('authorizer');
 
         // Our implementation introspects the token to get token claims
-        const expiry = await this._introspectTokenAndSetTokenClaims(accessToken, claims);
+        await this._introspectTokenAndGetTokenClaims(accessToken, claims);
 
         // It then adds user info claims
-        await this._setCentralUserInfoClaims(accessToken, claims);
+        await this._getCentralUserInfoClaims(accessToken, claims);
 
         // Finish logging here, and note that on exception the logging framework disposes the child
         authorizationLogEntry.dispose();
-
-        // It then returns the token expiry as a cache time to live
-        return expiry;
     }
 
     /*
      * Introspection processing
      */
-    private async _introspectTokenAndSetTokenClaims(accessToken: string, claims: CoreApiClaims): Promise<number> {
+    private async _introspectTokenAndGetTokenClaims(accessToken: string, claims: CoreApiClaims): Promise<number> {
 
         return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
 
@@ -82,12 +79,11 @@ export class OAuthAuthenticator {
                 const clientId = this._getClaim(tokenData.client_id, 'client_id');
                 const scope = this._getClaim(tokenData.scope, 'scope');
 
-                // Update the claims object
-                claims.setTokenInfo(userId, clientId, scope.split(' '));
+                // Get the expiry as a number
+                const expiry = parseInt(this._getClaim((tokenData as any).exp, 'exp'), 10);
 
-                // Return the expiry as a number
-                const expiry = this._getClaim((tokenData as any).exp, 'exp');
-                return parseInt(expiry, 10);
+                // Update the claims object
+                claims.setTokenInfo(userId, clientId, scope.split(' '), expiry);
 
             } catch (e) {
 
@@ -100,7 +96,7 @@ export class OAuthAuthenticator {
     /*
      * User info lookup
      */
-    private async _setCentralUserInfoClaims(accessToken: string, claims: CoreApiClaims): Promise<void> {
+    private async _getCentralUserInfoClaims(accessToken: string, claims: CoreApiClaims): Promise<void> {
 
         return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
 
@@ -145,6 +141,6 @@ export class OAuthAuthenticator {
      * Plumbing to ensure that the this parameter is available in async callbacks
      */
     private _setupCallbacks(): void {
-        this.authenticateAndSetClaims = this.authenticateAndSetClaims.bind(this);
+        this.validateTokenAndGetClaims = this.validateTokenAndGetClaims.bind(this);
     }
 }

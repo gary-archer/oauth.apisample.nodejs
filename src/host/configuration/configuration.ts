@@ -1,3 +1,4 @@
+import {ClaimsConfiguration} from '../../plumbing/configuration/claimsConfiguration';
 import {LoggingConfiguration} from '../../plumbing/configuration/loggingConfiguration';
 import {OAuthConfiguration} from '../../plumbing/configuration/oauthConfiguration';
 import {ApiConfiguration} from './apiConfiguration';
@@ -7,12 +8,15 @@ import {ApiConfiguration} from './apiConfiguration';
  */
 export interface Configuration {
 
-    // Application specific configuration
+    // API specific configuration
     api: ApiConfiguration;
 
-    // Logging configuration that could be shared between multiple APIs
+    // Common logging configuration
     logging: LoggingConfiguration;
 
-    // OAuth configuration that could be shared between multiple APIs
+    // Common OAuth configuration
     oauth: OAuthConfiguration;
+
+    // Common claims configuration
+    claims: ClaimsConfiguration;
 }
