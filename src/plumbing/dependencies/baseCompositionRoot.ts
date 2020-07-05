@@ -79,7 +79,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     }
 
     /*
-     * Consumers of the builder class can provide a constructor function for injecting custom claims
+     * Receive information used for claims caching
      */
     public useClaimsCaching(claimsConfiguration: ClaimsConfiguration): BaseCompositionRoot<TClaims> {
 
