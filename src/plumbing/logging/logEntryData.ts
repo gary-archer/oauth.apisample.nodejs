@@ -37,11 +37,11 @@ export class LogEntryData {
     // The calling application name
     public callingApplicationName: string;
 
-    // The calling user, for secured requests
+    // The user id in the API's own data
     public userId: string;
 
-    // The calling user name, for secured requests
-    public userName: string;
+    // The subject claim from the OAuth 2.0 access token
+    public userOAuthId: string;
 
     // The status code returned
     public statusCode: number;
@@ -90,7 +90,7 @@ export class LogEntryData {
         this.clientId = '';
         this.callingApplicationName = '';
         this.userId = '';
-        this.userName = '';
+        this.userOAuthId = '';
         this.statusCode = 0;
         this.millisecondsTaken = 0;
         this.performanceThresholdMilliseconds = 0;
@@ -126,7 +126,7 @@ export class LogEntryData {
         this.clientId = parent.clientId;
         this.callingApplicationName = parent.callingApplicationName;
         this.userId = parent.userId;
-        this.userName = parent.userName;
+        this.userOAuthId = parent.userOAuthId;
         this.correlationId = parent.correlationId;
         this.sessionId = parent.sessionId;
     }
@@ -164,7 +164,7 @@ export class LogEntryData {
         this._outputString((x) => output.clientId = x, this.clientId);
         this._outputString((x) => output.callingApplicationName = x, this.callingApplicationName);
         this._outputString((x) => output.userId = x, this.userId);
-        this._outputString((x) => output.userName = x, this.userName);
+        this._outputString((x) => output.userOAuthId = x, this.userOAuthId);
         this._outputNumber((x) => output.statusCode = x, this.statusCode);
         this._outputString((x) => output.errorCode = x, this.errorCode);
         this._outputNumber((x) => output.errorId = x, this.errorId);
@@ -191,6 +191,7 @@ export class LogEntryData {
      * Add a string to the output unless empty
      */
     private _outputString(setter: (val: string) => void, value: string): void {
+
         if (value.length > 0) {
             setter(value);
         }
@@ -200,6 +201,7 @@ export class LogEntryData {
      * Add a number to the output unless zero or forced
      */
     private _outputNumber(setter: (val: number) => void, value: number, force: boolean = false): void {
+
         if (value > 0 || force) {
             setter(value);
         }
@@ -219,6 +221,7 @@ export class LogEntryData {
      * Add error details if applicable
      */
     private _outputError(output: any): void {
+
         if (this.errorData !== null) {
             output.errorData = this.errorData;
         }
@@ -228,6 +231,7 @@ export class LogEntryData {
      * Add info details if applicable
      */
     private _outputInfo(data: any): void {
+
         if (this.infoData.length > 0) {
             data.infoData = this.infoData;
         }

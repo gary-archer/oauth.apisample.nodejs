@@ -2,7 +2,7 @@ import {injectable} from 'inversify';
 import {CoreApiClaims} from '../../plumbing/claims/coreApiClaims';
 
 /*
- * Override the core claims to support additional custom claims
+ * An example of using custom claims
  */
 @injectable()
 export class SampleApiClaims extends CoreApiClaims {
@@ -13,7 +13,7 @@ export class SampleApiClaims extends CoreApiClaims {
         return this._regionsCovered;
     }
 
-    public set regionsCovered(regionsCovered: string[]) {
-        this._regionsCovered = regionsCovered;
+    public set regionsCovered(value: string[]) {
+        this._regionsCovered = value;
     }
 }

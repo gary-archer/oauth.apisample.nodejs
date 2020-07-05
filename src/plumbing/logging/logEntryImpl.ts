@@ -78,8 +78,8 @@ export class LogEntryImpl implements LogEntry {
      */
     public setIdentity(claims: CoreApiClaims): void {
         this._data.clientId = claims.clientId;
-        this._data.userId = claims.userId;
-        this._data.userName = `${claims.givenName} ${claims.familyName}`;
+        this._data.userOAuthId = claims.subject;
+        this._data.userId = claims.userDatabaseId;
     }
 
     /*

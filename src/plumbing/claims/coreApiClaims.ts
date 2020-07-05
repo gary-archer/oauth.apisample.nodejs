@@ -7,7 +7,7 @@ import {injectable} from 'inversify';
 export class CoreApiClaims {
 
     // Token claims
-    private _userId!: string;
+    private _subject!: string;
     private _clientId!: string;
     private _scopes!: string[];
     private _expiry!: number;
@@ -17,11 +17,12 @@ export class CoreApiClaims {
     private _familyName!: string;
     private _email!: string;
 
-    /*
-     * Accessors
-     */
-    public get userId(): string {
-        return this._userId;
+    // The database primary key from the API's own database
+    private _userDatabaseId!: string;
+
+    // Accessors
+    public get subject(): string {
+        return this._subject;
     }
 
     public get clientId(): string {
@@ -48,18 +49,26 @@ export class CoreApiClaims {
         return this._email;
     }
 
+    public get userDatabaseId(): string {
+        return this._userDatabaseId;
+    }
+
+    public set userDatabaseId(value: string) {
+        this._userDatabaseId = value;
+    }
+
     /*
-     * Set token claims after introspection
+     * Set claims from the OAuth 2.0 access token
      */
-    public setTokenInfo(userId: string, clientId: string, scopes: string[], expiry: number) {
-        this._userId = userId;
+    public setTokenInfo(subject: string, clientId: string, scopes: string[], expiry: number) {
+        this._subject = subject;
         this._clientId = clientId;
         this._scopes = scopes;
         this._expiry = expiry;
     }
 
     /*
-     * Set informational fields after user info lookup
+     * Set claims from the OAuth 2.0 user info endpoint
      */
     public setCentralUserInfo(givenName: string, familyName: string, email: string) {
         this._givenName = givenName;

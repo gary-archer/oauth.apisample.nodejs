@@ -74,16 +74,14 @@ export class OAuthAuthenticator {
                     throw ErrorFactory.createClient401Error('Access token is expired and failed introspection');
                 }
 
-                // Read protocol claims and we will use the immutable user id as the subject claim
-                const userId = this._getClaim((tokenData as any).uid, 'uid');
+                // Read token claims and use the immutable user id as the subject claim
+                const subject = this._getClaim((tokenData as any).uid, 'uid');
                 const clientId = this._getClaim(tokenData.client_id, 'client_id');
                 const scope = this._getClaim(tokenData.scope, 'scope');
-
-                // Get the expiry as a number
                 const expiry = parseInt(this._getClaim((tokenData as any).exp, 'exp'), 10);
 
                 // Update the claims object
-                claims.setTokenInfo(userId, clientId, scope.split(' '), expiry);
+                claims.setTokenInfo(subject, clientId, scope.split(' '), expiry);
 
             } catch (e) {
 
