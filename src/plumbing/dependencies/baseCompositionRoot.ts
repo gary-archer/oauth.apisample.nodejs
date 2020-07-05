@@ -12,13 +12,13 @@ import {BASETYPES} from '../dependencies/baseTypes';
 import {LogEntry} from '../logging/logEntry';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
-import {BaseAuthorizer} from '../middleware/baseAuthorizer';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 import {IssuerMetadata} from '../oauth/issuerMetadata';
 import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
 import {OAuthAuthorizer} from '../oauth/oauthAuthorizer';
+import {BaseAuthorizer} from '../security/baseAuthorizer';
 
 /*
  * A class to create and register common cross cutting concerns
@@ -27,34 +27,24 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
 
     // Constructor properties
     private readonly _container: Container;
-    private readonly _loggingConfiguration: LoggingConfiguration;
-    private readonly _loggerFactory: LoggerFactory;
 
     // Builder properties
-    private _apiBasePath: string;
+    private _apiBasePath?: string;
+    private _loggingConfiguration?: LoggingConfiguration;
+    private _loggerFactory?: LoggerFactory;
+    private _loggerMiddleware?: LoggerMiddleware;
+    private _exceptionHandler?: UnhandledExceptionHandler;
     private _oauthConfiguration?: OAuthConfiguration;
-    private _claimsConfiguration?: ClaimsConfiguration;
     private _authorizer?: BaseAuthorizer;
+    private _claimsConfiguration?: ClaimsConfiguration;
     private _claimsSupplier?: () => TClaims;
     private _customClaimsProviderSupplier?: () => CustomClaimsProvider<TClaims>;
-    private _exceptionHandler?: UnhandledExceptionHandler;
-    private _loggerMiddleware?: LoggerMiddleware;
 
     /*
      * Receive details common for all APIs
      */
-    public constructor(
-        container: Container,
-        loggingConfiguration: LoggingConfiguration,
-        loggerFactory: LoggerFactory) {
-
-        // Store supplied values
+    public constructor(container: Container) {
         this._container = container;
-        this._loggingConfiguration = loggingConfiguration;
-        this._loggerFactory = loggerFactory;
-
-        // Set defaults
-        this._apiBasePath = '/';
     }
 
     /*
@@ -63,10 +53,22 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     public useApiBasePath(apiBasePath: string): BaseCompositionRoot<TClaims> {
 
         this._apiBasePath = apiBasePath.toLowerCase();
-        if (!apiBasePath.endsWith('/')) {
-            apiBasePath += '/';
+        if (!this._apiBasePath.endsWith('/')) {
+            this._apiBasePath += '/';
         }
 
+        return this;
+    }
+
+    /*
+     * Receive the logging configuration so that we can create objects related to logging and error handling
+     */
+    public useDiagnostics(
+        loggingConfiguration: LoggingConfiguration,
+        loggerFactory: LoggerFactory): BaseCompositionRoot<TClaims> {
+
+        this._loggingConfiguration = loggingConfiguration;
+        this._loggerFactory = loggerFactory;
         return this;
     }
 
@@ -111,7 +113,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     public async register(): Promise<BaseCompositionRoot<TClaims>> {
 
         // Register dependencies for logging
-        this._exceptionHandler = new UnhandledExceptionHandler(this._loggingConfiguration);
+        this._exceptionHandler = new UnhandledExceptionHandler(this._loggingConfiguration!);
         this._registerLoggingDependencies();
 
         // Register OAuth specific dependencies for Entry Point APIs
@@ -130,14 +132,14 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     public configureMiddleware(expressApp: Application): void {
 
         // The first middleware starts structured logging of API requests
-        this._loggerMiddleware = new LoggerMiddleware(this._loggerFactory);
+        this._loggerMiddleware = new LoggerMiddleware(this._loggerFactory!);
         expressApp.use(`${this._apiBasePath}*`, this._loggerMiddleware.logRequest);
 
         // The second middleware manages authorization
         expressApp.use(`${this._apiBasePath}*`, this._authorizer!.authorizeRequestAndGetClaims);
 
         // The third middleware supports non functional testing via headers
-        const handler = new CustomHeaderMiddleware(this._loggingConfiguration.apiName);
+        const handler = new CustomHeaderMiddleware(this._loggingConfiguration!.apiName);
         expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
     }
 
@@ -154,7 +156,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
      * This enables our logging to calculate key logging fields throughout the whole middleware pipeline
      */
     public finalise(): void {
-        const routeMetadataHandler = new RouteMetadataHandler(this._apiBasePath, getRawMetadata(this._container));
+        const routeMetadataHandler = new RouteMetadataHandler(this._apiBasePath!, getRawMetadata(this._container));
         this._loggerMiddleware!.setRouteMetadataHandler(routeMetadataHandler);
     }
 
@@ -167,9 +169,9 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
         this._container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
                         .toConstantValue(this._exceptionHandler!);
         this._container.bind<LoggerFactory>(BASETYPES.LoggerFactory)
-                        .toConstantValue(this._loggerFactory);
+                        .toConstantValue(this._loggerFactory!);
         this._container.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
-                        .toConstantValue(this._loggingConfiguration);
+                        .toConstantValue(this._loggingConfiguration!);
 
         // Register a per request dummy value that is overridden by the logger middleware later
         this._container.bind<LogEntry>(BASETYPES.LogEntry)
@@ -209,7 +211,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
         const claimsCache = ClaimsCache.createInstance<ClaimsCache<TClaims>>(
             ClaimsCache,
             this._claimsConfiguration!,
-            this._loggerFactory);
+            this._loggerFactory!);
 
         // Create an injectable object to enable run time creation of claims objects of a specific type
         const claimsSupplier = ClaimsSupplier.createInstance<ClaimsSupplier<TClaims>, TClaims>(

@@ -35,17 +35,15 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Register base dependencies for logging, error handling, OAuth and claims
-        const base = await new BaseCompositionRoot<SampleApiClaims>(
-            this._container,
-            this._configuration.logging,
-            this._loggerFactory)
-                .useApiBasePath('/api/')
-                .useOAuth(this._configuration.oauth)
-                .useClaimsCaching(this._configuration.claims)
-                .withClaimsSupplier(SampleApiClaims)
-                .withCustomClaimsProviderSupplier(SampleApiClaimsProvider)
-                .register();
+        // Use common code and give it any data it needs
+        const base = await new BaseCompositionRoot<SampleApiClaims>(this._container)
+            .useApiBasePath('/api/')
+            .useDiagnostics(this._configuration.logging, this._loggerFactory)
+            .useOAuth(this._configuration.oauth)
+            .useClaimsCaching(this._configuration.claims)
+            .withClaimsSupplier(SampleApiClaims)
+            .withCustomClaimsProviderSupplier(SampleApiClaimsProvider)
+            .register();
 
         // Register the API's own dependencies
         CompositionRoot.registerDependencies(this._container);

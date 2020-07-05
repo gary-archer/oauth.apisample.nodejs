@@ -168,7 +168,7 @@ export class LogEntryData {
         this._outputNumber((x) => output.statusCode = x, this.statusCode);
         this._outputString((x) => output.errorCode = x, this.errorCode);
         this._outputNumber((x) => output.errorId = x, this.errorId);
-        this._outputNumber((x) => output.millisecondsTaken = x, this.performance.millisecondsTaken);
+        this._outputNumber((x) => output.millisecondsTaken = x, this.performance.millisecondsTaken, true);
         this._outputNumber((x) => output.millisecondsThreshold = x, this.performanceThresholdMilliseconds, true);
         this._outputString((x) => output.correlationId = x, this.correlationId);
         this._outputString((x) => output.sessionId = x, this.sessionId);

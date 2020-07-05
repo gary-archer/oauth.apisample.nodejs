@@ -2,7 +2,7 @@ import {injectable} from 'inversify';
 import {CoreApiClaims} from '../../plumbing/claims/coreApiClaims';
 
 /*
- * An example of using custom claims
+ * Extend core claims for this particular API
  */
 @injectable()
 export class SampleApiClaims extends CoreApiClaims {

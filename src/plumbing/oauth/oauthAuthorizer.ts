@@ -6,7 +6,7 @@ import {CoreApiClaims} from '../claims/coreApiClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper'
 import {ErrorFactory} from '../errors/errorFactory';
-import {BaseAuthorizer} from '../middleware/baseAuthorizer';
+import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {OAuthAuthenticator} from './oauthAuthenticator';
 
 /*
