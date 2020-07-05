@@ -31,11 +31,11 @@ export class LogEntryData {
     // The request path
     public requestPath: string;
 
-    // The application id of the original caller of the consumer API
-    public clientId: string;
-
     // The calling application name
-    public callingApplicationName: string;
+    public clientApplicationName: string;
+
+    // The client id from the OAuth 2.0 access token
+    public clientOAuthId: string;
 
     // The user id in the API's own data
     public userId: string;
@@ -87,8 +87,8 @@ export class LogEntryData {
         this.requestVerb = '';
         this.resourceId = '';
         this.requestPath = '';
-        this.clientId = '';
-        this.callingApplicationName = '';
+        this.clientApplicationName = '';
+        this.clientOAuthId = '';
         this.userId = '';
         this.userOAuthId = '';
         this.statusCode = 0;
@@ -123,8 +123,8 @@ export class LogEntryData {
         this.requestVerb = parent.requestVerb;
         this.resourceId = parent.resourceId;
         this.requestPath = parent.requestPath;
-        this.clientId = parent.clientId;
-        this.callingApplicationName = parent.callingApplicationName;
+        this.clientApplicationName = parent.clientApplicationName;
+        this.clientOAuthId = parent.clientOAuthId;
         this.userId = parent.userId;
         this.userOAuthId = parent.userOAuthId;
         this.correlationId = parent.correlationId;
@@ -161,8 +161,8 @@ export class LogEntryData {
         this._outputString((x) => output.requestVerb = x, this.requestVerb);
         this._outputString((x) => output.resourceId = x, this.resourceId);
         this._outputString((x) => output.requestPath = x, this.requestPath);
-        this._outputString((x) => output.clientId = x, this.clientId);
-        this._outputString((x) => output.callingApplicationName = x, this.callingApplicationName);
+        this._outputString((x) => output.clientApplicationName = x, this.clientApplicationName);
+        this._outputString((x) => output.clientOAuthId = x, this.clientOAuthId);
         this._outputString((x) => output.userId = x, this.userId);
         this._outputString((x) => output.userOAuthId = x, this.userOAuthId);
         this._outputNumber((x) => output.statusCode = x, this.statusCode);
