@@ -165,7 +165,7 @@ export class RouteMetadataHandler {
         return {
             operationName: operationMetadata.key,
             resourceIds,
-        } as RouteMetadata;
+        };
     }
 
     private _trimTrailingForwardSlash(input: string): string {

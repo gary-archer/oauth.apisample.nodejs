@@ -34,7 +34,7 @@ export class CompanyController extends BaseHttpController {
     public async getCompanyList(): Promise<Company[]> {
 
         // Do the work of the operation
-        return await this._service.getCompanyList(this._claims.regionsCovered);
+        return this._service.getCompanyList(this._claims.regionsCovered);
     }
 
     /*
@@ -53,6 +53,6 @@ export class CompanyController extends BaseHttpController {
                 'The company id must be a positive numeric integer');
         }
 
-        return await this._service.getCompanyTransactions(companyId, this._claims.regionsCovered);
+        return this._service.getCompanyTransactions(companyId, this._claims.regionsCovered);
     }
 }

@@ -27,6 +27,6 @@ export class UserInfoController extends BaseHttpController {
             givenName: this._claims.givenName,
             familyName: this._claims.familyName,
             email: this._claims.email,
-        } as UserInfoClaims;
+        };
     }
 }

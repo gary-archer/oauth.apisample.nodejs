@@ -145,7 +145,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
         const loggerOptions = {
             level,
             transports,
-        } as winston.LoggerOptions;
+        };
         winston.loggers.add(PRODUCTION_LOGGER_NAME, loggerOptions);
     }
 
@@ -191,7 +191,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
             transports,
             format: this._createDevelopmentFormatter(name),
             level,
-        } as winston.LoggerOptions;
+        };
 
         winston.loggers.add(name, options);
     }
@@ -207,7 +207,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
             datePattern: 'YYYY-MM-DD',
             maxSize: transportConfig.maxSize,
             maxFiles: transportConfig.maxFiles,
-        } as DailyRotateFile.DailyRotateFileTransportOptions;
+        };
 
         return new DailyRotateFile(options);
     }

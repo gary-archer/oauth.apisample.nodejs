@@ -25,7 +25,8 @@
     "tunnel-agent": "^0.6.0",
     "url": "^0.11.0",
     "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^3.9.0"
+    "winston-daily-rotate-file": "^4.5.0",
+    "winston-transport": "^4.4.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.6",

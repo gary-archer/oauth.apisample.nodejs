@@ -60,11 +60,7 @@ export class LogEntryImpl implements LogEntry {
 
         // Use the correlation id from request headers or create one
         const correlationId = request.header('x-mycompany-correlation-id');
-        if (correlationId) {
-            this._data.correlationId = correlationId;
-        } else {
-            this._data.correlationId = Guid.create().toString();
-        }
+        this._data.correlationId = correlationId ? correlationId : Guid.create().toString();
 
         // Log an optional session id if supplied
         const sessionId = request.header('x-mycompany-session-id');
