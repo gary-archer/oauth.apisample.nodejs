@@ -1,10 +1,10 @@
 import cors from 'cors';
 import express from 'express';
 import fs from 'fs-extra';
-import https from 'https';
+import https, {ServerOptions} from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
-import url from 'url';
+import tls from 'tls';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
@@ -85,28 +85,39 @@ export class HttpServerConfiguration {
      */
     public async start(): Promise<void> {
 
-        // Use the web URL to determine the port
-        const webUrl = url.parse(this._configuration.api.trustedOrigins[0]);
-
-        // Calculate the port from the URL
-        let port = 443;
-        if (webUrl.port) {
-            port = Number(webUrl.port);
-        }
-
         // Load the certificate file from disk
         const pfxFile = await fs.readFile(`certs/${this._configuration.api.sslCertificateFileName}`);
-        const sslOptions = {
+        
+        // http://nodejs.md/blog/https-server-with-multiple-domains-on-same-port-and-instance/
+        const ctx = tls.createSecureContext({
             pfx: pfxFile,
             passphrase: this._configuration.api.sslCertificatePassword,
+        })
+        
+        const serverOptions = {
+            pfx: pfxFile,
+            passphrase: this._configuration.api.sslCertificatePassword,
+            SNICallback: (serverName: string, callback) => {
+                
+                if (serverName === 'api.mycompany.com' || serverName === 'web.mycompany.com') {
+                    callback(null, ctx);
+                }
+            },
+        } as ServerOptions;
+
+        // Set listen options to enable us to run this at the same time as our API
+        const listenOptions = {
+            port: 443,
+            path: '/api',
+            exclusive: true,
         };
 
         // Start listening on HTTPS
-        const httpsServer = https.createServer(sslOptions, this._expressApp);
-        httpsServer.listen(port, () => {
+        const httpsServer = https.createServer(serverOptions, this._expressApp);
+        httpsServer.listen(listenOptions, () => {
 
             // Show a startup message
-            console.log(`Listening on HTTPS port ${port}`);
+            console.log(`Listening on HTTPS port ${listenOptions.port}`);
         });
     }
 
