@@ -1,7 +1,7 @@
 import {Client, custom, Issuer} from 'openid-client';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {ErrorUtils} from '../errors/errorUtils';
-import {DebugProxyAgent} from '../utilities/debugProxyAgent';
+import {HttpProxy} from '../utilities/httpProxy';
 
 /*
  * A singleton to read metadata at application startup
@@ -18,7 +18,7 @@ export class IssuerMetadata {
         // Set up OAuth HTTP requests and extend the default 1.5 second timeout
         custom.setHttpOptionsDefaults({
             timeout: 10000,
-            agent: DebugProxyAgent.get(),
+            agent: HttpProxy.get(),
         });
     }
 

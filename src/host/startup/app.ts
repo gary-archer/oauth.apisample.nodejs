@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
 import {LoggerFactoryBuilder} from '../../plumbing/logging/loggerFactoryBuilder';
-import {DebugProxyAgent} from '../../plumbing/utilities/debugProxyAgent'
+import {HttpProxy} from '../../plumbing/utilities/httpProxy'
 import {Configuration} from '../configuration/configuration';
 import {HttpServerConfiguration} from './httpServerConfiguration';
 
@@ -23,7 +23,7 @@ import {HttpServerConfiguration} from './httpServerConfiguration';
         loggerFactory.configure(configuration.logging);
 
         // Initialize HTTP debugging
-        DebugProxyAgent.initialize(configuration.api.useProxy, configuration.api.proxyUrl);
+        HttpProxy.initialize(configuration.api.useProxy, configuration.api.proxyUrl);
 
         // Configure the API behaviour at startup
         const httpServer = new HttpServerConfiguration(configuration, container, loggerFactory);

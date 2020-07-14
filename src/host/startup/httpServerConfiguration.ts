@@ -1,17 +1,15 @@
 import cors from 'cors';
 import express from 'express';
 import fs from 'fs-extra';
-import https, {ServerOptions} from 'https';
+import https from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
-import tls from 'tls';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
 import {SampleApiClaimsProvider} from '../claims/sampleApiClaimsProvider';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
-import {WebStaticContent} from '../utilities/webStaticContent';
 
 /*
  * Configure HTTP behaviour at application startup
@@ -59,15 +57,12 @@ export class HttpServerConfiguration {
             // Our API requests are not designed for caching
             this._expressApp.set('etag', false);
 
-            // Allow cross origin requests from the SPA first, to prevent other middleware firing for OPTIONS requests
-            const corsOptions = { origin: this._configuration.api.trustedOrigins };
+            // Allow cross origin requests from the SPA
+            const corsOptions = { origin: this._configuration.api.webTrustedOrigins };
             this._expressApp.use('/api/*', cors(corsOptions));
 
             // We must configure Express cross cutting concerns during this callback
             base.configureMiddleware(this._expressApp);
-
-            // Configure how web static content is served
-            this._configureWebStaticContent();
         })
         .setErrorConfig(() => {
 
@@ -85,48 +80,24 @@ export class HttpServerConfiguration {
      */
     public async start(): Promise<void> {
 
-        // Load the certificate file from disk
+        // Set HTTPS server options
         const pfxFile = await fs.readFile(`certs/${this._configuration.api.sslCertificateFileName}`);
-        
-        // http://nodejs.md/blog/https-server-with-multiple-domains-on-same-port-and-instance/
-        const ctx = tls.createSecureContext({
-            pfx: pfxFile,
-            passphrase: this._configuration.api.sslCertificatePassword,
-        })
-        
         const serverOptions = {
             pfx: pfxFile,
             passphrase: this._configuration.api.sslCertificatePassword,
-            SNICallback: (serverName: string, callback) => {
-                
-                if (serverName === 'api.mycompany.com' || serverName === 'web.mycompany.com') {
-                    callback(null, ctx);
-                }
-            },
-        } as ServerOptions;
-
-        // Set listen options to enable us to run this at the same time as our API
-        const listenOptions = {
-            port: 443,
-            path: '/api',
-            exclusive: true,
         };
 
-        // Start listening on HTTPS
+        // Set listener options
+        const listenOptions = {
+            port: this._configuration.api.sslPort,
+        };
+
+        // Start listening
         const httpsServer = https.createServer(serverOptions, this._expressApp);
         httpsServer.listen(listenOptions, () => {
 
-            // Show a startup message
-            console.log(`Listening on HTTPS port ${listenOptions.port}`);
+            // Render a startup message
+            console.log(`API is listening on HTTPS port ${listenOptions.port}`);
         });
-    }
-
-    /*
-     * Handle requests for static web content
-     */
-    private _configureWebStaticContent(): void {
-
-        const content = new WebStaticContent(this._expressApp);
-        content.handleWebRequests();
     }
 }

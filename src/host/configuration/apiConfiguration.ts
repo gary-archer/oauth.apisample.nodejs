@@ -3,18 +3,21 @@
  */
 export interface ApiConfiguration {
 
-    // CORS origins used for SPA requests
-    trustedOrigins: string[];
-
     // The path to the SSL certificate PEM file
     sslCertificateFileName: string;
 
     // The SSL certificate's private key password
     sslCertificatePassword: string;
 
+    // The SSL port to listen on
+    sslPort: number;
+
     // Whether to use an HTTPS proxy
     useProxy: boolean;
 
     // The proxy URL when used
     proxyUrl: string;
+
+    // We allow CORS requests from SPAs from these origins
+    webTrustedOrigins: string[];
 }
