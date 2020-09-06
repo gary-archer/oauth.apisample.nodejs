@@ -7,7 +7,15 @@ import {CoreApiClaims} from '../../plumbing/claims/coreApiClaims';
 @injectable()
 export class SampleApiClaims extends CoreApiClaims {
 
-    private _regionsCovered!: string[];
+    private _regionsCovered: string[];
+
+    /*
+     * Give fields default values
+     */
+    public constructor() {
+        super();
+        this._regionsCovered = [];
+    }
 
     public get regionsCovered(): string[] {
         return this._regionsCovered;

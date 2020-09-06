@@ -1,5 +1,5 @@
 /*
- * An interface for handling an error and processing full exception details
+ * An abstraction for server exception behaviour
  */
 export abstract class ServerError extends Error {
 

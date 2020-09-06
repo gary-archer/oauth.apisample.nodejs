@@ -6,16 +6,30 @@ import {injectable} from 'inversify';
 @injectable()
 export class CoreApiClaims {
 
+    /*
+     * Give fields default values
+     */
+    public constructor() {
+        this._subject = '';
+        this._clientId = '';
+        this._scopes = [];
+        this._expiry = 0;
+        this._givenName = '';
+        this._familyName = '';
+        this._email = '';
+        this._userDatabaseId = '';
+    }
+
     // Token claims
-    private _subject!: string;
-    private _clientId!: string;
-    private _scopes!: string[];
-    private _expiry!: number;
+    private _subject: string;
+    private _clientId: string;
+    private _scopes: string[];
+    private _expiry: number;
 
     // Data from the OAuth user info endpoint
-    private _givenName!: string;
-    private _familyName!: string;
-    private _email!: string;
+    private _givenName: string;
+    private _familyName: string;
+    private _email: string;
 
     // The database primary key from the API's own database
     private _userDatabaseId!: string;

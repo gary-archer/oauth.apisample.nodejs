@@ -12,15 +12,19 @@ export class ErrorFactory {
     /*
      * Create a server error
      */
-    public static createServerError(errorCode: string, userMessage: string, stack?: string | undefined): ServerError {
-        return new ServerErrorImpl(errorCode, userMessage, stack);
+    public static createServerError(
+        errorCode: string, userMessage: string, stack?: string | undefined): ServerError {
+        
+            return new ServerErrorImpl(errorCode, userMessage, stack);
     }
 
     /*
      * Create an error indicating a client problem
      */
-    public static createClientError(statusCode: number, errorCode: string, userMessage: string): ClientError {
-        return new ClientErrorImpl(statusCode, errorCode, userMessage);
+    public static createClientError(
+        statusCode: number, errorCode: string, userMessage: string): ClientError {
+        
+            return new ClientErrorImpl(statusCode, errorCode, userMessage);
     }
 
     /*

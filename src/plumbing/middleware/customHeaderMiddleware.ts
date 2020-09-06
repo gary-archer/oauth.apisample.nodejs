@@ -7,13 +7,6 @@ import {ErrorFactory} from '../errors/errorFactory';
  */
 export class CustomHeaderMiddleware {
 
-    private readonly _apiName: string;
-
-    public constructor(apiName: string) {
-        this._apiName = apiName.toLowerCase();
-        this._setupCallbacks();
-    }
-
     /*
      * Enable testers to select an API to break as part of non functional testing
      * This can be especially useful when there are many APIs and they call each other
@@ -32,6 +25,15 @@ export class CustomHeaderMiddleware {
 
         next();
     }
+
+    private readonly _apiName: string;
+
+    public constructor(apiName: string) {
+        this._apiName = apiName.toLowerCase();
+        this._setupCallbacks();
+    }
+
+    
 
     /*
      * Plumbing to ensure the this parameter is available
