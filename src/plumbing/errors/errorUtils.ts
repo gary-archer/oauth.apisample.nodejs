@@ -83,6 +83,20 @@ export class ErrorUtils {
     }
 
     /*
+     * Handle the error for key identifier lookups
+     */
+    public static fromSigningKeyDownloadError(responseError: any, url: string): ServerError {
+
+        const error = ErrorFactory.createServerError(
+            BaseErrorCodes.signingKeyDownloadFailure,
+            'Signing key download failed',
+            responseError.stack);
+
+        ErrorUtils._setErrorDetails(error, null, responseError, url);
+        return error;
+    }
+
+    /*
      * Handle user info lookup failures
      */
     public static fromUserInfoError(responseError: any, url: string): ServerError {

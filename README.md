@@ -18,10 +18,9 @@
 
 ### Middleware Used
 
+* Express is used to host the API, using OpenSSL self signed certificates
+* [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
+* AWS Cognito is used for the Authorization Server
 * The [OpenId-Client Library](https://github.com/panva/node-openid-client) is used for API OAuth operations
 * The [Node Cache](https://github.com/mpneuried/nodecache) is used to cache API claims in memory
-* Express is used to host the API
-* [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
-* Okta is used for the Authorization Server
-* OpenSSL is used for SSL certificate handling
-* API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support common [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
+* API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
