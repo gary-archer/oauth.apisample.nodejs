@@ -194,7 +194,7 @@ export class OAuthAuthenticator {
     }
 
     /*
-     * User info lookup
+     * Perform OAuth user info lookup
      */
     private async _getUserInfoClaims(accessToken: string, claims: CoreApiClaims): Promise<void> {
 
@@ -215,7 +215,7 @@ export class OAuthAuthenticator {
                 const email = this._getClaim(response.email, 'email');
 
                 // Update the claims object and indicate success
-                claims.setCentralUserInfo(givenName, familyName, email);
+                claims.setOAuthUserInfo(givenName, familyName, email);
 
             } catch (e) {
 
