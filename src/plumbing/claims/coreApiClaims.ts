@@ -84,7 +84,7 @@ export class CoreApiClaims {
     /*
      * Set claims from the OAuth 2.0 user info endpoint
      */
-    public setCentralUserInfo(givenName: string, familyName: string, email: string) {
+    public setUserInfo(givenName: string, familyName: string, email: string) {
         this._givenName = givenName;
         this._familyName = familyName;
         this._email = email;

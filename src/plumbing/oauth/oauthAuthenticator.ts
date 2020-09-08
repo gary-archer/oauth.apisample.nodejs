@@ -215,7 +215,7 @@ export class OAuthAuthenticator {
                 const email = this._getClaim(response.email, 'email');
 
                 // Update the claims object and indicate success
-                claims.setOAuthUserInfo(givenName, familyName, email);
+                claims.setUserInfo(givenName, familyName, email);
 
             } catch (e) {
 
