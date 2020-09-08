@@ -88,8 +88,8 @@ export class ErrorUtils {
     public static fromSigningKeyDownloadError(responseError: any, url: string): ServerError {
 
         const error = ErrorFactory.createServerError(
-            BaseErrorCodes.signingKeyDownloadFailure,
-            'Signing key download failed',
+            BaseErrorCodes.tokenSigningKeysDownloadError,
+            'Problem downloading token signing keys',
             responseError.stack);
 
         ErrorUtils._setErrorDetails(error, null, responseError, url);

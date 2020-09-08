@@ -136,7 +136,7 @@ export class OAuthAuthenticator {
      */
     private async _getTokenSigningPublicKey(tokenKeyIdentifier: string): Promise<string> {
 
-        return using (this._logEntry.createPerformanceBreakdown('downloadJwksKey'), async () => {
+        return using (this._logEntry.createPerformanceBreakdown('getTokenSigningPublicKey'), async () => {
 
             try {
                 // Trigger a download of JWKS keys
@@ -168,7 +168,7 @@ export class OAuthAuthenticator {
      */
     private async _validateJsonWebToken(accessToken: string, tokenSigningPublicKey: string): Promise<any> {
 
-        return using (this._logEntry.createPerformanceBreakdown('validateTokenInMemory'), async () => {
+        return using (this._logEntry.createPerformanceBreakdown('validateJsonWebToken'), async () => {
 
             try {
 

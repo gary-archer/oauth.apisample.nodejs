@@ -13,7 +13,7 @@ export class BaseErrorCodes {
 
     public static readonly introspectionFailure = 'introspection_failure';
 
-    public static readonly signingKeyDownloadFailure = ''
+    public static readonly tokenSigningKeysDownloadError = 'jwks_download_failure'
 
     public static readonly userinfoFailure = 'userinfo_failure';
 
