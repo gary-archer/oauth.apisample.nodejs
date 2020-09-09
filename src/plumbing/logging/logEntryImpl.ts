@@ -109,9 +109,7 @@ export class LogEntryImpl implements LogEntry {
      * Create a child performance breakdown when requested
      */
     public createPerformanceBreakdown(name: string): PerformanceBreakdown {
-        const child = this._current().performance.createChild(name);
-        child.start();
-        return child;
+        return this._current().performance.createChild(name);
     }
 
     /*

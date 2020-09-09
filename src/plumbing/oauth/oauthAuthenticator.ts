@@ -11,6 +11,7 @@ import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntry} from '../logging/logEntry';
 import {using} from '../utilities/using';
 import {IssuerMetadata} from './issuerMetadata';
+import { PerformanceBreakdown } from '../logging/performanceBreakdown';
 
 /*
  * The default authenticator does OAuth token handling and is used by public APIs
@@ -106,7 +107,8 @@ export class OAuthAuthenticator {
      */
     private async _validateTokenInMemoryAndGetTokenClaims(accessToken: string, claims: CoreApiClaims) {
 
-        return using (this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
+        const breakdown = this._logEntry.createPerformanceBreakdown('validateToken');
+        return using (breakdown, async () => {
 
             // First decoode the token without verifying it so that we get the key identifier
             const decoded = jsonwebtoken.decode(accessToken, {complete: true}) as any;
@@ -117,10 +119,12 @@ export class OAuthAuthenticator {
             }
 
             // Download the token signing public key
-            const publicKey = await this._getTokenSigningPublicKey(decoded.header.kid);
+            const publicKey = await this._getTokenSigningPublicKey(decoded.header.kid, breakdown);
 
             // Verify the token's digital signature
-            const tokenData = await this._validateJsonWebToken(accessToken, publicKey);
+            const tokenData = await this._validateJsonWebToken(accessToken, publicKey, breakdown);
+
+            // Also check scope / audience here if required
 
             // Read protocol claims and use the immutable user id as the subject claim
             const subject = this._getClaim(tokenData.sub, 'subject');
@@ -134,9 +138,11 @@ export class OAuthAuthenticator {
     /*
      * Download the public key with which our access token is signed
      */
-    private async _getTokenSigningPublicKey(tokenKeyIdentifier: string): Promise<string> {
+    private async _getTokenSigningPublicKey(
+        tokenKeyIdentifier: string,
+        breakdown: PerformanceBreakdown): Promise<string> {
 
-        return using (this._logEntry.createPerformanceBreakdown('getTokenSigningPublicKey'), async () => {
+        return using (breakdown.createChild('getTokenSigningPublicKey'), async () => {
 
             try {
                 // Trigger a download of JWKS keys
@@ -166,9 +172,12 @@ export class OAuthAuthenticator {
     /*
      * Call a third party library to do the token validation, and return token claims
      */
-    private async _validateJsonWebToken(accessToken: string, tokenSigningPublicKey: string): Promise<any> {
+    private async _validateJsonWebToken(
+        accessToken: string,
+        tokenSigningPublicKey: string,
+        breakdown: PerformanceBreakdown): Promise<any> {
 
-        return using (this._logEntry.createPerformanceBreakdown('validateJsonWebToken'), async () => {
+        return using (breakdown.createChild('validateJsonWebToken'), async () => {
 
             try {
 

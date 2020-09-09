@@ -84,10 +84,11 @@ export class PerformanceBreakdownImpl implements PerformanceBreakdown {
     /*
      * Add a child to the performance breakdown
      */
-    public createChild(name: string): PerformanceBreakdownImpl {
+    public createChild(name: string): PerformanceBreakdown {
 
         const child = new PerformanceBreakdownImpl(name);
         this._children.push(child);
+        child.start();
         return child;
     }
 }

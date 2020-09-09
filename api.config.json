@@ -28,7 +28,7 @@
             "performanceThresholdsMilliseconds": {
                 "default": 250,
                 "operationOverrides": {
-                    "authorizer": 0
+                    "authorizer": 1000
                 }
             }
         },
