@@ -18,9 +18,9 @@ kubectl delete svc/nodeapi-svc  2>/dev/null
 docker image rm -f nodeapi      2>/dev/null
 
 #
-# Build the docker image, with the Node files, configuration file and SSL certificate
+# Build the docker image, with the Node files and other resources
 #
-echo "Building Docker Image from Node files ..."
+echo "Building NodeJS Docker Image ..."
 cd ..
 docker build -f deployment/Dockerfile -t nodeapi .
 if [ $? -ne 0 ]

@@ -1,6 +1,3 @@
-0. Get dockerfile image working to same level as Java
-   Currently ts-node not found
-
 1. Understand how my code should use ports when running in a container
    Configure the API to listen on port 8080 by default and make useSSL optional
    Get calls from outside the container working over HTTP using IP addresses
