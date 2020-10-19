@@ -5,12 +5,11 @@
 ### Overview
 
 * The final API code sample using OAuth 2.0 and Open Id Connect, referenced in my blog at https://authguidance.com
-* **This sample implements our [API Non Functional Requirements](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior) in NodeJS**
 
 ### Details
 
 * See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for what the API does and how to run it
-* See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for further technical details
+* See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for technical implementation details
 
 ### Programming Languages
 
