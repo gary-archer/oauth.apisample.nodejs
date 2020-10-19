@@ -1,8 +1,8 @@
-import {ServerError} from './ServerError';
-import {ServerErrorImpl} from './ServerErrorImpl';
 import {BaseErrorCodes} from './baseErrorCodes';
 import {ClientError} from './clientError';
 import {ClientErrorImpl} from './clientErrorImpl';
+import {ServerError} from './serverError';
+import {ServerErrorImpl} from './serverErrorImpl';
 
 /*
  * An error factory class that returns the interface rather than the concrete type

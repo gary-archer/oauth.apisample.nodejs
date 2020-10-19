@@ -10,6 +10,7 @@ WORKDIR /usr/sampleapi
 
 # Copy files into our docker image
 COPY src/                       /usr/sampleapi/src/
+COPY tsconfig.json              /usr/sampleapi/
 COPY deployment/api.config.json /usr/sampleapi/
 COPY certs/mycompany.ssl.pfx    /usr/sampleapi/certs/
 COPY package*.json              /usr/sampleapi/

@@ -1,6 +1,6 @@
-import {ServerError} from './ServerError';
 import {ClientError} from './clientError';
 import {ErrorFactory} from './errorFactory';
+import {ServerError} from './serverError';
 
 // Ranges for random error ids
 const MIN_ERROR_ID = 10000;

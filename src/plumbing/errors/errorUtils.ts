@@ -1,7 +1,7 @@
-import {ServerError} from './ServerError';
 import {BaseErrorCodes} from './baseErrorCodes';
 import {ClientError} from './clientError';
 import {ErrorFactory} from './errorFactory';
+import {ServerError} from './serverError';
 
 /*
  * General error utility functions
