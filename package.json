@@ -5,8 +5,8 @@
   "main": "app.ts",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "build": "ts-node --files src/host/startup/app.ts",
-    "start": "nodemon -e ts --exec \"npm run build\""
+    "start": "ts-node --files src/host/startup/app.ts",
+    "watch": "nodemon -e ts --exec \"npm run start\""
   },
   "keywords": [],
   "author": "Gary Archer",
