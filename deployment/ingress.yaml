@@ -1,0 +1,17 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx
+spec:
+  tls:
+    - secretName: api-mycluster.com-tls
+      hosts:
+        - api.mycluster.com
+  rules:
+    - host: api.mycluster.com
+      http:
+        paths:
+          - backend:
+              serviceName: nginx
+              servicePort: 80

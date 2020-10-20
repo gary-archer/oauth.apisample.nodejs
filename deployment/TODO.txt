@@ -11,3 +11,21 @@
 
 5. Get stdout logging pushing to Elastic Search
    This means pods need to be able to call localhost:9200 on the host
+
+EARLY NOTES ON SSL
+https://www.youtube.com/watch?v=7K0gAYmWWho
+
+minikube addons enable ingress
+kubectl create deployment nginx --image=nginx:1.10.0
+kubectl expose deployment nginx --port 80
+kubectl apply -f ingress.yaml
+
+Add $(minikube ip) to /etc/hosts:
+192.168.64.2 api.mycluster.com
+ping api.mycluster.com shows nginx HTML
+
+UP TO HERE
+Create a self signed certificate for mycluster.com
+kubectl create secret tls api-mycluster.com-tls --cert=api.mycluster.com.crt --key=api.mycluster.com.key
+Update ingress.yaml again
+Re-run 'kubectl apply -f ingress.yaml'
