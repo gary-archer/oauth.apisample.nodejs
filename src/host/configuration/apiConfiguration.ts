@@ -3,14 +3,17 @@
  */
 export interface ApiConfiguration {
 
+    // The port to listen on
+    port: number;
+
+    // Whether to use SSL
+    useSsl: boolean;
+
     // The path to the SSL certificate PEM file
     sslCertificateFileName: string;
 
     // The SSL certificate's private key password
     sslCertificatePassword: string;
-
-    // The SSL port to listen on
-    sslPort: number;
 
     // Whether to use an HTTPS proxy
     useProxy: boolean;

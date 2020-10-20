@@ -22,5 +22,8 @@ RUN npm install --production
 # When the container is run, this will execute the NodeJS program
 CMD ["npm", "start"]
 
+# Expose the service over port 80 for demo purposes
+EXPOSE 80/tcp
+
 # This can be used to view the image's file structure before deploying it
 # docker run -it nodeapi sh

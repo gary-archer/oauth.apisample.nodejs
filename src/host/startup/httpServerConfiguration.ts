@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
+import { http } from 'winston';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
 import {SampleApiClaims} from '../claims/sampleApiClaims';
@@ -80,24 +81,31 @@ export class HttpServerConfiguration {
      */
     public async start(): Promise<void> {
 
-        // Set HTTPS server options
-        const pfxFile = await fs.readFile(`certs/${this._configuration.api.sslCertificateFileName}`);
-        const serverOptions = {
-            pfx: pfxFile,
-            passphrase: this._configuration.api.sslCertificatePassword,
-        };
-
-        // Set listener options
+        // Set common options
         const listenOptions = {
-            port: this._configuration.api.sslPort,
+            port: this._configuration.api.port,
+        };
+        const listenCallback = () => {
+            console.log(`API is listening on port ${listenOptions.port}`);
         };
 
-        // Start listening
-        const httpsServer = https.createServer(serverOptions, this._expressApp);
-        httpsServer.listen(listenOptions, () => {
+        if (this._configuration.api.useSsl) {
 
-            // Render a startup message
-            console.log(`API is listening on HTTPS port ${listenOptions.port}`);
-        });
+            // Load certificate details
+            const pfxFile = await fs.readFile(`certs/${this._configuration.api.sslCertificateFileName}`);
+            const serverOptions = {
+                pfx: pfxFile,
+                passphrase: this._configuration.api.sslCertificatePassword,
+            };
+
+            // Start listening over HTTPS
+            const httpsServer = https.createServer(serverOptions, this._expressApp);
+            httpsServer.listen(listenOptions, listenCallback);
+
+        } else {
+
+            // Start listening over HTTP
+            this._expressApp.listen(listenOptions.port, listenCallback);
+        }
     }
 }
