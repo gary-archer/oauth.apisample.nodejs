@@ -1,6 +1,5 @@
 import TunnelAgent from 'tunnel-agent';
 import url from 'url';
-import {ApiConfiguration} from '../../host/configuration/apiConfiguration';
 
 /*
  * Some HTTP libraries require an agent to be expressed in order to see traffic in Fiddler or Charles
