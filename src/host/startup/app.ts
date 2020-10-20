@@ -22,7 +22,7 @@ import {HttpServerConfiguration} from './httpServerConfiguration';
         const configuration = JSON.parse(configurationBuffer.toString()) as Configuration;
         loggerFactory.configure(configuration.logging);
 
-        // Initialize HTTP debugging
+        // Initialize HTTP debugging for requests to the Authorization Server
         HttpProxy.initialize(configuration.api.useProxy, configuration.api.proxyUrl);
 
         // Configure the API behaviour at startup
