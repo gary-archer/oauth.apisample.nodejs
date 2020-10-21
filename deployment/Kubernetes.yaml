@@ -1,6 +1,6 @@
 #
 # The Kubernetes deployment file for our NodeJS API
-# API instances run on dynamically assigned IP addresses and port 80
+# API instances run on dynamically assigned IP addresses and a low privilege port
 # API instances cannot be called directly from outside Kubernetes
 #
 
