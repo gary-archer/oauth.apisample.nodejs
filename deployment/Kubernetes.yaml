@@ -1,7 +1,7 @@
 #
 # The Kubernetes deployment file for our NodeJS API
-# The API instances run on dynamically assigned IP addresses
-# Each API instance runs on port 80 and cannot be called directly
+# API instances run on dynamically assigned IP addresses and port 80
+# API instances cannot be called directly from outside Kubernetes
 #
 
 kind: Service

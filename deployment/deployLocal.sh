@@ -5,7 +5,7 @@
 #
 
 #
-# Use the minikube docker daemon rather than that of Docker Desktop for Mac
+# Use the Minikube Docker Daemon rather than that of Docker Desktop for Mac
 #
 echo "Preparing Kubernetes ..."
 eval $(minikube docker-env)
@@ -13,9 +13,10 @@ eval $(minikube docker-env)
 #
 # Clean up any resources for the previously deployed version of the API
 #
-kubectl delete deploy/nodeapi   2>/dev/null
-kubectl delete svc/nodeapi-svc  2>/dev/null
-docker image rm -f nodeapi      2>/dev/null
+kubectl delete deploy/nodeapi               2>/dev/null
+kubectl delete svc/nodeapi-svc              2>/dev/null
+docker image rm -f nodeapi                  2>/dev/null
+kubectl delete secret mycompany-com-tls     2>/dev/null
 
 #
 # Build the docker image, with the Node files and other resources
@@ -30,7 +31,12 @@ then
 fi
 
 #
-# Deploy the local docker image to multiple Kubernetes pods
+# Deploy our SSL wildcard certificate to the Kubernetes cluster
+#
+kubectl create secret tls mycompany-com-tls --cert=../certs/mycompany.ssl.crt --key=../certs/mycompany.ssl.key
+
+#
+# Deploy 2 instances of the local docker image to 2 Kubernetes pods
 #
 echo "Deploying Docker Image to Kubernetes ..."
 cd deployment
@@ -42,8 +48,8 @@ then
 fi
 
 #
-# Expose the API over port 80 for a custom host name
-# Once available we can run http://nodeapi.mycompany.com/api/companies
+# Expose the API to clients outside Kubernetes on port 443 with a custom host name
+# We can then access the API at https://nodeapi.mycompany.com/api/companies
 #
 minikube addons enable ingress
 kubectl apply -f ingress.yaml

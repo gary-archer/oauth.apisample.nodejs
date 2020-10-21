@@ -10,20 +10,13 @@ WORKDIR /usr/sampleapi
 
 # Copy files into our docker image
 COPY src/                       /usr/sampleapi/src/
-COPY tsconfig.json              /usr/sampleapi/
-COPY deployment/api.config.json /usr/sampleapi/
-COPY certs/mycompany.ssl.pfx    /usr/sampleapi/certs/
-COPY package*.json              /usr/sampleapi/
 COPY data/*                     /usr/sampleapi/data/
+COPY deployment/api.config.json /usr/sampleapi/
+COPY package*.json              /usr/sampleapi/
+COPY tsconfig.json              /usr/sampleapi/
 
 # Install production dependencies
 RUN npm install --production
 
 # When the container is run, this will execute the NodeJS program
 CMD ["npm", "start"]
-
-# Expose the service over port 80 for demo purposes
-EXPOSE 80/tcp
-
-# This can be used to view the image's file structure before deploying it
-# docker run -it nodeapi sh

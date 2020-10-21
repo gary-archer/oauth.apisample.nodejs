@@ -8,6 +8,10 @@ kind: Ingress
 metadata:
   name: nodeapi-ingress
 spec:
+  tls:
+    - hosts:
+        - nodeapi.mycompany.com
+      secretName: mycompany-com-tls
   rules:
     - host: nodeapi.mycompany.com
       http:
