@@ -34,7 +34,7 @@ fi
 #
 echo "Deploying Docker Image to Kubernetes ..."
 cd deployment
-kubectl create -f Kubernetes.yaml
+kubectl apply -f Kubernetes.yaml
 if [ $? -ne 0 ]
 then
   echo "*** Kubernetes deployment error ***"
@@ -42,24 +42,9 @@ then
 fi
 
 #
-# Output the names of created PODs and indicate success
+# Expose the API over port 80 for a custom host name
+# Once available we can run http://nodeapi.mycompany.com/api/companies
 #
+minikube addons enable ingress
+kubectl apply -f ingress.yaml
 echo "Deployment completed successfully"
-kubectl get pod -l app=nodeapi
-API_URL=$(minikube service --url nodeapi-svc)/api/companies
-echo $API_URL
-
-#
-# Troubleshooting commands from outside Kubernetes
-#
-#curl $API_URL
-#kubectl describe service nodeapi-svc
-#kubectl logs --tail=100 pod/nodeapi-74f57df659-2tjz5
-
-#
-# Troubleshooting commands from inside the POD
-#
-#kubectl exec --stdin --tty pod/nodeapi-74f57df659-2tjz5 -- /bin/sh
-#ls -lr /usr/sampleapi
-#apk add curl
-#curl http://localhost/api/companies

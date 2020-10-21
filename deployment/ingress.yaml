@@ -1,17 +1,21 @@
----
-apiVersion: extensions/v1beta1
+#
+# The load balancer for our NodeJS API, which exposes it over port 80
+# The below host name is configured on the host PC in the /etc/hosts file
+#
+
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nginx
+  name: nodeapi-ingress
 spec:
-  tls:
-    - secretName: api-mycluster.com-tls
-      hosts:
-        - api.mycluster.com
   rules:
-    - host: api.mycluster.com
+    - host: nodeapi.mycompany.com
       http:
         paths:
-          - backend:
-              serviceName: nginx
-              servicePort: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nodeapi-svc
+                port:
+                  number: 80

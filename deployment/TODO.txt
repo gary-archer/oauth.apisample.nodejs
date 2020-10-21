@@ -1,24 +1,16 @@
-1. Understand how to expose the API over port 80
-   Right now NodePort uses a port above 30000
-
-2. Understand Kubernetes, Minikube and DNS via host files
-   Get a better API URL over HTTP, similar to api.mycompany.com
-
-3. Get SSL working so that the call into Kubernetes from the local PC is over port 444
+1. Get SSL working so that the call into Kubernetes from the local PC is over port 444
    Understand how to configure SSL trust
 
-4. Use a redis client to cache tokens across the cluster
+2. Use a redis client to cache tokens across the cluster
 
-5. Get stdout logging pushing to Elastic Search
+3. Get stdout logging pushing to Elastic Search
    This means pods need to be able to call localhost:9200 on the host
 
-EARLY NOTES ON SSL
-https://www.youtube.com/watch?v=7K0gAYmWWho
+EXPOSING OVER PORT 80
+---------------------
+https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
 
-minikube addons enable ingress
-kubectl create deployment nginx --image=nginx:1.10.0
-kubectl expose deployment nginx --port 80
-kubectl apply -f ingress.yaml
+Get rid of NodePort from Kubernetes.yaml and use a lower / standard port instead
 
 Add $(minikube ip) to /etc/hosts:
 192.168.64.2 api.mycluster.com
@@ -29,3 +21,27 @@ Create a self signed certificate for mycluster.com
 kubectl create secret tls api-mycluster.com-tls --cert=api.mycluster.com.crt --key=api.mycluster.com.key
 Update ingress.yaml again
 Re-run 'kubectl apply -f ingress.yaml'
+
+
+#
+# Output the names of created PODs and indicate success
+#
+echo "Deployment completed successfully"
+kubectl get pod -l app=nodeapi
+API_URL=$(minikube service --url nodeapi-svc)/api/companies
+echo $API_URL
+
+#
+# Troubleshooting commands from outside Kubernetes
+#
+#curl $API_URL
+#kubectl describe service nodeapi-svc
+#kubectl logs --tail=100 pod/nodeapi-74f57df659-2tjz5
+
+#
+# Troubleshooting commands from inside the POD
+#
+#kubectl exec --stdin --tty pod/nodeapi-74f57df659-2tjz5 -- /bin/sh
+#ls -lr /usr/sampleapi
+#apk add curl
+#curl http://localhost/api/companies
