@@ -1,0 +1,37 @@
+#
+# The Kubernetes deployment file for our NodeJS API
+# API instances run on dynamically assigned IP addresses and a low privilege port
+# API instances cannot be called directly from outside Kubernetes
+#
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: nodeapi-svc
+spec:
+  selector:
+    app: nodeapi
+  ports:
+  - protocol: "TCP"
+    port: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapi
+  labels:
+    app: nodeapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodeapi
+  template:
+    metadata:
+      labels:
+        app: nodeapi
+    spec:
+      containers:
+      - name: nodeapi
+        image: nodeapi:v1
+        imagePullPolicy: Never
