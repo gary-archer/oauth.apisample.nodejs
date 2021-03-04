@@ -3,9 +3,17 @@
  */
 export class CustomClaims {
 
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public static import(data: any): CustomClaims {
-        return new CustomClaims();
+    public static import(input: any): CustomClaims {
+
+        const output = {} as any;
+
+        for (const field in input) {
+            if (field) {
+                output[field] = input[field];
+            }
+        }
+
+        return output as CustomClaims;
     }
 
     public export(): any {

@@ -52,6 +52,9 @@ export class ClaimsCache {
         // Otherwise return cached claims
         this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
         const data = JSON.parse(claimsText);
+        console.log('*** GET ***');
+        console.log(claimsText);
+        console.log('*** GET ***');
         return ApiClaims.import(data);
     }
 
@@ -77,7 +80,10 @@ export class ClaimsCache {
             // Cache the claims until the above time
             this._traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
+            console.log('*** PUT ***');
             const data = JSON.stringify(claims.export());
+            console.log(data);
+            console.log('*** PUT ***');
             await this._cache.set(accessTokenHash, data, secondsToCache);
         }
     }
