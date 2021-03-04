@@ -13,10 +13,7 @@ import {JsonFileReader} from '../utilities/jsonFileReader';
 @injectable()
 export class CompanyRepository {
 
-    // An injected object to read data from text files
     private readonly _jsonReader: JsonFileReader;
-
-    // Every API request receives its log entry and can contribute to it
     private readonly _logEntry: LogEntry;
 
     public constructor(

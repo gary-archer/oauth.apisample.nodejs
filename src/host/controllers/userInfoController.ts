@@ -1,8 +1,7 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
+import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
-import {SampleApiClaims} from '../claims/sampleApiClaims';
-import {UserInfoClaims} from '../claims/userInfoClaims';
 
 /*
  * A controller class to return user info
@@ -10,23 +9,22 @@ import {UserInfoClaims} from '../claims/userInfoClaims';
 @controller('/userclaims')
 export class UserInfoController extends BaseHttpController {
 
-    private readonly _claims: SampleApiClaims;
+    private readonly _claims: UserInfoClaims;
 
-    public constructor(@inject(BASETYPES.CoreApiClaims) claims: SampleApiClaims) {
+    public constructor(@inject(BASETYPES.UserInfoClaims) claims: UserInfoClaims) {
         super();
         this._claims = claims;
     }
 
     /*
-     * Return any user claims needed by the UI
+     * Return user claims needed by the UI
      */
     @httpGet('/current')
-    public getUserClaims(): UserInfoClaims {
+    public getUserClaims(): any {
 
         return {
             givenName: this._claims.givenName,
             familyName: this._claims.familyName,
-            email: this._claims.email,
         };
     }
 }

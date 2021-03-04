@@ -6,8 +6,7 @@ import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
-import {SampleApiClaims} from '../claims/sampleApiClaims';
-import {SampleApiClaimsProvider} from '../claims/sampleApiClaimsProvider';
+import {SampleCustomClaimsProvider} from '../claims/SampleCustomClaimsProvider';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
 
@@ -34,13 +33,12 @@ export class HttpServerConfiguration {
     public async configure(): Promise<void> {
 
         // Use common code and give it any data it needs
-        const base = await new BaseCompositionRoot<SampleApiClaims>(this._container)
+        const base = await new BaseCompositionRoot(this._container)
             .useApiBasePath('/api/')
             .useDiagnostics(this._configuration.logging, this._loggerFactory)
             .useOAuth(this._configuration.oauth)
+            .withCustomClaimsProvider(new SampleCustomClaimsProvider())
             .useClaimsCaching(this._configuration.claims)
-            .withClaimsSupplier(SampleApiClaims)
-            .withCustomClaimsProviderSupplier(SampleApiClaimsProvider)
             .register();
 
         // Register the API's own dependencies

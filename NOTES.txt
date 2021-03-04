@@ -1,0 +1,5 @@
+FINALISE
+--------
+1. Deal with serialization of overridden custom claims
+
+2. Deal with logging of user database id

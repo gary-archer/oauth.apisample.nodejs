@@ -3,7 +3,7 @@ import {Guid} from 'guid-typescript';
 import {injectable} from 'inversify';
 import os from 'os';
 import {Logger} from 'winston';
-import {CoreApiClaims} from '../claims/coreApiClaims';
+import {TokenClaims} from '../claims/tokenClaims';
 import {ClientError} from '../errors/clientError';
 import {ServerError} from '../errors/serverError';
 import {Disposable} from '../utilities/disposable';
@@ -72,10 +72,9 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Add identity details for secured requests
      */
-    public setIdentity(claims: CoreApiClaims): void {
-        this._data.clientOAuthId = claims.clientId;
+    public setIdentity(claims: TokenClaims): void {
         this._data.userOAuthId = claims.subject;
-        this._data.userId = claims.userDatabaseId;
+        this._data.clientOAuthId = claims.clientId;
     }
 
     /*

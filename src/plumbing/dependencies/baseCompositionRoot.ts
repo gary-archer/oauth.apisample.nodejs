@@ -2,9 +2,10 @@ import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
 import {ClaimsCache} from '../claims/claimsCache';
-import {ClaimsSupplier} from '../claims/claimsSupplier';
-import {CoreApiClaims} from '../claims/coreApiClaims';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
+import {CustomClaims} from '../claims/customClaims';
+import {TokenClaims} from '../claims/tokenClaims';
+import {UserInfoClaims} from '../claims/userInfoClaims';
 import {ClaimsConfiguration} from '../configuration/claimsConfiguration';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
@@ -23,7 +24,7 @@ import {BaseAuthorizer} from '../security/baseAuthorizer';
 /*
  * A class to create and register common cross cutting concerns
  */
-export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
+export class BaseCompositionRoot {
 
     // Constructor properties
     private readonly _container: Container;
@@ -37,8 +38,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     private _oauthConfiguration?: OAuthConfiguration;
     private _authorizer?: BaseAuthorizer;
     private _claimsConfiguration?: ClaimsConfiguration;
-    private _claimsSupplier?: () => TClaims;
-    private _customClaimsProviderSupplier?: () => CustomClaimsProvider<TClaims>;
+    private _customClaimsProvider?: CustomClaimsProvider;
 
     /*
      * Receive details common for all APIs
@@ -50,7 +50,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     /*
      * Set the API base path, such as /api/
      */
-    public useApiBasePath(apiBasePath: string): BaseCompositionRoot<TClaims> {
+    public useApiBasePath(apiBasePath: string): BaseCompositionRoot {
 
         this._apiBasePath = apiBasePath.toLowerCase();
         if (!this._apiBasePath.endsWith('/')) {
@@ -65,7 +65,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
      */
     public useDiagnostics(
         loggingConfiguration: LoggingConfiguration,
-        loggerFactory: LoggerFactory): BaseCompositionRoot<TClaims> {
+        loggerFactory: LoggerFactory): BaseCompositionRoot {
 
         this._loggingConfiguration = loggingConfiguration;
         this._loggerFactory = loggerFactory;
@@ -75,42 +75,31 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     /*
      * Indicate that we're using OAuth and receive the configuration
      */
-    public useOAuth(oauthConfiguration: OAuthConfiguration): BaseCompositionRoot<TClaims> {
+    public useOAuth(oauthConfiguration: OAuthConfiguration): BaseCompositionRoot {
         this._oauthConfiguration = oauthConfiguration;
+        return this;
+    }
+
+    /*
+     * A class to provide custom claims when a new token is processed
+     */
+    public withCustomClaimsProvider(customClaimsProvider: CustomClaimsProvider): BaseCompositionRoot {
+        this._customClaimsProvider = customClaimsProvider;
         return this;
     }
 
     /*
      * Receive information used for claims caching
      */
-    public useClaimsCaching(claimsConfiguration: ClaimsConfiguration): BaseCompositionRoot<TClaims> {
-
+    public useClaimsCaching(claimsConfiguration: ClaimsConfiguration): BaseCompositionRoot {
         this._claimsConfiguration = claimsConfiguration;
-        return this;
-    }
-
-    /*
-     * Consumers of the builder class can provide a constructor function for creating claims
-     */
-    public withClaimsSupplier(construct: new () => TClaims): BaseCompositionRoot<TClaims> {
-        this._claimsSupplier = () => new construct();
-        return this;
-    }
-
-    /*
-     * Consumers of the builder class can provide a constructor function for injecting custom claims
-     */
-    public withCustomClaimsProviderSupplier(construct: new () => CustomClaimsProvider<TClaims>)
-            : BaseCompositionRoot<TClaims> {
-
-        this._customClaimsProviderSupplier = () => new construct();
         return this;
     }
 
     /*
      * Do the main builder work of registering dependencies
      */
-    public async register(): Promise<BaseCompositionRoot<TClaims>> {
+    public async register(): Promise<BaseCompositionRoot> {
 
         // Register dependencies for logging
         this._exceptionHandler = new UnhandledExceptionHandler(this._loggingConfiguration!);
@@ -146,7 +135,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     /*
      * With Inversify Express the exception middleware must be configured after other middleware
      */
-    public configureExceptionHandler(expressApp: Application): BaseCompositionRoot<TClaims> {
+    public configureExceptionHandler(expressApp: Application): BaseCompositionRoot {
         expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler!.handleException);
         return this;
     }
@@ -188,7 +177,7 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
         await issuerMetadata.load();
 
         // Create the authorizer, as the entry point to validating tokens and looking up claims
-        this._authorizer = new OAuthAuthorizer<TClaims>();
+        this._authorizer = new OAuthAuthorizer();
 
         // Singletons
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
@@ -207,26 +196,22 @@ export class BaseCompositionRoot<TClaims extends CoreApiClaims> {
     private _registerClaimsDependencies(): void {
 
         // Create the cache used to store claims results after authentication processing
-        // Use a constructor function as the first parameter, as required by TypeScript generics
-        const claimsCache = ClaimsCache.createInstance<ClaimsCache<TClaims>>(
-            ClaimsCache,
+        const claimsCache = new ClaimsCache(
             this._claimsConfiguration!,
             this._loggerFactory!);
 
-        // Create an injectable object to enable run time creation of claims objects of a specific type
-        const claimsSupplier = ClaimsSupplier.createInstance<ClaimsSupplier<TClaims>, TClaims>(
-            ClaimsSupplier,
-            this._claimsSupplier!,
-            this._customClaimsProviderSupplier!);
-
         // Singletons
-        this._container.bind<ClaimsCache<TClaims>>(BASETYPES.ClaimsCache)
+        this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
             .toConstantValue(claimsCache);
-        this._container.bind<ClaimsSupplier<TClaims>>(BASETYPES.ClaimsSupplier)
-            .toConstantValue(claimsSupplier);
+        this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
+            .toConstantValue(this._customClaimsProvider!);
 
-        // Register a dummy claims value that is overridden by the authorizer middleware later
-        this._container.bind<TClaims>(BASETYPES.CoreApiClaims)
+        // Register dummy claims values that are overridden later by the authorizer middleware
+        this._container.bind<TokenClaims>(BASETYPES.TokenClaims)
+            .toConstantValue({} as any);
+        this._container.bind<UserInfoClaims>(BASETYPES.UserInfoClaims)
+            .toConstantValue({} as any);
+        this._container.bind<CustomClaims>(BASETYPES.CustomClaims)
             .toConstantValue({} as any);
     }
 }
