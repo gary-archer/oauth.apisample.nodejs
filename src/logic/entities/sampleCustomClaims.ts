@@ -9,7 +9,7 @@ export class SampleCustomClaims extends CustomClaims {
     private _isAdmin: boolean;
     private _regionsCovered: string[];
 
-    public static import(data: any): SampleCustomClaims {
+    public static importData(data: any): SampleCustomClaims {
         return new SampleCustomClaims(data.userDatabaseId, data.isAdmin, data.regionsCovered);
     }
 
@@ -32,7 +32,7 @@ export class SampleCustomClaims extends CustomClaims {
         return this._regionsCovered;
     }
 
-    public export(): any {
+    public exportData(): any {
 
         return {
             'userDatabaseId': this._userDatabaseId,

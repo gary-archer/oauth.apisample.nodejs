@@ -7,11 +7,11 @@ import {injectable} from 'inversify';
 export class CustomClaims {
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public static import(data: any): CustomClaims {
+    public static importData(data: any): CustomClaims {
         return new CustomClaims();
     }
 
-    public export(): any {
+    public exportData(): any {
         return {};
     }
 }

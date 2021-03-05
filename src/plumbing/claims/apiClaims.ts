@@ -11,12 +11,12 @@ export class ApiClaims {
     private _userInfoClaims: UserInfoClaims;
     private _customClaims: CustomClaims;
 
-    public static import(data: any): ApiClaims {
+    public static importData(data: any): ApiClaims {
 
         return new ApiClaims(
-            TokenClaims.import(data.token),
-            UserInfoClaims.import(data.userInfo),
-            CustomClaims.import(data.custom));
+            TokenClaims.importData(data.token),
+            UserInfoClaims.importData(data.userInfo),
+            CustomClaims.importData(data.custom));
     }
 
     public constructor(tokenClaims: TokenClaims, userInfoClaims: UserInfoClaims, customClaims: CustomClaims) {
@@ -40,9 +40,9 @@ export class ApiClaims {
     public export(): any {
 
         return {
-            'token': this.token.export(),
-            'userInfo': this.userInfo.export(),
-            'custom': this.custom.export(),
+            'token': this.token.exportData(),
+            'userInfo': this.userInfo.exportData(),
+            'custom': this.custom.exportData(),
         };
     }
 }

@@ -11,8 +11,8 @@ export class TokenClaims {
     private _scopes: string[];
     private _expiry: number;
 
-    public static import(data: any): TokenClaims {
-        return new TokenClaims(data.subject, data.clientId, data.scopes, data.expiry);
+    public static importData(data: any): TokenClaims {
+        return new TokenClaims(data.subject, data.clientId, data.scopes.split(' '), data.expiry);
     }
 
     public constructor(subject: string, clientId: string, scopes: string[], expiry: number) {
@@ -38,12 +38,12 @@ export class TokenClaims {
         return this._expiry;
     }
 
-    public export(): any {
+    public exportData(): any {
 
         return {
             'subject': this._subject,
             'clientId': this._clientId,
-            'scopes': this._scopes,
+            'scopes': this._scopes.join(' '),
             'expiry': this._expiry,
         };
     }

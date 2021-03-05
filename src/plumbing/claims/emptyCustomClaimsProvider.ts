@@ -23,9 +23,9 @@ export class EmptyCustomClaimsProvider implements CustomClaimsProvider {
     public serialize(claims: ApiClaims): string {
 
         const data = {
-            token: claims.token.export(),
-            userInfo: claims.userInfo.export(),
-            custom: claims.custom.export(),
+            token: claims.token.exportData(),
+            userInfo: claims.userInfo.exportData(),
+            custom: claims.custom.exportData(),
         };
 
         return JSON.stringify(data);
@@ -39,9 +39,9 @@ export class EmptyCustomClaimsProvider implements CustomClaimsProvider {
         const data = JSON.parse(claimsText);
 
         return new ApiClaims(
-            TokenClaims.import(data.token),
-            UserInfoClaims.import(data.userInfo),
-            CustomClaims.import(data.custom)
+            TokenClaims.importData(data.token),
+            UserInfoClaims.importData(data.userInfo),
+            CustomClaims.importData(data.custom)
         );
     }
 }

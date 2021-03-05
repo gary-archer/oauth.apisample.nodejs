@@ -10,7 +10,7 @@ export class UserInfoClaims {
     private _familyName: string;
     private _email: string;
 
-    public static import(data: any): UserInfoClaims {
+    public static importData(data: any): UserInfoClaims {
         return new UserInfoClaims(data.givenName, data.familyName, data.email);
     }
 
@@ -32,7 +32,7 @@ export class UserInfoClaims {
         return this._email;
     }
 
-    public export(): any {
+    public exportData(): any {
 
         return {
             'givenName': this._givenName,
