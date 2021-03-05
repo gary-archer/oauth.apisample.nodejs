@@ -1,7 +1,0 @@
-FINALISE
---------
-1. Claims coming through null to CompanyService class
-   Needs debugging
-
-2. Deal with logging of user database id
-   Do this in CustomClaimsProvider
