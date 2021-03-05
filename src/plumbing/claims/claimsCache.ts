@@ -4,6 +4,7 @@ import {Logger} from 'winston';
 import {ClaimsConfiguration} from '../configuration/claimsConfiguration';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {ApiClaims} from './apiClaims';
+import {CustomClaimsProvider} from './customClaimsProvider';
 
 /*
  * A simple in memory claims cache for our API
@@ -12,15 +13,19 @@ import {ApiClaims} from './apiClaims';
 export class ClaimsCache {
 
     private readonly _cache: NodeCache;
+    private readonly _serializer: CustomClaimsProvider;
     private readonly _traceLogger: Logger;
 
     /*
      * Create the cache at application startup
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public constructor(configuration: ClaimsConfiguration, loggerFactory: LoggerFactory) {
+    public constructor(
+        configuration: ClaimsConfiguration,
+        serializer: CustomClaimsProvider,
+        loggerFactory: LoggerFactory) {
 
         // Get our logger
+        this._serializer = serializer;
         this._traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
@@ -30,6 +35,7 @@ export class ClaimsCache {
         });
 
         // If required add debug output here to verify expiry occurs when expected
+        /* eslint-disable @typescript-eslint/no-unused-vars */
         this._cache.on('expired', (key: string, value: any) => {
             this._traceLogger.debug(`Expired token has been removed from the cache (hash: ${key})`);
         });
@@ -51,11 +57,7 @@ export class ClaimsCache {
 
         // Otherwise return cached claims
         this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
-        const data = JSON.parse(claimsText);
-        console.log('*** GET ***');
-        console.log(claimsText);
-        console.log('*** GET ***');
-        return ApiClaims.import(data);
+        return this._serializer.deserialize(claimsText);
     }
 
     /*
@@ -80,11 +82,8 @@ export class ClaimsCache {
             // Cache the claims until the above time
             this._traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
-            console.log('*** PUT ***');
-            const data = JSON.stringify(claims.export());
-            console.log(data);
-            console.log('*** PUT ***');
-            await this._cache.set(accessTokenHash, data, secondsToCache);
+            const claimsText = this._serializer.serialize(claims);
+            await this._cache.set(accessTokenHash, claimsText, secondsToCache);
         }
     }
 }

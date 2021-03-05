@@ -1,19 +1,11 @@
 /*
- * An abstraction to support custom claims
+ * A default implementation of custom claims
  */
 export class CustomClaims {
 
-    public static import(input: any): CustomClaims {
-
-        const output = {} as any;
-
-        for (const field in input) {
-            if (field) {
-                output[field] = input[field];
-            }
-        }
-
-        return output as CustomClaims;
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    public static import(data: any): CustomClaims {
+        return new CustomClaims();
     }
 
     public export(): any {

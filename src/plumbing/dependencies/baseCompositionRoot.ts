@@ -198,6 +198,7 @@ export class BaseCompositionRoot {
         // Create the cache used to store claims results after authentication processing
         const claimsCache = new ClaimsCache(
             this._claimsConfiguration!,
+            this._customClaimsProvider!,
             this._loggerFactory!);
 
         // Singletons

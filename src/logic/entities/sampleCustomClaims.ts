@@ -11,6 +11,10 @@ export class SampleCustomClaims extends CustomClaims {
     private _isAdmin: boolean;
     private _regionsCovered: string[];
 
+    public static import(data: any): SampleCustomClaims {
+        return new SampleCustomClaims(data.userDatabaseId, data.isAdmin, data.regionsCovered);
+    }
+
     public constructor(userDatabaseId: string, isAdmin: boolean, regionsCovered: string[]) {
         super();
         this._userDatabaseId = userDatabaseId;
@@ -28,5 +32,14 @@ export class SampleCustomClaims extends CustomClaims {
 
     public get regionsCovered(): string[] {
         return this._regionsCovered;
+    }
+
+    public export(): any {
+
+        return {
+            'userDatabaseId': this._userDatabaseId,
+            'isAdmin': this._isAdmin,
+            'regionsCovered': this._regionsCovered,
+        };
     }
 }

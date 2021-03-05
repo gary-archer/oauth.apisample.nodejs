@@ -40,7 +40,7 @@ export abstract class BaseAuthorizer {
             // Bind claims objects to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<TokenClaims>(BASETYPES.TokenClaims).toConstantValue(claims.token);
             perRequestContainer.bind<UserInfoClaims>(BASETYPES.UserInfoClaims).toConstantValue(claims.userInfo);
-            perRequestContainer.bind<CustomClaims>(BASETYPES.TokenClaims).toConstantValue(claims.custom);
+            perRequestContainer.bind<CustomClaims>(BASETYPES.CustomClaims).toConstantValue(claims.custom);
 
             // Log caller identity details
             logEntry.setIdentity(claims.token);

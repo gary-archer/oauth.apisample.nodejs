@@ -1,15 +1,16 @@
 import {TokenClaims} from './tokenClaims';
+import {ApiClaims} from './apiClaims';
 import {CustomClaims} from './customClaims';
 import {UserInfoClaims} from './userInfoClaims';
 
 /*
- * Concrete APIs can override this class to add custom claims to the cache
- * @typescript-eslint/no-unused-vars:disable
+ * Concrete APIs override this class to include custom claims to the cache
  */
-export class CustomClaimsProvider {
+export interface CustomClaimsProvider {
 
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async getCustomClaims(token: TokenClaims, userInfo: UserInfoClaims): Promise<CustomClaims> {
-        return {} as CustomClaims;
-    }
+    getCustomClaims(token: TokenClaims, userInfo: UserInfoClaims): Promise<CustomClaims>;
+
+    serialize(claims: ApiClaims): string;
+
+    deserialize(claimsText: string): ApiClaims;
 }
