@@ -1,6 +1,9 @@
+import {injectable} from 'inversify';
+
 /*
  * Claims included in the JWT
  */
+@injectable()
 export class TokenClaims {
 
     private _subject: string;

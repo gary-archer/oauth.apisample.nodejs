@@ -1,4 +1,3 @@
-import {injectable} from 'inversify';
 import {CustomClaims} from './customClaims';
 import {TokenClaims} from './tokenClaims';
 import {UserInfoClaims} from './userInfoClaims';
@@ -6,7 +5,6 @@ import {UserInfoClaims} from './userInfoClaims';
 /*
  * An extensible claims object for APIs
  */
-@injectable()
 export class ApiClaims {
 
     private _tokenClaims: TokenClaims;

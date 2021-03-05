@@ -1,10 +1,8 @@
-import {injectable} from 'inversify';
 import {CustomClaims} from '../../plumbing/claims/customClaims';
 
 /*
  * Extend core claims for this particular API
  */
-@injectable()
 export class SampleCustomClaims extends CustomClaims {
 
     private _userDatabaseId: string;
