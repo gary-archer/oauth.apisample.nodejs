@@ -1,5 +1,4 @@
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
-import {ApiClaims} from '../../plumbing/claims/apiClaims';
 import {CustomClaims} from '../../plumbing/claims/customClaims';
 import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
 import {TokenClaims} from '../../plumbing/claims/tokenClaims';
@@ -8,7 +7,7 @@ import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 /*
  * An example of including domain specific details in cached claims
  */
-export class SampleCustomClaimsProvider implements CustomClaimsProvider {
+export class SampleCustomClaimsProvider extends CustomClaimsProvider {
 
     /*
      * An example of how custom claims can be included
@@ -29,30 +28,9 @@ export class SampleCustomClaimsProvider implements CustomClaimsProvider {
     }
 
     /*
-     * Serialize claims when requested, and use the concrete claims class
+     * An override to load custom claims when they are read from the cache
      */
-    public serialize(claims: ApiClaims): string {
-
-        const data = {
-            token: claims.token.exportData(),
-            userInfo: claims.userInfo.exportData(),
-            custom: (claims.custom as SampleCustomClaims).exportData(),
-        };
-
-        return JSON.stringify(data);
-    }
-
-    /*
-     * Read the claims parts, and use the concrete claims class
-     */
-    public  deserialize(claimsText: string): ApiClaims {
-
-        const data = JSON.parse(claimsText);
-
-        return new ApiClaims(
-            TokenClaims.importData(data.token),
-            UserInfoClaims.importData(data.userInfo),
-            SampleCustomClaims.importData(data.custom)
-        );
+    protected deserializeCustomClaims(data: any): CustomClaims {
+        return SampleCustomClaims.importData(data);
     }
 }
