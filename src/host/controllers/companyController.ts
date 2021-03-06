@@ -1,13 +1,11 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes';
 import {Company} from '../../logic/entities/company';
 import {CompanyTransactions} from '../../logic/entities/companyTransactions';
 import {ErrorCodes} from '../../logic/errors/errorCodes';
 import {CompanyService} from '../../logic/services/companyService';
-import {SampleApiClaims} from '../claims/sampleApiClaims';
 
 /*
  * Our API controller runs after claims handling has completed
@@ -16,15 +14,11 @@ import {SampleApiClaims} from '../claims/sampleApiClaims';
 export class CompanyController extends BaseHttpController {
 
     private readonly _service: CompanyService;
-    private readonly _claims: SampleApiClaims;
 
-    public constructor(
-        @inject(BASETYPES.CoreApiClaims) claims: SampleApiClaims,
-        @inject(SAMPLETYPES.CompanyService) service: CompanyService) {
+    public constructor(@inject(SAMPLETYPES.CompanyService) service: CompanyService) {
 
         super();
         this._service = service;
-        this._claims = claims;
     }
 
     /*
@@ -33,8 +27,7 @@ export class CompanyController extends BaseHttpController {
     @httpGet('')
     public async getCompanyList(): Promise<Company[]> {
 
-        // Do the work of the operation
-        return this._service.getCompanyList(this._claims.isAdmin, this._claims.regionsCovered);
+        return this._service.getCompanyList();
     }
 
     /*
@@ -53,6 +46,6 @@ export class CompanyController extends BaseHttpController {
                 'The company id must be a positive numeric integer');
         }
 
-        return this._service.getCompanyTransactions(companyId, this._claims.isAdmin, this._claims.regionsCovered);
+        return this._service.getCompanyTransactions(companyId);
     }
 }

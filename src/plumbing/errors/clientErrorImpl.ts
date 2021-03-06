@@ -5,23 +5,16 @@ import {ClientError} from './clientError';
  */
 export class ClientErrorImpl extends ClientError {
 
-    /*
-     * Fields in all client errors
-     */
+    // Fields in all client errors
     private readonly _statusCode: number;
     private readonly _errorCode: string;
     private _logContext: any;
 
-    /*
-     * Extra fields for 500 errors
-     */
+    // Extra fields for 500 errors
     private _area: string;
     private _id: number;
     private _utcTime: string;
 
-    /*
-     * Construct from mandatory fields
-     */
     public constructor(statusCode: number, errorCode: string, message: string) {
 
         // Set common fields

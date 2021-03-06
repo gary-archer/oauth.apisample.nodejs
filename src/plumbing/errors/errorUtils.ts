@@ -177,13 +177,13 @@ export class ErrorUtils {
      */
     private static _setErrorDetails(
         error: ServerError,
-        oauthDetails: string | null,
+        details: string | null,
         responseError: any,
         url: string): void {
 
         let detailsText = '';
-        if (oauthDetails) {
-            detailsText += oauthDetails;
+        if (details) {
+            detailsText += details;
         } else {
             detailsText += ErrorUtils._getExceptionDetailsMessage(responseError);
         }

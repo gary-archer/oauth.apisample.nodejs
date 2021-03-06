@@ -18,9 +18,6 @@ export class ServerErrorImpl extends ServerError {
     private readonly _utcTime: string;
     private _details: any;
 
-    /*
-     * Construct an error from known fields
-     */
     public constructor(errorCode: string, userMessage: string, stack?: string | undefined) {
 
         super(userMessage);

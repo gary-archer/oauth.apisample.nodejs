@@ -1,9 +1,9 @@
-import {Request} from 'express';
 import {inject, injectable} from 'inversify';
 import {decode, verify, VerifyOptions} from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 import {Client, custom, IntrospectionResponse, Issuer, UserinfoResponse} from 'openid-client';
-import {CoreApiClaims} from '../claims/coreApiClaims';
+import {TokenClaims} from '../claims/tokenClaims';
+import {UserInfoClaims} from '../claims/userInfoClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ErrorFactory} from '../errors/errorFactory';
@@ -32,40 +32,57 @@ export class OAuthAuthenticator {
         this._configuration = configuration;
         this._issuer = metadata.issuer;
         this._logEntry = logEntry;
-        this._setupCallbacks();
     }
 
     /*
-     * Do OAuth work to perform token validation and user info lookup
+     * Do OAuth work to perform token validation
      */
-    public async validateTokenAndGetClaims(
-        accessToken: string,
-        request: Request,
-        claims: CoreApiClaims): Promise<void> {
-
-        // Create a child log entry for authentication related work
-        // This ensures that any errors and performances in this area are reported separately to business logic
-        const authorizationLogEntry = this._logEntry.createChild('authorizer');
+    public async validateToken(accessToken: string): Promise<TokenClaims> {
 
         // Validate the token and read token claims
         const introspectionUrl = (this._issuer.metadata as any).introspection_endpoint;
         if (introspectionUrl && this._configuration.clientId && this._configuration.clientSecret) {
 
             // Use introspection if we can
-            await this._introspectTokenAndGetTokenClaims(accessToken, claims, introspectionUrl);
+            return await this._introspectTokenAndGetTokenClaims(accessToken, introspectionUrl);
         } else {
 
             // Use in memory validation otherwise
-            await this._validateTokenInMemoryAndGetTokenClaims(accessToken, claims);
+            return await this._validateTokenInMemoryAndGetTokenClaims(accessToken);
         }
+    }
 
-        // Add user info claims if the access token supports Open Id Connect operations
-        if (claims.scopes.find((s) => s === 'openid')) {
-            await this._getUserInfoClaims(accessToken, claims);
-        }
+    /*
+     * Perform OAuth user info lookup
+     */
+    public async getUserInfo(accessToken: string): Promise<UserInfoClaims> {
 
-        // Finish logging here, and note that on exception the logging framework disposes the child
-        authorizationLogEntry.dispose();
+        return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
+
+            // Create the Authorization Server client and note that a client id must be provided
+            const client = new this._issuer.Client({
+                client_id: this._configuration.clientId || 'x',
+            });
+            client[custom.http_options] = HttpProxy.getOptions;
+
+            try {
+                // Get the user info
+                const response: UserinfoResponse = await client.userinfo(accessToken);
+
+                // Read user info claims
+                const givenName = this._getClaim(response.given_name, 'given_name');
+                const familyName = this._getClaim(response.family_name, 'family_name');
+                const email = this._getClaim(response.email, 'email');
+
+                // Return the claims object
+                return new UserInfoClaims(givenName, familyName, email);
+
+            } catch (e) {
+
+                // Sanitize user info errors to ensure they are reported clearly
+                throw ErrorUtils.fromUserInfoError(e, this._issuer.metadata.userinfo_endpoint!);
+            }
+        });
     }
 
     /*
@@ -73,8 +90,7 @@ export class OAuthAuthenticator {
      */
     private async _introspectTokenAndGetTokenClaims(
         accessToken: string,
-        claims: CoreApiClaims,
-        introspectionUrl: string): Promise<number> {
+        introspectionUrl: string): Promise<TokenClaims> {
 
         return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
 
@@ -102,8 +118,8 @@ export class OAuthAuthenticator {
                 // Make sure the token is for this API
                 this._verifyScopes(scopes);
 
-                // Update the claims object
-                claims.setTokenInfo(subject, clientId, scopes, expiry);
+                // Return the claims object
+                return new TokenClaims(subject, clientId, scopes, expiry);
 
             } catch (e) {
 
@@ -116,7 +132,7 @@ export class OAuthAuthenticator {
     /*
      * Validate the access token in memory via the token signing public key
      */
-    private async _validateTokenInMemoryAndGetTokenClaims(accessToken: string, claims: CoreApiClaims) {
+    private async _validateTokenInMemoryAndGetTokenClaims(accessToken: string): Promise<TokenClaims> {
 
         const breakdown = this._logEntry.createPerformanceBreakdown('validateToken');
         return using (breakdown, async () => {
@@ -144,8 +160,8 @@ export class OAuthAuthenticator {
             // Make sure the token is for this API
             this._verifyScopes(scopes);
 
-            // Update token claims
-            claims.setTokenInfo(subject, clientId, scopes, expiry);
+            // Return the token claims
+            return new TokenClaims(subject, clientId, scopes, expiry);
         });
     }
 
@@ -229,39 +245,6 @@ export class OAuthAuthenticator {
     }
 
     /*
-     * Perform OAuth user info lookup
-     */
-    private async _getUserInfoClaims(accessToken: string, claims: CoreApiClaims): Promise<void> {
-
-        return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
-
-            // Create the Authorization Server client and note that a client id must be provided
-            const client = new this._issuer.Client({
-                client_id: this._configuration.clientId || 'x',
-            });
-            client[custom.http_options] = HttpProxy.getOptions;
-
-            try {
-                // Get the user info
-                const response: UserinfoResponse = await client.userinfo(accessToken);
-
-                // Read user info claims
-                const givenName = this._getClaim(response.given_name, 'given_name');
-                const familyName = this._getClaim(response.family_name, 'family_name');
-                const email = this._getClaim(response.email, 'email');
-
-                // Update the claims object and indicate success
-                claims.setUserInfo(givenName, familyName, email);
-
-            } catch (e) {
-
-                // Sanitize user info errors to ensure they are reported clearly
-                throw ErrorUtils.fromUserInfoError(e, this._issuer.metadata.userinfo_endpoint!);
-            }
-        });
-    }
-
-    /*
      * Sanity checks when receiving claims to avoid failing later with a cryptic error
      */
     private _getClaim(claim: string | undefined, name: string): string {
@@ -271,12 +254,5 @@ export class OAuthAuthenticator {
         }
 
         return claim;
-    }
-
-    /*
-     * Plumbing to ensure that the this parameter is available in async callbacks
-     */
-    private _setupCallbacks(): void {
-        this.validateTokenAndGetClaims = this.validateTokenAndGetClaims.bind(this);
     }
 }

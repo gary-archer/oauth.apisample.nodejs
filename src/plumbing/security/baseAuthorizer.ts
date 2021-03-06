@@ -1,13 +1,17 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
-import {CoreApiClaims} from '../claims/coreApiClaims';
+import {ApiClaims} from '../claims/apiClaims';
+import {CustomClaims} from '../claims/customClaims';
+import {CustomClaimsProvider} from '../claims/customClaimsProvider';
+import {TokenClaims} from '../claims/tokenClaims';
+import {UserInfoClaims} from '../claims/userInfoClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper';
 import {LogEntryImpl} from '../logging/logEntryImpl';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 
 /*
- * A base authorizer class that could be used for both Entry Point APIs and Microservices
+ * A base authorizer class that could be used for different types of security, all of which use claims
  */
 @injectable()
 export abstract class BaseAuthorizer {
@@ -25,15 +29,21 @@ export abstract class BaseAuthorizer {
         const perRequestContainer = ChildContainerHelper.resolve(request);
 
         try {
-            // Do authorization processing for this request, to get claims
-            const claims = await this.execute(request);
 
-            // Bind claims to this requests's child container so that they are injectable into business logic
-            perRequestContainer.bind<CoreApiClaims>(BASETYPES.CoreApiClaims).toConstantValue(claims);
-
-            // Log who called the API
+            // Get per request objects
             const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
-            logEntry.setIdentity(claims);
+            const customClaimsProvider = perRequestContainer.get<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider);
+
+            // Do authorization processing for this request, to get claims
+            const claims = await this.execute(request, customClaimsProvider, logEntry);
+
+            // Bind claims objects to this requests's child container so that they are injectable into business logic
+            perRequestContainer.bind<TokenClaims>(BASETYPES.TokenClaims).toConstantValue(claims.token);
+            perRequestContainer.bind<UserInfoClaims>(BASETYPES.UserInfoClaims).toConstantValue(claims.userInfo);
+            perRequestContainer.bind<CustomClaims>(BASETYPES.CustomClaims).toConstantValue(claims.custom);
+
+            // Log caller identity details
+            logEntry.setIdentity(claims.token);
 
             // On success, move on to the controller logic
             next();
@@ -48,7 +58,10 @@ export abstract class BaseAuthorizer {
     }
 
     // Concrete classes must override this
-    protected abstract execute(request: Request): Promise<CoreApiClaims>;
+    protected abstract execute(
+        request: Request,
+        customClaimsProvider: CustomClaimsProvider,
+        logEntry: LogEntryImpl): Promise<ApiClaims>;
 
     /*
      * Plumbing to ensure the this parameter is available

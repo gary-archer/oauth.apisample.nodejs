@@ -3,36 +3,29 @@ import NodeCache from 'node-cache';
 import {Logger} from 'winston';
 import {ClaimsConfiguration} from '../configuration/claimsConfiguration';
 import {LoggerFactory} from '../logging/loggerFactory';
-import {CoreApiClaims} from './coreApiClaims';
+import {ApiClaims} from './apiClaims';
+import {CustomClaimsProvider} from './customClaimsProvider';
 
 /*
  * A simple in memory claims cache for our API
  */
 @injectable()
-export class ClaimsCache<TClaims extends CoreApiClaims> {
-
-    /*
-     * Plumbing to enable thecorrect generic type to be created at runtime
-     * We need to pass in a constructor function plus parameters for constructor arguments
-     */
-    public static createInstance<TClaimsCache>(
-        construct: new (c: ClaimsConfiguration, lf: LoggerFactory) => TClaimsCache,
-        configuration: ClaimsConfiguration,
-        loggerFactory: LoggerFactory): TClaimsCache {
-
-        return new construct(configuration, loggerFactory);
-    }
+export class ClaimsCache {
 
     private readonly _cache: NodeCache;
+    private readonly _serializer: CustomClaimsProvider;
     private readonly _traceLogger: Logger;
 
     /*
      * Create the cache at application startup
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public constructor(configuration: ClaimsConfiguration, loggerFactory: LoggerFactory) {
+    public constructor(
+        configuration: ClaimsConfiguration,
+        serializer: CustomClaimsProvider,
+        loggerFactory: LoggerFactory) {
 
         // Get our logger
+        this._serializer = serializer;
         this._traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
@@ -42,6 +35,7 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
         });
 
         // If required add debug output here to verify expiry occurs when expected
+        /* eslint-disable @typescript-eslint/no-unused-vars */
         this._cache.on('expired', (key: string, value: any) => {
             this._traceLogger.debug(`Expired token has been removed from the cache (hash: ${key})`);
         });
@@ -50,11 +44,11 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
     /*
      * Get claims from the cache or return null if not found
      */
-    public async getClaimsForToken(accessTokenHash: string): Promise<TClaims | null> {
+    public async getClaimsForToken(accessTokenHash: string): Promise<ApiClaims | null> {
 
         // Get the token hash and see if it exists in the cache
-        const claims = await this._cache.get<TClaims>(accessTokenHash);
-        if (!claims) {
+        const claimsText = await this._cache.get<string>(accessTokenHash);
+        if (!claimsText) {
 
             // If this is a new token and we need to do claims processing
             this._traceLogger.debug(`New token will be added to claims cache (hash: ${accessTokenHash})`);
@@ -63,17 +57,17 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
 
         // Otherwise return cached claims
         this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
-        return claims;
+        return this._serializer.deserialize(claimsText);
     }
 
     /*
      * Add claims to the cache until the token's time to live
      */
-    public async addClaimsForToken(accessTokenHash: string, claims: TClaims): Promise<void> {
+    public async addClaimsForToken(accessTokenHash: string, claims: ApiClaims): Promise<void> {
 
         // Use the exp field returned from introspection to work out the token expiry time
         const epochSeconds = Math.floor((new Date() as any) / 1000);
-        let secondsToCache = claims.expiry - epochSeconds;
+        let secondsToCache = claims.token.expiry - epochSeconds;
         if (secondsToCache > 0) {
 
             // Output debug info
@@ -85,10 +79,11 @@ export class ClaimsCache<TClaims extends CoreApiClaims> {
                 secondsToCache = this._cache.options.stdTTL!;
             }
 
-            // Cache the token until the above time
+            // Cache the claims until the above time
             this._traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
-            await this._cache.set(accessTokenHash, claims, secondsToCache);
+            const claimsText = this._serializer.serialize(claims);
+            await this._cache.set(accessTokenHash, claimsText, secondsToCache);
         }
     }
 }
