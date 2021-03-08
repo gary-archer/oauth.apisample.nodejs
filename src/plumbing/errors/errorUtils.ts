@@ -201,7 +201,7 @@ export class ErrorUtils {
 
         // Already handled
         if (exception instanceof ServerError) {
-            return exception as ServerError;
+            return exception;
         }
 
         return null;
@@ -213,7 +213,7 @@ export class ErrorUtils {
     private static tryConvertToClientError(exception: any): ClientError | null {
 
         if (exception instanceof ClientError) {
-            return exception as ClientError;
+            return exception;
         }
 
         return null;
@@ -226,13 +226,13 @@ export class ErrorUtils {
 
         if (e.message) {
             return e.message;
-        } else {
-            const details = e.toString();
-            if (details !== {}.toString()) {
-                return details;
-            } else {
-                return '';
-            }
         }
+
+        const details = e.toString();
+        if (details !== {}.toString()) {
+            return details;
+        }
+
+        return '';
     }
 }
