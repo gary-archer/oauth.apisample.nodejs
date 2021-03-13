@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Before running this script, deploy certificates to the cluster:
+# Before running this script, deploy base certificate infrastructure to the cluster:
 # - git clone https://github.com/gary-archer/oauth.developmentcertificates
 # - cd kubernetes
 # - ./deploy.sh
@@ -20,7 +20,6 @@ npm install
 npm run buildRelease
 if [ $? -ne 0 ]
 then
-  echo "*** API build error ***"
   exit 1
 fi
 
@@ -30,7 +29,19 @@ fi
 docker build --no-cache -f kubernetes/Dockerfile -t demoapi:v1 .
 if [ $? -ne 0 ]
 then
-  echo "*** API docker build error ***"
+  exit 1
+fi
+
+#
+# Issue an SSL certificate for the API and a secret for its private key password
+# Files issued are then present in the data output of this command:
+# - kubectl get certificate demoapi-svc-internal-cert -o yaml
+#
+kubectl delete secret demoapi-pkcs12-password 2>/dev/null
+kubectl create secret generic demoapi-pkcs12-password --from-literal=password='Password1'
+kubectl apply -f kubernetes/internal-cert.yaml
+if [ $? -ne 0 ]
+then
   exit 1
 fi
 
@@ -39,11 +50,17 @@ fi
 #
 kubectl delete deploy/demoapi       2>/dev/null
 kubectl delete service/demoapi-svc  2>/dev/null
-kubectl apply -f kubernetes/internal-cert.yaml
 kubectl apply -f kubernetes/service.yaml
+if [ $? -ne 0 ]
+then
+  exit 1
+fi
+
+#
+# Expose the API to the host developer machine
+#
 kubectl apply -f kubernetes/ingress.yaml
 if [ $? -ne 0 ]
 then
-  echo "*** API deployment error ***"
   exit 1
 fi

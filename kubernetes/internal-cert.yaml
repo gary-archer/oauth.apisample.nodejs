@@ -16,3 +16,9 @@ spec:
   - demoapi-svc
   - demoapi-svc.default.svc
   - demoapi-svc.default.svc.cluster.local
+  keystores:
+    pkcs12:
+      create: true
+      passwordSecretRef:
+        name: demoapi-pkcs12-password
+        key: password

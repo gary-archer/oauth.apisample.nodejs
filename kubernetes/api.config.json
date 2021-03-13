@@ -1,8 +1,8 @@
 {
     "api": {
         "port": 8101,
-        "sslCertificateFileName": "",
-        "sslCertificatePassword": "",
+        "sslCertificateFileName": "./certs/keystore.p12",
+        "sslCertificatePassword": "Password1",
         "useProxy": false,
         "proxyUrl": "",
         "webTrustedOrigins": [

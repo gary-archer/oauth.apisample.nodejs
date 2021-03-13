@@ -1,6 +1,6 @@
 #
-# The load balancer for our NodeJS API, which exposes it over port 443
-# The below host name is configured on the host PC in the /etc/hosts file
+# Expose the demo API over port 443 if required
+# The below host name is then configured on the host PC in the /etc/hosts file
 #
 
 apiVersion: networking.k8s.io/v1
