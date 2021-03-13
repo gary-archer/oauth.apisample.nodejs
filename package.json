@@ -1,11 +1,11 @@
 {
   "name": "sampleapi",
   "version": "3.0.0",
-  "description": "An OAuth secured API with claims caching and targeted logging",
+  "description": "A NodeJS version of the Final OAuth secured API",
   "scripts": {
     "lint": "npx eslint . --ext .ts",
-    "start": "ts-node --files src/host/startup/app.ts",
-    "watch": "nodemon -e ts --exec \"npm run start\"",
+    "build": "ts-node --files src/host/startup/app.ts",
+    "start": "nodemon -e ts --exec \"npm run build\"",
     "buildRelease": "rimraf dist && tsc",
     "startRelease": "node dist/host/startup/app.js"
   },

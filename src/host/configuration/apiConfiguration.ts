@@ -6,9 +6,6 @@ export interface ApiConfiguration {
     // The port to listen on
     port: number;
 
-    // Whether to use SSL
-    useSsl: boolean;
-
     // The path to the SSL certificate PEM file
     sslCertificateFileName: string;
 

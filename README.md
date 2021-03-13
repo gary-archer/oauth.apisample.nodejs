@@ -26,3 +26,7 @@
 * The [Node Cache](https://github.com/mpneuried/nodecache) is used to cache API claims in memory
 * API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
 
+### SSL Certificates
+
+Certificates in the certs folder originate from the [OAuth Development Certificates](https://github.com/gary-archer/oauth.developmentcertificates) repository.\
+See that repository's README file for further details on how certificates were created.

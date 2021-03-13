@@ -6,7 +6,7 @@ import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
-import {SampleCustomClaimsProvider} from '../claims/SampleCustomClaimsProvider';
+import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
 
@@ -78,14 +78,11 @@ export class HttpServerConfiguration {
         const listenOptions = {
             port: this._configuration.api.port,
         };
-        const listenCallback = () => {
-            console.log(`API is listening on port ${listenOptions.port}`);
-        };
 
-        if (this._configuration.api.useSsl) {
+        if (this._configuration.api.sslCertificateFileName && this._configuration.api.sslCertificatePassword) {
 
             // Load certificate details
-            const pfxFile = await fs.readFile(`certs/${this._configuration.api.sslCertificateFileName}`);
+            const pfxFile = await fs.readFile(this._configuration.api.sslCertificateFileName);
             const serverOptions = {
                 pfx: pfxFile,
                 passphrase: this._configuration.api.sslCertificatePassword,
@@ -93,12 +90,16 @@ export class HttpServerConfiguration {
 
             // Start listening over HTTPS
             const httpsServer = https.createServer(serverOptions, this._expressApp);
-            httpsServer.listen(listenOptions, listenCallback);
+            httpsServer.listen(listenOptions, () => {
+                console.log(`API is listening on HTTPS port ${listenOptions.port}`);
+            });
 
         } else {
 
-            // Start listening over HTTP
-            this._expressApp.listen(listenOptions.port, listenCallback);
+            // Otherwise listen over HTTP
+            this._expressApp.listen(listenOptions.port, () => {
+                console.log(`API is listening on HTTP port ${listenOptions.port}`);
+            });
         }
     }
 }

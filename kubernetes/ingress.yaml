@@ -6,20 +6,20 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nodeapi-ingress
+  name: demoapi-ingress
 spec:
   tls:
     - hosts:
-        - nodeapi.mycompany.com
-      secretName: mycompany-com-tls
+        - api.mycluster.com
+      secretName: mycluster-com-tls
   rules:
-    - host: nodeapi.mycompany.com
+    - host: api.mycluster.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: nodeapi-svc
+                name: demoapi-svc
                 port:
-                  number: 8000
+                  number: 8101
