@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
+import {ListenOptions} from 'node:net';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
 import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
@@ -74,8 +75,7 @@ export class HttpServerConfiguration {
      */
     public async start(): Promise<void> {
 
-        // Set common options
-        const listenOptions = {
+        const listenOptions: ListenOptions = {
             port: this._configuration.api.port,
         };
 
@@ -91,13 +91,13 @@ export class HttpServerConfiguration {
             // Start listening over HTTPS
             const httpsServer = https.createServer(serverOptions, this._expressApp);
             httpsServer.listen(listenOptions, () => {
-                console.log(`API is listening on HTTPS port ${listenOptions.port}`);
+                console.log(`API is listening on HTTPS port ${this._configuration.api.port}`);
             });
 
         } else {
 
             // Otherwise listen over HTTP
-            this._expressApp.listen(listenOptions.port, () => {
+            this._expressApp.listen(listenOptions, () => {
                 console.log(`API is listening on HTTP port ${listenOptions.port}`);
             });
         }

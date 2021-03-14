@@ -6,7 +6,7 @@ export interface ApiConfiguration {
     // The port to listen on
     port: number;
 
-    // The path to the SSL certificate PEM file
+    // The path to the SSL certificate P12 file
     sslCertificateFileName: string;
 
     // The SSL certificate's private key password
