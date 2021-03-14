@@ -29,7 +29,7 @@ RUN adduser -u 1001 -G apigroup -h /home/apiuser -D apiuser
 # Install production dependencies
 RUN npm install --production
 
-# Configure the Linux OS to trust the Cluster root certificate, to enable calls inside the cluster
+# Configure the Linux OS to trust the Cluster root certificate, to enable HTTPS calls inside the cluster
 # An example is calling a Kubernetes deployed Authorization Server at https://login.mycompany.com
 COPY certs/kubernetes/internal/svc.default.cluster.local.ca.pem /usr/local/share/ca-certificates/trusted.ca.pem
 RUN update-ca-certificates
