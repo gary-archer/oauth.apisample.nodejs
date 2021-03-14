@@ -28,5 +28,4 @@
 
 ### SSL Certificates
 
-Certificates in the certs folder originate from the [OAuth Development Certificates](https://github.com/gary-archer/oauth.developmentcertificates) repository.\
-See that repository's README file for further details on how certificates were created.
+* Certificates in the certs folder originate from the [OAuth Development Certificates](https://github.com/gary-archer/oauth.developmentcertificates) repository
