@@ -33,7 +33,7 @@ then
 fi
 
 #
-# Issue an SSL certificate for the API and a secret for its private key password
+# Issue an internal SSL certificate for the API and a secret for its private key password
 # Files issued are then present in the data output of this command:
 # - kubectl get certificate demoapi-svc-internal-cert -o yaml
 #
@@ -46,7 +46,7 @@ then
 fi
 
 #
-# Deploy the API to the cluster and expose it over the API endpoint
+# Deploy the API to the cluster
 #
 kubectl delete deploy/demoapi       2>/dev/null
 kubectl delete service/demoapi-svc  2>/dev/null
@@ -57,7 +57,7 @@ then
 fi
 
 #
-# Expose the API to the host developer machine
+# Expose the API on the host developer PC
 #
 kubectl apply -f kubernetes/ingress.yaml
 if [ $? -ne 0 ]
