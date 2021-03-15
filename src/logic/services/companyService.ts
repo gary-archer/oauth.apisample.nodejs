@@ -17,14 +17,14 @@ import {CompanyRepository} from '../repositories/companyRepository';
 export class CompanyService {
 
     private readonly _repository: CompanyRepository;
-    private readonly _claims: SampleCustomClaims;
+    private readonly _customClaims: SampleCustomClaims;
 
     public constructor(
         @inject(SAMPLETYPES.CompanyRepository) repository: CompanyRepository,
-        @inject(BASETYPES.CustomClaims) claims: CustomClaims) {
+        @inject(BASETYPES.CustomClaims) customClaims: CustomClaims) {
 
         this._repository = repository;
-        this._claims = claims as SampleCustomClaims;
+        this._customClaims = customClaims as SampleCustomClaims;
     }
 
     /*
@@ -60,11 +60,11 @@ export class CompanyService {
      */
     private _isUserAuthorizedForCompany(company: Company): boolean {
 
-        if (this._claims.isAdmin) {
+        if (this._customClaims.isAdmin) {
             return true;
         }
 
-        const found = this._claims.regionsCovered.find((c) => c === company.region);
+        const found = this._customClaims.regionsCovered.find((c) => c === company.region);
         return !!found;
     }
 

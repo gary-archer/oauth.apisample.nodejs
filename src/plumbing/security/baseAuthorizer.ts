@@ -16,14 +16,27 @@ import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler
 @injectable()
 export abstract class BaseAuthorizer {
 
+    private _unsecuredPaths: string[];
+
     public constructor() {
+        this._unsecuredPaths = [];
         this._setupCallbacks();
+    }
+
+    public setUnsecuredPaths(paths: string[]): void {
+        this._unsecuredPaths = paths;
     }
 
     /*
      * The entry point for implementing authorization
      */
     public async authorizeRequestAndGetClaims(request: Request, response: Response, next: NextFunction): Promise<void> {
+
+        // Bypass OAuth security for unsecured paths
+        if (this._unsecuredPaths.find((p) => request.originalUrl.toLowerCase().startsWith(p.toLowerCase()))) {
+            next();
+            return;
+        }
 
         // Get the container for this request
         const perRequestContainer = ChildContainerHelper.resolve(request);

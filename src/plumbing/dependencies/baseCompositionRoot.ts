@@ -31,6 +31,7 @@ export class BaseCompositionRoot {
 
     // Builder properties
     private _apiBasePath?: string;
+    private _unsecuredPaths: string[];
     private _loggingConfiguration?: LoggingConfiguration;
     private _loggerFactory?: LoggerFactory;
     private _loggerMiddleware?: LoggerMiddleware;
@@ -45,6 +46,7 @@ export class BaseCompositionRoot {
      */
     public constructor(container: Container) {
         this._container = container;
+        this._unsecuredPaths = [];
     }
 
     /*
@@ -57,6 +59,14 @@ export class BaseCompositionRoot {
             this._apiBasePath += '/';
         }
 
+        return this;
+    }
+
+    /*
+     * Allow some paths to bypass OAuth security
+     */
+    public addUnsecuredPath(unsecuredPath: string): BaseCompositionRoot {
+        this._unsecuredPaths.push(unsecuredPath);
         return this;
     }
 
@@ -178,6 +188,7 @@ export class BaseCompositionRoot {
 
         // Create the authorizer, as the entry point to validating tokens and looking up claims
         this._authorizer = new OAuthAuthorizer();
+        this._authorizer.setUnsecuredPaths(this._unsecuredPaths);
 
         // Singletons
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)

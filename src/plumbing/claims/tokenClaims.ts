@@ -1,4 +1,6 @@
 import {injectable} from 'inversify';
+import {BaseErrorCodes} from '../errors/baseErrorCodes';
+import {ErrorFactory} from '../errors/errorFactory';
 
 /*
  * Claims included in the JWT
@@ -11,6 +13,9 @@ export class TokenClaims {
     private _scopes: string[];
     private _expiry: number;
 
+    /*
+     * Read claims from the claims cache
+     */
     public static importData(data: any): TokenClaims {
         return new TokenClaims(data.subject, data.clientId, data.scopes.split(' '), data.expiry);
     }
@@ -20,6 +25,7 @@ export class TokenClaims {
         this._clientId = clientId;
         this._scopes = scopes;
         this._expiry = expiry;
+        this._setupCallbacks();
     }
 
     public get subject(): string {
@@ -38,6 +44,9 @@ export class TokenClaims {
         return this._expiry;
     }
 
+    /*
+     * Write data to the claims cache
+     */
     public exportData(): any {
 
         return {
@@ -46,5 +55,26 @@ export class TokenClaims {
             'scopes': this._scopes.join(' '),
             'expiry': this._expiry,
         };
+    }
+
+    /*
+     * Verify that we are allowed to access this type of data, via the scopes from the token
+     */
+    public verifyScope(requiredScope: string): void {
+
+        if (!this.scopes.some((s) => s.indexOf(requiredScope) !== -1)) {
+
+            throw ErrorFactory.createClientError(
+                403,
+                BaseErrorCodes.insufficientScope,
+                'Access token does not have a valid scope for this API endpoint');
+        }
+    }
+
+    /*
+     * Plumbing to ensure the this parameter is available
+     */
+    private _setupCallbacks(): void {
+        this.verifyScope = this.verifyScope.bind(this);
     }
 }
