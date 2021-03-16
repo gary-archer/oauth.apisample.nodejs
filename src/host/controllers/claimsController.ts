@@ -4,13 +4,13 @@ import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-e
  * A controller called during token issuing to ask the API for custom claim values
  * This is not used by Cognito and requires the ability for the Authorization Server to call the API
  */
-@controller('/users')
+@controller('/customclaims')
 export class ClaimsController extends BaseHttpController {
 
     /*
      * Return custom claims for the supplied subject value from the Authorization Server
      */
-    @httpGet('/:subject/claims')
+    @httpGet('/:subject')
     public async getCustomClaims(@requestParam('subject') subject: string): Promise<any> {
 
         if (subject.indexOf('admin') !== -1) {

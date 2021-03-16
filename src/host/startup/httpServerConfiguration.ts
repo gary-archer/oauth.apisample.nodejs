@@ -36,6 +36,7 @@ export class HttpServerConfiguration {
         // Use common code and give it any data it needs
         const base = await new BaseCompositionRoot(this._container)
             .useApiBasePath('/api/')
+            .addUnsecuredPath('/api/customclaims')
             .useDiagnostics(this._configuration.logging, this._loggerFactory)
             .useOAuth(this._configuration.oauth)
             .withCustomClaimsProvider(new SampleCustomClaimsProvider())

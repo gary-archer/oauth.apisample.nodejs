@@ -15,6 +15,8 @@ export class BaseErrorCodes {
 
     public static readonly tokenSigningKeysDownloadError = 'jwks_download_failure'
 
+    public static readonly insufficientScope = 'insufficient_scope';
+
     public static readonly userinfoFailure = 'userinfo_failure';
 
     public static readonly userInfoTokenExpired = 'invalid_token';

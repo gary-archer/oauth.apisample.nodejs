@@ -115,9 +115,6 @@ export class OAuthAuthenticator {
                 const scopes = this._getClaim(tokenData.scope, 'scope').split(' ');
                 const expiry = parseInt(this._getClaim((tokenData as any).exp, 'exp'), 10);
 
-                // Make sure the token is for this API
-                this._verifyScopes(scopes);
-
                 // Return the claims object
                 return new TokenClaims(subject, clientId, scopes, expiry);
 
@@ -156,9 +153,6 @@ export class OAuthAuthenticator {
             const clientId = this._getClaim(tokenData.client_id, 'clientId');
             const scopes = this._getClaim(tokenData.scope, 'scope').split(' ');
             const expiry = parseInt(this._getClaim(tokenData.exp, 'exp'), 10);
-
-            // Make sure the token is for this API
-            this._verifyScopes(scopes);
 
             // Return the token claims
             return new TokenClaims(subject, clientId, scopes, expiry);
@@ -232,16 +226,6 @@ export class OAuthAuthenticator {
                 throw ErrorFactory.createClient401Error(details);
             }
         });
-    }
-
-    /*
-     * Make sure the token is for this API
-     */
-    private _verifyScopes(scopes: string[]) {
-
-        if (!scopes.find((s) => s === this._configuration.requiredScope)) {
-            throw ErrorFactory.createClient401Error('Access token does not have a valid scope for this API');
-        }
     }
 
     /*
