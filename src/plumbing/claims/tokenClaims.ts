@@ -9,7 +9,6 @@ import {ErrorFactory} from '../errors/errorFactory';
 export class TokenClaims {
 
     private _subject: string;
-    private _clientId: string;
     private _scopes: string[];
     private _expiry: number;
 
@@ -17,12 +16,11 @@ export class TokenClaims {
      * Read claims from the claims cache
      */
     public static importData(data: any): TokenClaims {
-        return new TokenClaims(data.subject, data.clientId, data.scopes.split(' '), data.expiry);
+        return new TokenClaims(data.subject, data.scopes.split(' '), data.expiry);
     }
 
-    public constructor(subject: string, clientId: string, scopes: string[], expiry: number) {
+    public constructor(subject: string, scopes: string[], expiry: number) {
         this._subject = subject;
-        this._clientId = clientId;
         this._scopes = scopes;
         this._expiry = expiry;
         this._setupCallbacks();
@@ -30,10 +28,6 @@ export class TokenClaims {
 
     public get subject(): string {
         return this._subject;
-    }
-
-    public get clientId(): string {
-        return this._clientId;
     }
 
     public get scopes(): string[] {
@@ -51,7 +45,6 @@ export class TokenClaims {
 
         return {
             'subject': this._subject,
-            'clientId': this._clientId,
             'scopes': this._scopes.join(' '),
             'expiry': this._expiry,
         };
