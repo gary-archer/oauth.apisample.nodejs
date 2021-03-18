@@ -74,7 +74,6 @@ export class LogEntryImpl implements LogEntry {
      */
     public setIdentity(claims: TokenClaims): void {
         this._data.userOAuthId = claims.subject;
-        this._data.clientOAuthId = claims.clientId;
     }
 
     /*

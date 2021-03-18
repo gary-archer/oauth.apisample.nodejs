@@ -34,9 +34,6 @@ export class LogEntryData {
     // The calling application name
     public clientApplicationName: string;
 
-    // The client id from the OAuth 2.0 access token
-    public clientOAuthId: string;
-
     // The subject claim from the OAuth 2.0 access token
     public userOAuthId: string;
 
@@ -85,7 +82,6 @@ export class LogEntryData {
         this.resourceId = '';
         this.requestPath = '';
         this.clientApplicationName = '';
-        this.clientOAuthId = '';
         this.userOAuthId = '';
         this.statusCode = 0;
         this.millisecondsTaken = 0;
@@ -120,7 +116,6 @@ export class LogEntryData {
         this.resourceId = parent.resourceId;
         this.requestPath = parent.requestPath;
         this.clientApplicationName = parent.clientApplicationName;
-        this.clientOAuthId = parent.clientOAuthId;
         this.userOAuthId = parent.userOAuthId;
         this.correlationId = parent.correlationId;
         this.sessionId = parent.sessionId;
@@ -157,7 +152,6 @@ export class LogEntryData {
         this._outputString((x) => output.resourceId = x, this.resourceId);
         this._outputString((x) => output.requestPath = x, this.requestPath);
         this._outputString((x) => output.clientApplicationName = x, this.clientApplicationName);
-        this._outputString((x) => output.clientOAuthId = x, this.clientOAuthId);
         this._outputString((x) => output.userOAuthId = x, this.userOAuthId);
         this._outputNumber((x) => output.statusCode = x, this.statusCode);
         this._outputString((x) => output.errorCode = x, this.errorCode);
