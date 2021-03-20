@@ -1,12 +1,6 @@
 #!/bin/bash
 
 #
-# Before running this script, deploy base certificate infrastructure to the cluster:
-# - git clone https://github.com/gary-archer/oauth.developmentcertificates
-# - cd kubernetes
-# - ./deploy.sh
-
-#
 # Use the Minikube Docker Daemon rather than that of Docker Desktop for Mac
 #
 minikube profile api
@@ -18,8 +12,9 @@ eval $(minikube docker-env)
 cd ..
 npm install
 npm run buildRelease
-if [ $? -ne 0 ]
+if [ $? -ne 0 ];
 then
+  echo "API build problem encountered"
   exit 1
 fi
 
@@ -27,8 +22,9 @@ fi
 # Build the API's docker image
 #
 docker build --no-cache -f kubernetes/Dockerfile -t demoapi:v1 .
-if [ $? -ne 0 ]
+if [ $? -ne 0 ];
 then
+  echo "API docker build problem encountered"
   exit 1
 fi
 
@@ -40,8 +36,9 @@ fi
 kubectl delete secret demoapi-pkcs12-password 2>/dev/null
 kubectl create secret generic demoapi-pkcs12-password --from-literal=password='Password1'
 kubectl apply -f kubernetes/internal-cert.yaml
-if [ $? -ne 0 ]
+if [ $? -ne 0 ];
 then
+  echo "API internal certificate problem encountered"
   exit 1
 fi
 
@@ -51,16 +48,22 @@ fi
 kubectl delete deploy/demoapi       2>/dev/null
 kubectl delete service/demoapi-svc  2>/dev/null
 kubectl apply -f kubernetes/service.yaml
-if [ $? -ne 0 ]
+if [ $? -ne 0 ];
 then
+  echo "API service deployment problem encountered"
   exit 1
 fi
 
 #
-# Expose the API on the host developer PC
+# Expose the API on the host developer PC unless we are using an API Gateway, in which case a no-ingress script parameter is provided
 #
-kubectl apply -f kubernetes/ingress.yaml
-if [ $? -ne 0 ]
+kubectl delete -f kubernetes/ingress.yaml
+if [ "$1" != "no-ingress" ];
 then
-  exit 1
+  kubectl apply -f kubernetes/ingress.yaml
+  if [ $? -ne 0 ];
+    then
+      echo "API ingress problem encountered"
+      exit 1
+  fi
 fi
