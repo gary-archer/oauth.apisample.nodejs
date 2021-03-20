@@ -1,6 +1,8 @@
+import {inject, injectable} from 'inversify';
 import {JwksClient, SigningKey} from 'jwks-rsa';
 import {decode, verify, VerifyOptions} from 'jsonwebtoken';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {BASETYPES} from '../../dependencies/baseTypes';
 import {ErrorFactory} from '../../errors/errorFactory';
 import {ErrorUtils} from '../../errors/errorUtils';
 import {TokenValidator} from './tokenValidator';
@@ -8,12 +10,16 @@ import {TokenValidator} from './tokenValidator';
 /*
  * An implementation that validates access tokens as JWTs
  */
+@injectable()
 export class JwtValidator implements TokenValidator {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _jwksClient: JwksClient;
 
-    public constructor(configuration: OAuthConfiguration, jwksClient: JwksClient) {
+    public constructor(
+        @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
+        @inject(BASETYPES.JwksClient) jwksClient: JwksClient) {
+
         this._jwksClient = jwksClient;
         this._configuration = configuration;
     }

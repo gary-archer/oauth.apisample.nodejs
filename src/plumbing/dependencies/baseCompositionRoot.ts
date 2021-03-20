@@ -4,8 +4,8 @@ import {getRawMetadata} from 'inversify-express-utils';
 import jwksRsa, {JwksClient} from 'jwks-rsa';
 import {ClaimsCache} from '../claims/claimsCache';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
+import {BaseClaims} from '../claims/baseClaims';
 import {CustomClaims} from '../claims/customClaims';
-import {TokenClaims} from '../claims/tokenClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
@@ -115,12 +115,10 @@ export class BaseCompositionRoot {
         this._exceptionHandler = new UnhandledExceptionHandler(this._loggingConfiguration!);
         this._registerLoggingDependencies();
 
-        // Register OAuth specific dependencies for Entry Point APIs
-        if (this._oauthConfiguration) {
-            await this._registerOAuthDependencies();
-        }
+        // Register OAuth specific dependencies
+        await this._registerOAuthDependencies();
 
-        // Register claims dependencies for all APIs
+        // Register claims dependencies
         this._registerClaimsDependencies();
         return this;
     }
@@ -235,9 +233,9 @@ export class BaseCompositionRoot {
      */
     private _registerClaimsDependencies(): void {
 
+        // Register the singleton cache if using claims caching
         if (this._oauthConfiguration!.strategy === 'claims-caching') {
 
-            // Register the singleton cache used to store claims results after authentication processing
             const claimsCache = new ClaimsCache(
                 this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
                 this._customClaimsProvider!,
@@ -245,14 +243,14 @@ export class BaseCompositionRoot {
 
             this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
                 .toConstantValue(claimsCache);
-
-            // The point of claims caching is to use custom claims from the API's own data, so register a provider
-            this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
-                .toConstantValue(this._customClaimsProvider!);
         }
 
+        // Register an object to issue custom claims from the API's own data
+        this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
+            .toConstantValue(this._customClaimsProvider!);
+
         // Register dummy claims values that are overridden later by the authorizer middleware
-        this._container.bind<TokenClaims>(BASETYPES.TokenClaims)
+        this._container.bind<BaseClaims>(BASETYPES.BaseClaims)
             .toConstantValue({} as any);
         this._container.bind<UserInfoClaims>(BASETYPES.UserInfoClaims)
             .toConstantValue({} as any);

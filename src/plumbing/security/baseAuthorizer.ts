@@ -3,7 +3,7 @@ import {injectable} from 'inversify';
 import {ApiClaims} from '../claims/apiClaims';
 import {CustomClaims} from '../claims/customClaims';
 import {CustomClaimsProvider}  from '../claims/customClaimsProvider';
-import {TokenClaims} from '../claims/tokenClaims';
+import {BaseClaims} from '../claims/baseClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper';
@@ -51,7 +51,7 @@ export abstract class BaseAuthorizer {
             const claims = await this.execute(request, customClaimsProvider, logEntry);
 
             // Bind claims objects to this requests's child container so that they are injectable into business logic
-            perRequestContainer.bind<TokenClaims>(BASETYPES.TokenClaims).toConstantValue(claims.token);
+            perRequestContainer.bind<BaseClaims>(BASETYPES.BaseClaims).toConstantValue(claims.token);
             perRequestContainer.bind<UserInfoClaims>(BASETYPES.UserInfoClaims).toConstantValue(claims.userInfo);
             perRequestContainer.bind<CustomClaims>(BASETYPES.CustomClaims).toConstantValue(claims.custom);
 

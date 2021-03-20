@@ -5,7 +5,7 @@ import {Company} from '../../logic/entities/company';
 import {CompanyTransactions} from '../../logic/entities/companyTransactions';
 import {ErrorCodes} from '../../logic/errors/errorCodes';
 import {CompanyService} from '../../logic/services/companyService';
-import {TokenClaims} from '../../plumbing/claims/tokenClaims';
+import {BaseClaims} from '../../plumbing/claims/baseClaims';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory';
 
@@ -16,11 +16,11 @@ import {ErrorFactory} from '../../plumbing/errors/errorFactory';
 export class CompanyController extends BaseHttpController {
 
     private readonly _service: CompanyService;
-    private readonly _claims: TokenClaims;
+    private readonly _claims: BaseClaims;
 
     public constructor(
         @inject(SAMPLETYPES.CompanyService) service: CompanyService,
-        @inject(BASETYPES.TokenClaims) claims: TokenClaims) {
+        @inject(BASETYPES.BaseClaims) claims: BaseClaims) {
 
         super();
         this._service = service;

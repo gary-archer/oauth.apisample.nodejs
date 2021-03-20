@@ -12,30 +12,14 @@ export class SampleCustomClaimsProvider extends CustomClaimsProvider {
      * My Authorization Server setup currently sends the user's email as the subject claim
      */
     public async supplyCustomClaimsFromSubject(subject: any): Promise<SampleCustomClaims> {
-
-        return await this.supplyCustomClaims( {}, { email: subject } ) as SampleCustomClaims;
+        return await this._supplyCustomClaims(subject) as SampleCustomClaims;
     }
 
     /*
-     * For a real implementation the custom claims would be looked up from the API's own data
-     * When using the StandardAuthorizer this is called at the time of token issuance
      * When using the ClaimsCachingAuthorizer this is called when the API first receives the access token
      */
     protected async supplyCustomClaims(tokenData: any, userInfoData: any): Promise<CustomClaims> {
-
-        const isAdmin = userInfoData.email.toLowerCase().indexOf('admin') !== -1;
-        if (isAdmin) {
-
-            // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
-            // The CompanyService class will use these claims to return all transaction data
-            return new SampleCustomClaims('20116', 'admin', []);
-
-        } else {
-
-            // For other users we hard code this user id, assign a role of 'user' and grant access to only one region
-            // The CompanyService class will use these claims to return only transactions for the US region
-            return new SampleCustomClaims('10345', 'user', ['USA']);
-        }
+        return await this._supplyCustomClaims(userInfoData.email) as SampleCustomClaims;
     }
 
     /*
@@ -54,5 +38,26 @@ export class SampleCustomClaimsProvider extends CustomClaimsProvider {
      */
     protected deserializeCustomClaimsFromCache(data: any): CustomClaims {
         return SampleCustomClaims.importData(data);
+    }
+
+    /*
+     * Simulate some API logic for identifying the user from OAuth data, via either the subject or email claims
+     * A real API would then do a database lookup to find the user's custom claims
+     */
+    private async _supplyCustomClaims(email: string): Promise<CustomClaims> {
+
+        const isAdmin = email.toLowerCase().indexOf('admin') !== -1;
+        if (isAdmin) {
+
+            // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
+            // The CompanyService class will use these claims to return all transaction data
+            return new SampleCustomClaims('20116', 'admin', []);
+
+        } else {
+
+            // For other users we hard code this user id, assign a role of 'user' and grant access to only one region
+            // The CompanyService class will use these claims to return only transactions for the US region
+            return new SampleCustomClaims('10345', 'user', ['USA']);
+        }
     }
 }

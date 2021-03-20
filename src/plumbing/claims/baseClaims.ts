@@ -3,10 +3,10 @@ import {BaseErrorCodes} from '../errors/baseErrorCodes';
 import {ErrorFactory} from '../errors/errorFactory';
 
 /*
- * Claims included in the JWT
+ * Base claims that are always included in the JWT
  */
 @injectable()
-export class TokenClaims {
+export class BaseClaims {
 
     private _subject: string;
     private _scopes: string[];
@@ -15,8 +15,8 @@ export class TokenClaims {
     /*
      * Read claims from the claims cache
      */
-    public static importData(data: any): TokenClaims {
-        return new TokenClaims(data.subject, data.scopes.split(' '), data.expiry);
+    public static importData(data: any): BaseClaims {
+        return new BaseClaims(data.subject, data.scopes.split(' '), data.expiry);
     }
 
     public constructor(subject: string, scopes: string[], expiry: number) {

@@ -1,5 +1,7 @@
+import {inject, injectable} from 'inversify';
 import {custom, IntrospectionResponse, Issuer} from 'openid-client';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
+import {BASETYPES} from '../../dependencies/baseTypes';
 import {ErrorFactory} from '../../errors/errorFactory';
 import {ErrorUtils} from '../../errors/errorUtils';
 import {HttpProxy} from '../../utilities/httpProxy';
@@ -8,11 +10,12 @@ import {TokenValidator} from './tokenValidator';
 /*
  * An implementation that validates access tokens by introspecting them
  */
+@injectable()
 export class IntrospectionValidator implements TokenValidator {
 
     private readonly _configuration: OAuthConfiguration;
 
-    public constructor(configuration: OAuthConfiguration) {
+    public constructor(@inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration) {
         this._configuration = configuration;
     }
 

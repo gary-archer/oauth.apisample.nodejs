@@ -1,12 +1,14 @@
+import {injectable} from 'inversify';
 import {ErrorUtils} from '../errors/errorUtils';
 import {ApiClaims} from './apiClaims';
+import {BaseClaims} from './baseClaims';
 import {CustomClaims} from './customClaims';
-import {TokenClaims} from './tokenClaims';
 import {UserInfoClaims} from './userInfoClaims';
 
 /*
  * A default custom claims provider implementation
  */
+@injectable()
 export class CustomClaimsProvider {
 
     /*
@@ -56,7 +58,7 @@ export class CustomClaimsProvider {
         const data = JSON.parse(claimsText);
 
         return new ApiClaims(
-            TokenClaims.importData(data.token),
+            BaseClaims.importData(data.token),
             UserInfoClaims.importData(data.userInfo),
             this.deserializeCustomClaimsFromCache(data.custom),
         );
@@ -88,12 +90,12 @@ export class CustomClaimsProvider {
     /*
      * Read base claims from the supplied token data
      */
-    private _readBaseClaims(data: any): TokenClaims {
+    private _readBaseClaims(data: any): BaseClaims {
 
         const subject = this.getClaim(data.sub, 'sub');
         const scopes = this.getClaim(data.scope, 'scope').split(' ');
         const expiry = parseInt(this.getClaim(data.exp, 'exp'), 10);
-        return new TokenClaims(subject, scopes, expiry);
+        return new BaseClaims(subject, scopes, expiry);
     }
 
     /*

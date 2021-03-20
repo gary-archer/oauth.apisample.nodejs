@@ -1,6 +1,6 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
-import {TokenClaims} from '../../plumbing/claims/tokenClaims';
+import {BaseClaims} from '../../plumbing/claims/baseClaims';
 import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 
@@ -10,15 +10,15 @@ import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 @controller('/userinfo')
 export class UserInfoController extends BaseHttpController {
 
-    private readonly _tokenClaims: TokenClaims;
+    private readonly _baseClaims: BaseClaims;
     private readonly _userInfoClaims: UserInfoClaims;
 
     public constructor(
-        @inject(BASETYPES.TokenClaims) tokenClaims: TokenClaims,
+        @inject(BASETYPES.BaseClaims) baseClaims: BaseClaims,
         @inject(BASETYPES.UserInfoClaims) userInfoClaims: UserInfoClaims) {
         super();
 
-        this._tokenClaims = tokenClaims;
+        this._baseClaims = baseClaims;
         this._userInfoClaims = userInfoClaims;
     }
 
@@ -29,7 +29,7 @@ export class UserInfoController extends BaseHttpController {
     public getUserInfo(): any {
 
         // First check scopes
-        this._tokenClaims.verifyScope('profile');
+        this._baseClaims.verifyScope('profile');
 
         // Return OAuth profile data for display in the UI
         return {
