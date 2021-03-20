@@ -5,6 +5,11 @@
 #
 minikube profile api
 eval $(minikube docker-env)
+if [ $? -ne 0 ];
+then
+  echo "Minikube problem encountered - please ensure that the service is started"
+  exit 1
+fi
 
 #
 # Build the API's code
@@ -55,7 +60,7 @@ then
 fi
 
 #
-# Expose the API on the host developer PC unless we are using an API Gateway, in which case a no-ingress script parameter is provided
+# Expose the API on the host developer PC unless we are using an API Gateway
 #
 kubectl delete -f kubernetes/ingress.yaml
 if [ "$1" != "no-ingress" ];
