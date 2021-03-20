@@ -1,33 +1,34 @@
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
+import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
+import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 
 /*
  * A controller called during token issuing to ask the API for custom claim values
- * This is not used by Cognito and requires the ability for the Authorization Server to call the API
+ * This is not used by Cognito and requires an ability for the Authorization Server to reach out to the API
  */
 @controller('/customclaims')
 export class ClaimsController extends BaseHttpController {
 
+    private readonly _claimsProvider: SampleCustomClaimsProvider;
+
+    public constructor(claimsProvider: CustomClaimsProvider) {
+        super();
+        this._claimsProvider = claimsProvider as SampleCustomClaimsProvider;
+    }
+
     /*
-     * Return custom claims for the supplied subject value from the Authorization Server
+     * This is called during token issuance by the Authorization Server when using the StandardAuthorizer
+     * The custom claims are then included in the access token
      */
     @httpGet('/:subject')
     public async getCustomClaims(@requestParam('subject') subject: string): Promise<any> {
 
-        if (subject.indexOf('admin') !== -1) {
+        const customClaims = await this._claimsProvider.supplyCustomClaimsFromSubject(subject);
 
-            return {
-                user_database_id: 10345,
-                user_role: 'admin',
-                user_regions: [],
-            };
-
-        } else {
-
-            return {
-                user_database_id: 20112,
-                user_role: 'user',
-                user_regions: ['USA'],
-            };
-        }
+        return {
+            user_database_id: customClaims.userDatabaseId,
+            user_role: customClaims.userRole,
+            user_regions: customClaims.regionsCovered,
+        };
     }
 }

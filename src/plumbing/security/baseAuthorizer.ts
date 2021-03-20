@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {ApiClaims} from '../claims/apiClaims';
 import {CustomClaims} from '../claims/customClaims';
+import {CustomClaimsProvider}  from '../claims/customClaimsProvider';
 import {TokenClaims} from '../claims/tokenClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
@@ -42,11 +43,12 @@ export abstract class BaseAuthorizer {
 
         try {
 
-            // Get per request objects
+            // Resolve per request objects
+            const customClaimsProvider =  perRequestContainer.get<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider);
             const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
 
             // Do authorization processing for this request, to get all claims the API needs
-            const claims = await this.execute(request, logEntry);
+            const claims = await this.execute(request, customClaimsProvider, logEntry);
 
             // Bind claims objects to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<TokenClaims>(BASETYPES.TokenClaims).toConstantValue(claims.token);
@@ -68,8 +70,27 @@ export abstract class BaseAuthorizer {
         }
     }
 
+    /*
+     * Try to read the token from the authorization header
+     */
+    protected readAccessToken(request: Request): string | null {
+
+        const authorizationHeader = request.header('authorization');
+        if (authorizationHeader) {
+            const parts = authorizationHeader.split(' ');
+            if (parts.length === 2 && parts[0] === 'Bearer') {
+                return parts[1];
+            }
+        }
+
+        return null;
+    }
+
     // Concrete classes must override this
-    protected abstract execute(request: Request, logEntry: LogEntryImpl): Promise<ApiClaims>;
+    protected abstract execute(
+        request: Request,
+        customClaimsProvider: CustomClaimsProvider,
+        logEntry: LogEntryImpl): Promise<ApiClaims>;
 
     /*
      * Plumbing to ensure the this parameter is available

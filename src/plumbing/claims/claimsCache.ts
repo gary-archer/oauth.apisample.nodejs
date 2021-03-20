@@ -56,7 +56,7 @@ export class ClaimsCache {
 
         // Otherwise return cached claims
         this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
-        return this._serializer.deserialize(claimsText);
+        return this._serializer.deserializeFromCache(claimsText);
     }
 
     /*
@@ -81,7 +81,7 @@ export class ClaimsCache {
             // Cache the claims until the above time
             this._traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
-            const claimsText = this._serializer.serialize(claims);
+            const claimsText = this._serializer.serializeToCache(claims);
             await this._cache.set(accessTokenHash, claimsText, secondsToCache);
         }
     }

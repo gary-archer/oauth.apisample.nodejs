@@ -8,27 +8,23 @@ import {ChildContainerHelper} from '../dependencies/childContainerHelper';
 import {ErrorFactory} from '../errors/errorFactory';
 import {LogEntryImpl} from '../logging/logEntryImpl';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
-import {OAuthAuthenticator} from './oauthAuthenticator';
+import {OAuthClient} from './oauthClient';
 
 /*
- * The Express entry point for OAuth token validation and claims lookup
+ * An authorizer that manages claims in an extensible manner, with the ability to use claims from the API's own data
  */
 export class ClaimsCachingAuthorizer extends BaseAuthorizer {
-
-    private readonly _customClaimsProvider: CustomClaimsProvider;
-
-    public constructor(customClaimsProvider: CustomClaimsProvider) {
-        super();
-        this._customClaimsProvider = customClaimsProvider;
-    }
 
     /*
      * Do the OAuth processing via the middleware class
      */
-    protected async execute(request: Request, logEntry: LogEntryImpl): Promise<ApiClaims> {
+    protected async execute(
+        request: Request,
+        customClaimsProvider: CustomClaimsProvider,
+        logEntry: LogEntryImpl): Promise<ApiClaims> {
 
         // First read the access token
-        const accessToken = this._readAccessToken(request);
+        const accessToken = super.readAccessToken(request);
         if (!accessToken) {
             throw ErrorFactory.createClient401Error('No access token was supplied in the bearer header');
         }
@@ -48,40 +44,23 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
         // This ensures that any errors and performance in this area are reported separately to business logic
         const authorizationLogEntry = logEntry.createChild('authorizer');
 
-        // Resolve the authenticator for this request
-        const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
+        // Get an OAuth client for this request
+        const client = perRequestContainer.get<OAuthClient>(BASETYPES.OAuthClient);
 
         // Validate the token and read token claims
-        const tokenClaims = await authenticator.validateToken(accessToken);
+        const tokenData = await client.validateToken(accessToken);
 
         // Do the work for user info lookup
-        const userInfoClaims = await authenticator.getUserInfo(accessToken);
+        const userInfoData = await client.getUserInfo(accessToken);
 
-        // Add custom claims from the API's own data if needed
-        const customClaims = await this._customClaimsProvider.getCustomClaims(tokenClaims, userInfoClaims);
+        // Ask the provider to supply claims not in the token and then create the final claims object
+        const claims = await customClaimsProvider.supplyClaims(tokenData, userInfoData);
 
         // Cache the claims against the token hash until the token's expiry time
-        const claims = new ApiClaims(tokenClaims, userInfoClaims, customClaims);
         await cache.addClaimsForToken(accessTokenHash, claims);
 
         // Finish logging here, and note that on exception the logging framework disposes the entry instead
         authorizationLogEntry.dispose();
         return claims;
-    }
-
-    /*
-     * Try to read the token from the authorization header
-     */
-    private _readAccessToken(request: Request): string | null {
-
-        const authorizationHeader = request.header('authorization');
-        if (authorizationHeader) {
-            const parts = authorizationHeader.split(' ');
-            if (parts.length === 2 && parts[0] === 'Bearer') {
-                return parts[1];
-            }
-        }
-
-        return null;
     }
 }

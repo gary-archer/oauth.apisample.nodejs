@@ -1,8 +1,6 @@
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
 import {CustomClaims} from '../../plumbing/claims/customClaims';
 import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
-import {TokenClaims} from '../../plumbing/claims/tokenClaims';
-import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 
 /*
  * An example of including domain specific details in cached claims
@@ -10,27 +8,51 @@ import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 export class SampleCustomClaimsProvider extends CustomClaimsProvider {
 
     /*
-     * An example of how custom claims can be included
+     * When using the StandardAuthorizer this is called at the time of token issuance by the ClaimsController
+     * My Authorization Server setup currently sends the user's email as the subject claim
      */
-    public async getCustomClaims(token: TokenClaims, userInfo: UserInfoClaims): Promise<CustomClaims> {
+    public async supplyCustomClaimsFromSubject(subject: any): Promise<SampleCustomClaims> {
 
-        // A real implementation would look up the database user id from the subject and / or email claim
-        const email = userInfo.email;
-        const userDatabaseId = '10345';
+        return await this.supplyCustomClaims( {}, { email: subject } ) as SampleCustomClaims;
+    }
 
-        // Our blog's code samples have two fixed users and we use the below mock implementation:
-        // - guestadmin@mycompany.com is an admin and sees all data
-        // - guestuser@mycompany.com is not an admin and only sees data for the USA region
-        const isAdmin = email.toLowerCase().indexOf('admin') !== -1;
-        const regionsCovered = isAdmin? [] : ['USA'];
+    /*
+     * For a real implementation the custom claims would be looked up from the API's own data
+     * When using the StandardAuthorizer this is called at the time of token issuance
+     * When using the ClaimsCachingAuthorizer this is called when the API first receives the access token
+     */
+    protected async supplyCustomClaims(tokenData: any, userInfoData: any): Promise<CustomClaims> {
 
-        return new SampleCustomClaims(userDatabaseId, isAdmin, regionsCovered);
+        const isAdmin = userInfoData.email.toLowerCase().indexOf('admin') !== -1;
+        if (isAdmin) {
+
+            // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions
+            // The CompanyService class will use these claims to return all transaction data
+            return new SampleCustomClaims('20116', 'admin', []);
+
+        } else {
+
+            // For other users we hard code this user id, assign a role of 'user' and grant access to only one region
+            // The CompanyService class will use these claims to return only transactions for the US region
+            return new SampleCustomClaims('10345', 'user', ['USA']);
+        }
+    }
+
+    /*
+     * When using the StandardAuthorizer we read all custom claims directly from the token
+     */
+    protected readCustomClaims(tokenData: any): CustomClaims {
+
+        const userId = this.getClaim(tokenData.user_role, 'user_id');
+        const role = this.getClaim(tokenData.user_role, 'user_role');
+        const regionsCovered = this.getClaim(tokenData.user_regions, 'user_regions').split(' ');
+        return new SampleCustomClaims(userId, role, regionsCovered);
     }
 
     /*
      * An override to load custom claims when they are read from the cache
      */
-    protected deserializeCustomClaims(data: any): CustomClaims {
+    protected deserializeCustomClaimsFromCache(data: any): CustomClaims {
         return SampleCustomClaims.importData(data);
     }
 }

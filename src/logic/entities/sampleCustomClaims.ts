@@ -6,17 +6,17 @@ import {CustomClaims} from '../../plumbing/claims/customClaims';
 export class SampleCustomClaims extends CustomClaims {
 
     private _userDatabaseId: string;
-    private _isAdmin: boolean;
+    private _userRole: string;
     private _regionsCovered: string[];
 
     public static importData(data: any): SampleCustomClaims {
-        return new SampleCustomClaims(data.userDatabaseId, data.isAdmin, data.regionsCovered);
+        return new SampleCustomClaims(data.userDatabaseId, data.userRole, data.regionsCovered);
     }
 
-    public constructor(userDatabaseId: string, isAdmin: boolean, regionsCovered: string[]) {
+    public constructor(userDatabaseId: string, userRole: string, regionsCovered: string[]) {
         super();
         this._userDatabaseId = userDatabaseId;
-        this._isAdmin = isAdmin;
+        this._userRole = userRole;
         this._regionsCovered = regionsCovered;
     }
 
@@ -24,8 +24,8 @@ export class SampleCustomClaims extends CustomClaims {
         return this._userDatabaseId;
     }
 
-    public get isAdmin(): boolean {
-        return this._isAdmin;
+    public get userRole(): string {
+        return this._userRole;
     }
 
     public get regionsCovered(): string[] {
@@ -36,7 +36,7 @@ export class SampleCustomClaims extends CustomClaims {
 
         return {
             'userDatabaseId': this._userDatabaseId,
-            'isAdmin': this._isAdmin,
+            'userRole': this._userRole,
             'regionsCovered': this._regionsCovered,
         };
     }

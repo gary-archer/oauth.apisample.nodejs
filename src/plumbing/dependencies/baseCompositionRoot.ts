@@ -16,8 +16,9 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
-import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
 import {ClaimsCachingAuthorizer} from '../oauth/claimsCachingAuthorizer';
+import {OAuthClient} from '../oauth/oauthClient';
+import {StandardAuthorizer} from '../oauth/standardAuthorizer';
 import {IntrospectionValidator} from '../oauth/token-validation/introspectionValidator';
 import {JwtValidator} from '../oauth/token-validation/jwtValidator';
 import {TokenValidator} from '../oauth/token-validation/tokenValidator';
@@ -31,13 +32,13 @@ export class BaseCompositionRoot {
     private readonly _container: Container;
     private _apiBasePath?: string;
     private _unsecuredPaths: string[];
+    private _oauthConfiguration?: OAuthConfiguration;
+    private _authorizer?: BaseAuthorizer;
+    private _customClaimsProvider?: CustomClaimsProvider;
     private _loggingConfiguration?: LoggingConfiguration;
     private _loggerFactory?: LoggerFactory;
     private _loggerMiddleware?: LoggerMiddleware;
     private _exceptionHandler?: UnhandledExceptionHandler;
-    private _oauthConfiguration?: OAuthConfiguration;
-    private _authorizer?: BaseAuthorizer;
-    private _customClaimsProvider?: CustomClaimsProvider;
     private _useProxy?: boolean;
     private _proxyUrl?: string;
 
@@ -68,18 +69,6 @@ export class BaseCompositionRoot {
     }
 
     /*
-     * Receive the logging configuration so that we can create objects related to logging and error handling
-     */
-    public useLogging(
-        loggingConfiguration: LoggingConfiguration,
-        loggerFactory: LoggerFactory): BaseCompositionRoot {
-
-        this._loggingConfiguration = loggingConfiguration;
-        this._loggerFactory = loggerFactory;
-        return this;
-    }
-
-    /*
      * Indicate that we're using OAuth and receive the configuration
      */
     public useOAuth(oauthConfiguration: OAuthConfiguration): BaseCompositionRoot {
@@ -92,6 +81,18 @@ export class BaseCompositionRoot {
      */
     public withCustomClaimsProvider(customClaimsProvider: CustomClaimsProvider): BaseCompositionRoot {
         this._customClaimsProvider = customClaimsProvider;
+        return this;
+    }
+
+    /*
+     * Receive the logging configuration so that we can create objects related to logging and error handling
+     */
+    public withLogging(
+        loggingConfiguration: LoggingConfiguration,
+        loggerFactory: LoggerFactory): BaseCompositionRoot {
+
+        this._loggingConfiguration = loggingConfiguration;
+        this._loggerFactory = loggerFactory;
         return this;
     }
 
@@ -186,14 +187,13 @@ export class BaseCompositionRoot {
 
             // Create an authorizer for Cognito, which looks up claims within the API
             // This is used when the Authorization Server does not support custom claims in the desired manner
-            this._authorizer = new ClaimsCachingAuthorizer(this._customClaimsProvider!);
+            this._authorizer = new ClaimsCachingAuthorizer();
 
         } else {
 
             // Create a standard authorizer, which receives all claims from the access token
-            // This is used when the Authorization Server has advanced capabilities to get claims separately per API
-            // this._authorizer = new ClaimsCachingAuthorizer(this._customClaimsProvider);
-            throw new Error('not yet implemented');
+            // This is used when the Authorization Server has advanced capabilities to reach out to the API for claims
+            this._authorizer = new StandardAuthorizer();
         }
 
         // Allow anonymous access when needed
@@ -203,9 +203,9 @@ export class BaseCompositionRoot {
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
             .toConstantValue(this._oauthConfiguration!);
 
-        // The authenticator object is created per request
-        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
-            .to(OAuthAuthenticator).inRequestScope();
+        // The OAuth client object is created per request
+        this._container.bind<OAuthClient>(BASETYPES.OAuthClient)
+            .to(OAuthClient).inRequestScope();
 
         // Wire up the token validator depending on the strategy
         if (this._oauthConfiguration!.tokenValidationStrategy === 'introspection') {

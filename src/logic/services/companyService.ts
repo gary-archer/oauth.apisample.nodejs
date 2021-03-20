@@ -60,10 +60,13 @@ export class CompanyService {
      */
     private _isUserAuthorizedForCompany(company: Company): boolean {
 
-        if (this._customClaims.isAdmin) {
+        // First authorize based on the user role
+        const isAdmin = this._customClaims.userRole.toLowerCase().indexOf('admin') !== -1;
+        if (isAdmin) {
             return true;
         }
 
+        // Next authorize based on a business rule that links the user to regional data
         const found = this._customClaims.regionsCovered.find((c) => c === company.region);
         return !!found;
     }

@@ -1,7 +1,5 @@
 import {inject, injectable} from 'inversify';
-import {custom, Issuer, UserinfoResponse} from 'openid-client';
-import {TokenClaims} from '../claims/tokenClaims';
-import {UserInfoClaims} from '../claims/userInfoClaims';
+import {custom, Issuer} from 'openid-client';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ErrorUtils} from '../errors/errorUtils';
@@ -11,10 +9,10 @@ import {using} from '../utilities/using';
 import {TokenValidator} from './token-validation/tokenValidator';
 
 /*
- * A class responsible for initiating calls to the Authorization Server
+ * An entry point class for initiating calls to the Authorization Server
  */
 @injectable()
-export class OAuthAuthenticator {
+export class OAuthClient {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _tokenValidator: TokenValidator;
@@ -33,7 +31,7 @@ export class OAuthAuthenticator {
     /*
      * Do the work of performing token validation via the injected class
      */
-    public async validateToken(accessToken: string): Promise<TokenClaims> {
+    public async validateToken(accessToken: string): Promise<any> {
 
         return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
             return await this._tokenValidator.validateToken(accessToken);
@@ -44,7 +42,7 @@ export class OAuthAuthenticator {
      * Perform OAuth user info lookup when required
     * We supply a dummy client id to the library, since no client id should be needed for this OAuth message
      */
-    public async getUserInfo(accessToken: string): Promise<UserInfoClaims> {
+    public async getUserInfo(accessToken: string): Promise<any> {
 
         return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
 
@@ -60,15 +58,7 @@ export class OAuthAuthenticator {
 
             try {
                 // Get the user info
-                const response: UserinfoResponse = await client.userinfo(accessToken);
-
-                // Read user info claims
-                const givenName = this._getClaim(response.given_name, 'given_name');
-                const familyName = this._getClaim(response.family_name, 'family_name');
-                const email = this._getClaim(response.email, 'email');
-
-                // Return the claims object
-                return new UserInfoClaims(givenName, familyName, email);
+                return await client.userinfo(accessToken);
 
             } catch (e) {
 
@@ -76,17 +66,5 @@ export class OAuthAuthenticator {
                 throw ErrorUtils.fromUserInfoError(e, this._configuration.userInfoEndpoint);
             }
         });
-    }
-
-    /*
-     * Sanity checks when receiving claims to avoid failing later with a cryptic error
-     */
-    private _getClaim(claim: string | undefined, name: string): string {
-
-        if (!claim) {
-            throw ErrorUtils.fromMissingClaim(name);
-        }
-
-        return claim;
     }
 }

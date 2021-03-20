@@ -9,7 +9,7 @@ export const BASETYPES = {
     LogEntry: Symbol.for('LogEntry'),
     LoggerFactory: Symbol.for('LoggerFactory'),
     LoggingConfiguration: Symbol.for('Configuration'),
-    OAuthAuthenticator: Symbol.for('OAuthAuthenticator'),
+    OAuthClient: Symbol.for('OAuthClient'),
     OAuthConfiguration: Symbol.for('OAuthConfiguration'),
     TokenClaims: Symbol.for('TokenClaims'),
     TokenValidator: Symbol.for('TokenValidator'),

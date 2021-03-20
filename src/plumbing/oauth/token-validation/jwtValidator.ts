@@ -1,6 +1,5 @@
 import {JwksClient, SigningKey} from 'jwks-rsa';
 import {decode, verify, VerifyOptions} from 'jsonwebtoken';
-import {TokenClaims} from '../../claims/tokenClaims';
 import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
 import {ErrorFactory} from '../../errors/errorFactory';
 import {ErrorUtils} from '../../errors/errorUtils';
@@ -13,7 +12,6 @@ export class JwtValidator implements TokenValidator {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _jwksClient: JwksClient;
-    private _tokenData: any;
 
     public constructor(configuration: OAuthConfiguration, jwksClient: JwksClient) {
         this._jwksClient = jwksClient;
@@ -23,7 +21,7 @@ export class JwtValidator implements TokenValidator {
     /*
      * The entry point for in memory token validation
      */
-    public async validateToken(accessToken: string): Promise<TokenClaims> {
+    public async validateToken(accessToken: string): Promise<any> {
 
         // First decoode the token without verifying it so that we get the key identifier from the JWT header
         const decoded = decode(accessToken, {complete: true}) as any;
@@ -36,15 +34,7 @@ export class JwtValidator implements TokenValidator {
         // Do the work to download JWKS keys and verify the JWT
         const keyIdentifier = decoded.header.kid;
         const tokenSigningPublicKey = await this._downloadJwksKeyForKeyIdentifier(keyIdentifier);
-        this._tokenData = await this._validateTokenInMemory(accessToken, tokenSigningPublicKey);
-
-        // Read protocol claims and use the immutable user id as the subject claim
-        const subject = this._getClaim(this._tokenData.sub, 'sub');
-        const scopes = this._getClaim(this._tokenData.scope, 'scope').split(' ');
-        const expiry = parseInt(this._getClaim(this._tokenData.exp, 'exp'), 10);
-
-        // Return the token claims
-        return new TokenClaims(subject, scopes, expiry);
+        return await this._validateTokenInMemory(accessToken, tokenSigningPublicKey);
     }
 
     /*
@@ -93,17 +83,5 @@ export class JwtValidator implements TokenValidator {
 
             throw ErrorFactory.createClient401Error(details);
         }
-    }
-
-    /*
-     * Sanity checks when receiving claims to avoid failing later with a cryptic error
-     */
-    private _getClaim(claim: string | undefined, name: string): string {
-
-        if (!claim) {
-            throw ErrorUtils.fromMissingClaim(name);
-        }
-
-        return claim;
     }
 }
