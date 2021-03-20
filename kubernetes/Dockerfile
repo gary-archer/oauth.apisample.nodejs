@@ -22,6 +22,9 @@ COPY kubernetes/api.config.json /usr/api/
 COPY package*.json              /usr/api/
 COPY tsconfig.json              /usr/api/
 
+# Our code currently requires a logs folder
+RUN mkdir /usr/api/logs
+
 # Create a low privilege user
 RUN addgroup -g 1001 apigroup
 RUN adduser -u 1001 -G apigroup -h /home/apiuser -D apiuser
