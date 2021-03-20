@@ -62,7 +62,7 @@ fi
 #
 # Expose the API on the host developer PC unless we are using an API Gateway
 #
-kubectl delete -f kubernetes/ingress.yaml
+kubectl delete -f kubernetes/ingress.yaml 2>/dev/null
 if [ "$1" != "no-ingress" ];
 then
   kubectl apply -f kubernetes/ingress.yaml
