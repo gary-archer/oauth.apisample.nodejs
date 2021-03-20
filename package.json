@@ -20,7 +20,7 @@
     "inversify-express-utils": "^6.3.2",
     "js-sha256": "^0.9.0",
     "jsonwebtoken": "^8.5.1",
-    "jwk-to-pem": "^2.0.4",
+    "jwks-rsa": "^2.0.0",
     "node-cache": "^5.1.2",
     "openid-client": "^4.2.1",
     "reflect-metadata": "^0.1.13",

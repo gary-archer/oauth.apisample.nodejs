@@ -1,7 +1,6 @@
 import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
-import {ClaimsConfiguration} from '../configuration/claimsConfiguration';
 import {LoggerFactory} from '../logging/loggerFactory';
 import {ApiClaims} from './apiClaims';
 import {CustomClaimsProvider} from './customClaimsProvider';
@@ -20,7 +19,7 @@ export class ClaimsCache {
      * Create the cache at application startup
      */
     public constructor(
-        configuration: ClaimsConfiguration,
+        timeToLiveMinutes: number,
         serializer: CustomClaimsProvider,
         loggerFactory: LoggerFactory) {
 
@@ -29,7 +28,7 @@ export class ClaimsCache {
         this._traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
-        const defaultExpirySeconds = configuration.maxCacheMinutes * 60;
+        const defaultExpirySeconds = timeToLiveMinutes * 60;
         this._cache = new NodeCache({
             stdTTL: defaultExpirySeconds,
         });

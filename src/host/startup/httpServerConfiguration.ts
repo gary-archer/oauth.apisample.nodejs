@@ -37,10 +37,10 @@ export class HttpServerConfiguration {
         const base = await new BaseCompositionRoot(this._container)
             .useApiBasePath('/api/')
             .addUnsecuredPath('/api/customclaims')
-            .useDiagnostics(this._configuration.logging, this._loggerFactory)
+            .useLogging(this._configuration.logging, this._loggerFactory)
             .useOAuth(this._configuration.oauth)
             .withCustomClaimsProvider(new SampleCustomClaimsProvider())
-            .useClaimsCaching(this._configuration.claims)
+            .withProxyConfiguration(this._configuration.api.useProxy, this._configuration.api.proxyUrl)
             .register();
 
         // Register the API's own dependencies

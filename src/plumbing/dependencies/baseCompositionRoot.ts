@@ -1,12 +1,12 @@
 import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
+import jwksRsa, {JwksClient} from 'jwks-rsa';
 import {ClaimsCache} from '../claims/claimsCache';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
 import {CustomClaims} from '../claims/customClaims';
 import {TokenClaims} from '../claims/tokenClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
-import {ClaimsConfiguration} from '../configuration/claimsConfiguration';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
@@ -16,9 +16,11 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
-import {IssuerMetadata} from '../oauth/issuerMetadata';
 import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
-import {OAuthAuthorizer} from '../oauth/oauthAuthorizer';
+import {ClaimsCachingAuthorizer} from '../oauth/claimsCachingAuthorizer';
+import {IntrospectionValidator} from '../oauth/token-validation/introspectionValidator';
+import {JwtValidator} from '../oauth/token-validation/jwtValidator';
+import {TokenValidator} from '../oauth/token-validation/tokenValidator';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 
 /*
@@ -26,10 +28,7 @@ import {BaseAuthorizer} from '../security/baseAuthorizer';
  */
 export class BaseCompositionRoot {
 
-    // Constructor properties
     private readonly _container: Container;
-
-    // Builder properties
     private _apiBasePath?: string;
     private _unsecuredPaths: string[];
     private _loggingConfiguration?: LoggingConfiguration;
@@ -38,12 +37,10 @@ export class BaseCompositionRoot {
     private _exceptionHandler?: UnhandledExceptionHandler;
     private _oauthConfiguration?: OAuthConfiguration;
     private _authorizer?: BaseAuthorizer;
-    private _claimsConfiguration?: ClaimsConfiguration;
     private _customClaimsProvider?: CustomClaimsProvider;
+    private _useProxy?: boolean;
+    private _proxyUrl?: string;
 
-    /*
-     * Receive details common for all APIs
-     */
     public constructor(container: Container) {
         this._container = container;
         this._unsecuredPaths = [];
@@ -73,7 +70,7 @@ export class BaseCompositionRoot {
     /*
      * Receive the logging configuration so that we can create objects related to logging and error handling
      */
-    public useDiagnostics(
+    public useLogging(
         loggingConfiguration: LoggingConfiguration,
         loggerFactory: LoggerFactory): BaseCompositionRoot {
 
@@ -99,10 +96,12 @@ export class BaseCompositionRoot {
     }
 
     /*
-     * Receive information used for claims caching
+     * Apply HTTP proxy details for outgoing OAuth calls if configured
      */
-    public useClaimsCaching(claimsConfiguration: ClaimsConfiguration): BaseCompositionRoot {
-        this._claimsConfiguration = claimsConfiguration;
+    public withProxyConfiguration(useProxy: boolean, proxyUrl: string): BaseCompositionRoot {
+
+        this._useProxy = useProxy;
+        this._proxyUrl = proxyUrl;
         return this;
     }
 
@@ -182,23 +181,53 @@ export class BaseCompositionRoot {
      */
     private async _registerOAuthDependencies(): Promise<void> {
 
-        // Load Open Id Connect metadata
-        const issuerMetadata = new IssuerMetadata(this._oauthConfiguration!);
-        await issuerMetadata.load();
+        // Create the authorizer, which provides the overall algorithm for handling requests
+        if (this._oauthConfiguration!.strategy === 'claims-caching') {
 
-        // Create the authorizer, as the entry point to validating tokens and looking up claims
-        this._authorizer = new OAuthAuthorizer();
+            // Create an authorizer for Cognito, which looks up claims within the API
+            // This is used when the Authorization Server does not support custom claims in the desired manner
+            this._authorizer = new ClaimsCachingAuthorizer(this._customClaimsProvider!);
+
+        } else {
+
+            // Create a standard authorizer, which receives all claims from the access token
+            // This is used when the Authorization Server has advanced capabilities to get claims separately per API
+            // this._authorizer = new ClaimsCachingAuthorizer(this._customClaimsProvider);
+            throw new Error('not yet implemented');
+        }
+
+        // Allow anonymous access when needed
         this._authorizer.setUnsecuredPaths(this._unsecuredPaths);
 
         // Singletons
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
             .toConstantValue(this._oauthConfiguration!);
-        this._container.bind<IssuerMetadata>(BASETYPES.IssuerMetadata)
-            .toConstantValue(issuerMetadata);
 
-        // Per request objects
+        // The authenticator object is created per request
         this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
             .to(OAuthAuthenticator).inRequestScope();
+
+        // Wire up the token validator depending on the strategy
+        if (this._oauthConfiguration!.tokenValidationStrategy === 'introspection') {
+
+            // The introspection validator is created per request
+            this._container.bind<TokenValidator>(BASETYPES.TokenValidator)
+                .to(IntrospectionValidator).inRequestScope();
+
+        } else {
+
+            // The JWKS client caches JWKS keys so is a singleton
+            const jwksClient = jwksRsa({
+                jwksUri: this._oauthConfiguration!.jwksEndpoint,
+                proxy: this._useProxy ? this._proxyUrl : undefined,
+            });
+            this._container.bind<JwksClient>(BASETYPES.JwksClient)
+                .toConstantValue(jwksClient);
+
+            // The JWT validator is created per request
+            this._container.bind<TokenValidator>(BASETYPES.TokenValidator)
+                .to(JwtValidator).inRequestScope();
+        }
     }
 
     /*
@@ -206,17 +235,21 @@ export class BaseCompositionRoot {
      */
     private _registerClaimsDependencies(): void {
 
-        // Create the cache used to store claims results after authentication processing
-        const claimsCache = new ClaimsCache(
-            this._claimsConfiguration!,
-            this._customClaimsProvider!,
-            this._loggerFactory!);
+        if (this._oauthConfiguration!.strategy === 'claims-caching') {
 
-        // Singletons
-        this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
-            .toConstantValue(claimsCache);
-        this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
-            .toConstantValue(this._customClaimsProvider!);
+            // Register the singleton cache used to store claims results after authentication processing
+            const claimsCache = new ClaimsCache(
+                this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
+                this._customClaimsProvider!,
+                this._loggerFactory!);
+
+            this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
+                .toConstantValue(claimsCache);
+
+            // The point of claims caching is to use custom claims from the API's own data, so register a provider
+            this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
+                .toConstantValue(this._customClaimsProvider!);
+        }
 
         // Register dummy claims values that are overridden later by the authorizer middleware
         this._container.bind<TokenClaims>(BASETYPES.TokenClaims)

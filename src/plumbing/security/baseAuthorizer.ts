@@ -2,7 +2,6 @@ import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {ApiClaims} from '../claims/apiClaims';
 import {CustomClaims} from '../claims/customClaims';
-import {CustomClaimsProvider} from '../claims/customClaimsProvider';
 import {TokenClaims} from '../claims/tokenClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
@@ -11,7 +10,7 @@ import {LogEntryImpl} from '../logging/logEntryImpl';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 
 /*
- * A base authorizer class that could be used for different types of security, all of which use claims
+ * A base authorizer class that manages base handling related to logging and dependency resolution
  */
 @injectable()
 export abstract class BaseAuthorizer {
@@ -45,10 +44,9 @@ export abstract class BaseAuthorizer {
 
             // Get per request objects
             const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
-            const customClaimsProvider = perRequestContainer.get<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider);
 
-            // Do authorization processing for this request, to get claims
-            const claims = await this.execute(request, customClaimsProvider, logEntry);
+            // Do authorization processing for this request, to get all claims the API needs
+            const claims = await this.execute(request, logEntry);
 
             // Bind claims objects to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<TokenClaims>(BASETYPES.TokenClaims).toConstantValue(claims.token);
@@ -71,10 +69,7 @@ export abstract class BaseAuthorizer {
     }
 
     // Concrete classes must override this
-    protected abstract execute(
-        request: Request,
-        customClaimsProvider: CustomClaimsProvider,
-        logEntry: LogEntryImpl): Promise<ApiClaims>;
+    protected abstract execute(request: Request, logEntry: LogEntryImpl): Promise<ApiClaims>;
 
     /*
      * Plumbing to ensure the this parameter is available

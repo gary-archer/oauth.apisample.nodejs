@@ -1,67 +1,60 @@
 import {inject, injectable} from 'inversify';
-import {decode, verify, VerifyOptions} from 'jsonwebtoken';
-import jwkToPem from 'jwk-to-pem';
-import {Client, custom, IntrospectionResponse, Issuer, UserinfoResponse} from 'openid-client';
+import {custom, Issuer, UserinfoResponse} from 'openid-client';
 import {TokenClaims} from '../claims/tokenClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
-import {ErrorFactory} from '../errors/errorFactory';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntry} from '../logging/logEntry';
-import {PerformanceBreakdown} from '../logging/performanceBreakdown';
 import {HttpProxy} from '../utilities/httpProxy';
 import {using} from '../utilities/using';
-import {IssuerMetadata} from './issuerMetadata';
+import {TokenValidator} from './token-validation/tokenValidator';
 
 /*
- * The default authenticator does OAuth token handling and is used by public APIs
+ * A class responsible for initiating calls to the Authorization Server
  */
 @injectable()
 export class OAuthAuthenticator {
 
     private readonly _configuration: OAuthConfiguration;
-    private readonly _issuer: Issuer<Client>;
+    private readonly _tokenValidator: TokenValidator;
     private readonly _logEntry: LogEntry;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
-        @inject(BASETYPES.IssuerMetadata) metadata: IssuerMetadata,
+        @inject(BASETYPES.TokenValidator) tokenValidator: TokenValidator,
         @inject(BASETYPES.LogEntry) logEntry: LogEntry) {
 
         this._configuration = configuration;
-        this._issuer = metadata.issuer;
+        this._tokenValidator = tokenValidator;
         this._logEntry = logEntry;
     }
 
     /*
-     * Do OAuth work to perform token validation
+     * Do the work of performing token validation via the injected class
      */
     public async validateToken(accessToken: string): Promise<TokenClaims> {
 
-        // Validate the token and read token claims
-        const introspectionUrl = (this._issuer.metadata as any).introspection_endpoint;
-        if (introspectionUrl && this._configuration.clientId && this._configuration.clientSecret) {
-
-            // Use introspection if we can
-            return await this._introspectTokenAndGetTokenClaims(accessToken, introspectionUrl);
-        } else {
-
-            // Use in memory validation otherwise
-            return await this._validateTokenInMemoryAndGetTokenClaims(accessToken);
-        }
+        return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
+            return await this._tokenValidator.validateToken(accessToken);
+        });
     }
 
     /*
-     * Perform OAuth user info lookup
+     * Perform OAuth user info lookup when required
+    * We supply a dummy client id to the library, since no client id should be needed for this OAuth message
      */
     public async getUserInfo(accessToken: string): Promise<UserInfoClaims> {
 
         return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
 
-            // Create the Authorization Server client and note that a client id must be provided
-            const client = new this._issuer.Client({
-                client_id: this._configuration.clientId || 'x',
+            const issuer = new Issuer({
+                issuer: this._configuration.issuer,
+                userinfo_endpoint: this._configuration.userInfoEndpoint,
+            });
+
+            const client = new issuer.Client({
+                client_id: 'dummy',
             });
             client[custom.http_options] = HttpProxy.getOptions;
 
@@ -80,149 +73,7 @@ export class OAuthAuthenticator {
             } catch (e) {
 
                 // Sanitize user info errors to ensure they are reported clearly
-                throw ErrorUtils.fromUserInfoError(e, this._issuer.metadata.userinfo_endpoint!);
-            }
-        });
-    }
-
-    /*
-     * Validate the access token via introspection and populate claims
-     */
-    private async _introspectTokenAndGetTokenClaims(
-        accessToken: string,
-        introspectionUrl: string): Promise<TokenClaims> {
-
-        return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
-
-            // Create the Authorization Server client
-            const client = new this._issuer.Client({
-                client_id: this._configuration.clientId,
-                client_secret: this._configuration.clientSecret,
-            });
-            client[custom.http_options] = HttpProxy.getOptions;
-
-            try {
-
-                // Make a client request to do the introspection
-                const tokenData: IntrospectionResponse = await client.introspect(accessToken);
-                if (!tokenData.active) {
-                    throw ErrorFactory.createClient401Error('Access token introspection response inactive');
-                }
-
-                // Read token claims
-                const subject = this._getClaim((tokenData as any).sub, 'sub');
-                const scopes = this._getClaim(tokenData.scope, 'scope').split(' ');
-                const expiry = parseInt(this._getClaim((tokenData as any).exp, 'exp'), 10);
-
-                // Return the claims object
-                return new TokenClaims(subject, scopes, expiry);
-
-            } catch (e) {
-
-                // Sanitize introspection errors to ensure they are reported clearly
-                throw ErrorUtils.fromIntrospectionError(e, introspectionUrl);
-            }
-        });
-    }
-
-    /*
-     * Validate the access token in memory via the token signing public key
-     */
-    private async _validateTokenInMemoryAndGetTokenClaims(accessToken: string): Promise<TokenClaims> {
-
-        const breakdown = this._logEntry.createPerformanceBreakdown('validateToken');
-        return using (breakdown, async () => {
-
-            // First decoode the token without verifying it so that we get the key identifier
-            const decoded = decode(accessToken, {complete: true}) as any;
-            if (!decoded) {
-
-                // Indicate an invalid token if we cannot decode it
-                throw ErrorFactory.createClient401Error('Unable to decode received JWT');
-            }
-
-            // Download the token signing public key
-            const publicKey = await this._getTokenSigningPublicKey(decoded.header.kid, breakdown);
-
-            // Verify the token's digital signature
-            const tokenData = await this._validateJsonWebToken(accessToken, publicKey, breakdown);
-            console.log(tokenData);
-
-            // Read protocol claims and use the immutable user id as the subject claim
-            const subject = this._getClaim(tokenData.sub, 'sub');
-            const scopes = this._getClaim(tokenData.scope, 'scope').split(' ');
-            const expiry = parseInt(this._getClaim(tokenData.exp, 'exp'), 10);
-
-            // Return the token claims
-            return new TokenClaims(subject, scopes, expiry);
-        });
-    }
-
-    /*
-     * Download the public key with which our access token is signed
-     */
-    private async _getTokenSigningPublicKey(
-        tokenKeyIdentifier: string,
-        breakdown: PerformanceBreakdown): Promise<string> {
-
-        return using (breakdown.createChild('getTokenSigningPublicKey'), async () => {
-
-            try {
-                // Trigger a download of JWKS keys
-                this._issuer[custom.http_options] = HttpProxy.getOptions;
-                const keyStore = await this._issuer.keystore(true);
-
-                // Extend token data with central user info
-                const keys = keyStore.all();
-                const key = keys.find((k: any) => k.kid === tokenKeyIdentifier);
-                if (key) {
-
-                    // Convert to PEM format
-                    return jwkToPem(key);
-                }
-
-            } catch (e) {
-
-                // Report errors clearly
-                throw ErrorUtils.fromSigningKeyDownloadError(e, this._issuer.metadata.jwks_uri!);
-            }
-
-            // Indicate not found
-            throw ErrorFactory.createClient401Error(
-                `Key with identifier: ${tokenKeyIdentifier} not found in JWKS download`);
-        });
-    }
-
-    /*
-     * Call a third party library to do the token validation, and return token claims
-     */
-    private async _validateJsonWebToken(
-        accessToken: string,
-        tokenSigningPublicKey: string,
-        breakdown: PerformanceBreakdown): Promise<any> {
-
-        return using (breakdown.createChild('validateJsonWebToken'), async () => {
-
-            try {
-
-                // Verify the token's signature and issuer, and verify that it is not expired
-                const options: VerifyOptions = {
-                    issuer: this._issuer.metadata.issuer,
-                    algorithms: ['RS256'],
-                };
-
-                // On success return the claims JSON data
-                return verify(accessToken, tokenSigningPublicKey, options);
-
-            } catch (e) {
-
-                // Handle failures and capture the details
-                let details = 'JWT verification failed';
-                if (e.message) {
-                    details += ` : ${e.message}`;
-                }
-
-                throw ErrorFactory.createClient401Error(details);
+                throw ErrorUtils.fromUserInfoError(e, this._configuration.userInfoEndpoint);
             }
         });
     }

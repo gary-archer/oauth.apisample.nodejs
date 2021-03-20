@@ -13,15 +13,19 @@ import {OAuthAuthenticator} from './oauthAuthenticator';
 /*
  * The Express entry point for OAuth token validation and claims lookup
  */
-export class OAuthAuthorizer extends BaseAuthorizer {
+export class ClaimsCachingAuthorizer extends BaseAuthorizer {
+
+    private readonly _customClaimsProvider: CustomClaimsProvider;
+
+    public constructor(customClaimsProvider: CustomClaimsProvider) {
+        super();
+        this._customClaimsProvider = customClaimsProvider;
+    }
 
     /*
      * Do the OAuth processing via the middleware class
      */
-    protected async execute(
-        request: Request,
-        customClaimsProvider: CustomClaimsProvider,
-        logEntry: LogEntryImpl): Promise<ApiClaims> {
+    protected async execute(request: Request, logEntry: LogEntryImpl): Promise<ApiClaims> {
 
         // First read the access token
         const accessToken = this._readAccessToken(request);
@@ -54,7 +58,7 @@ export class OAuthAuthorizer extends BaseAuthorizer {
         const userInfoClaims = await authenticator.getUserInfo(accessToken);
 
         // Add custom claims from the API's own data if needed
-        const customClaims = await customClaimsProvider.getCustomClaims(tokenClaims, userInfoClaims);
+        const customClaims = await this._customClaimsProvider.getCustomClaims(tokenClaims, userInfoClaims);
 
         // Cache the claims against the token hash until the token's expiry time
         const claims = new ApiClaims(tokenClaims, userInfoClaims, customClaims);
