@@ -13,9 +13,8 @@ The Final NodeJS API code sample using OAuth and Open Id Connect, referenced in 
 
 ### Quick Start
 
-The setup script downloads SSL certificates, after which run the standard node commands:
+Run the standard commands to start listening over SSL:
 
-- ./setup.sh
 - npm install
 - npm start
 

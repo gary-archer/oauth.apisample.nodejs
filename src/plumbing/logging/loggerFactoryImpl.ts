@@ -1,3 +1,4 @@
+import {Guid} from 'guid-typescript';
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import Transport from 'winston-transport';
@@ -203,9 +204,10 @@ export class LoggerFactoryImpl implements LoggerFactory {
      */
     private _createFileTransport(transportConfig: any): Transport {
 
+        const subfolder = Guid.create().toString();
         const options = {
             filename: `${transportConfig.filePrefix}-%DATE%.log`,
-            dirname: `${transportConfig.dirname}`,
+            dirname: `${transportConfig.dirname}/${subfolder}`,
             datePattern: 'YYYY-MM-DD',
             maxSize: transportConfig.maxSize,
             maxFiles: transportConfig.maxFiles,
