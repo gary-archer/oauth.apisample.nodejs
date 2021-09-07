@@ -3,7 +3,6 @@
   "version": "3.0.0",
   "description": "A NodeJS version of the Final OAuth secured API",
   "scripts": {
-    "postinstall": "./setup.sh",
     "lint": "npx eslint . --ext .ts",
     "build": "ts-node --files src/host/startup/app.ts",
     "start": "nodemon -e ts --exec \"npm run build\"",
