@@ -1,4 +1,4 @@
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import express from 'express';
 import fs from 'fs-extra';
 import https from 'https';
@@ -53,8 +53,7 @@ export class HttpServerConfiguration {
                 this._expressApp.set('etag', false);
 
                 // Allow cross origin requests from the SPA
-                const corsOptions = { origin: this._configuration.api.webTrustedOrigins };
-                this._expressApp.use('/api/*', cors(corsOptions) as any);
+                this._expressApp.use('/api/*', cors(this._getCorsOptions()) as any);
 
                 // We must configure Express cross cutting concerns during this callback
                 base.configureMiddleware(this._expressApp);
@@ -98,5 +97,16 @@ export class HttpServerConfiguration {
                 console.log(`API is listening on HTTP port ${port}`);
             });
         }
+    }
+
+    /*
+     * The API allows the SPA client to call it, and also allows SPA client's to send SameSite cookies
+     */
+    private _getCorsOptions(): CorsOptions {
+
+        return {
+            origin: this._configuration.api.webTrustedOrigins,
+            credentials: true,
+        };
     }
 }
