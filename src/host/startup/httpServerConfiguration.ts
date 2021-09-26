@@ -100,7 +100,7 @@ export class HttpServerConfiguration {
     }
 
     /*
-     * The API allows the SPA client to call it, and also allows SPA client's to send SameSite cookies
+     * The API allows the SPA client to call it, and also to send SameSite cookies
      */
     private _getCorsOptions(): CorsOptions {
 
