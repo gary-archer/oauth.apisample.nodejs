@@ -1,7 +1,7 @@
 import {ErrorUtils} from '../errors/errorUtils';
 
 /*
- * A simple wrapper for the claims in a decoded JWT or introspection / user info response
+ * A simple wrapper for the claims in a decoded JWT or user info response
  */
 export class ClaimsPayload {
 

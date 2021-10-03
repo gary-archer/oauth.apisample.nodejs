@@ -12,7 +12,7 @@
     "logging": {
         "apiName": "SampleApi",
         "production": {
-            "level": "info",
+            "performanceThresholdMilliseconds": 500,
             "transports": [
                 {
                     "type": "console",
@@ -25,24 +25,17 @@
                     "maxSize": "10m",
                     "maxFiles": "7d"
                 }
-            ],
-            "performanceThresholdsMilliseconds": {
-                "default": 250
-            }
+            ]
         },
         "development": {
             "level": "info"
         }
     },
     "oauth": {
-        "strategy":                      "standard",
+        "provider":                      "standard",
         "issuer":                        "https://login.mycompany.com/oauth/v2/oauth-anonymous",
         "audience":                      "api.mycompany.com",
-        "tokenValidationStrategy":       "jwt",
         "jwksEndpoint":                  "https://login.mycompany.internal:8443/oauth/v2/oauth-anonymous/jwks",
-        "introspectEndpoint":            "",
-        "introspectClientId":            "",
-        "introspectClientSecret":        "",
         "userInfoEndpoint":              "",
         "claimsCacheTimeToLiveMinutes":  0
     }

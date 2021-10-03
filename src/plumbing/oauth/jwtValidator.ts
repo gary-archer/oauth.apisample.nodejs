@@ -1,18 +1,17 @@
 import {inject, injectable} from 'inversify';
 import {JwksClient, SigningKey} from 'jwks-rsa';
 import {decode, verify, VerifyOptions} from 'jsonwebtoken';
-import {ClaimsPayload} from '../../claims/claimsPayload';
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
-import {BASETYPES} from '../../dependencies/baseTypes';
-import {ErrorFactory} from '../../errors/errorFactory';
-import {ErrorUtils} from '../../errors/errorUtils';
-import {TokenValidator} from './tokenValidator';
+import {ClaimsPayload} from '../claims/claimsPayload';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration';
+import {BASETYPES} from '../dependencies/baseTypes';
+import {ErrorFactory} from '../errors/errorFactory';
+import {ErrorUtils} from '../errors/errorUtils';
 
 /*
  * An implementation that validates access tokens as JWTs
  */
 @injectable()
-export class JwtValidator implements TokenValidator {
+export class JwtValidator {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _jwksClient: JwksClient;

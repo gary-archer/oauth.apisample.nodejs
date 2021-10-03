@@ -63,7 +63,7 @@ export class ClaimsCache {
      */
     public async addClaimsForToken(accessTokenHash: string, claims: ApiClaims): Promise<void> {
 
-        // Use the exp field returned from introspection to work out the token expiry time
+        // Use the exp field to work out the token expiry time
         const epochSeconds = Math.floor((new Date() as any) / 1000);
         let secondsToCache = claims.token.expiry - epochSeconds;
         if (secondsToCache > 0) {

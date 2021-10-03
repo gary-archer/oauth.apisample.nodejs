@@ -45,30 +45,6 @@ export class ErrorUtils {
     }
 
     /*
-     * Handle introspection failures
-     */
-    public static fromIntrospectionError(responseError: any, url: string): ServerError | ClientError {
-
-        // Avoid reprocessing
-        if (responseError instanceof ServerError) {
-            return responseError;
-        }
-        if (responseError instanceof ClientError) {
-            return responseError;
-        }
-
-        const [code, description] = ErrorUtils._readOAuthErrorResponse(responseError);
-        const error = ErrorUtils._createOAuthServerError(
-            BaseErrorCodes.introspectionFailure,
-            'Token validation failed',
-            code,
-            responseError.stack);
-
-        ErrorUtils._setErrorDetails(error, description, responseError, url);
-        return error;
-    }
-
-    /*
      * Handle the error for key identifier lookups
      */
     public static fromSigningKeyDownloadError(responseError: any, url: string): ServerError {

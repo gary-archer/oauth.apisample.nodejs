@@ -7,7 +7,7 @@ import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntry} from '../logging/logEntry';
 import {HttpProxy} from '../utilities/httpProxy';
 import {using} from '../utilities/using';
-import {TokenValidator} from './tokenvalidation/tokenValidator';
+import {JwtValidator} from './jwtValidator';
 
 /*
  * The entry point for calls to the Authorization Server
@@ -16,18 +16,18 @@ import {TokenValidator} from './tokenvalidation/tokenValidator';
 export class OAuthAuthenticator {
 
     private readonly _configuration: OAuthConfiguration;
-    private readonly _tokenValidator: TokenValidator;
+    private readonly _jwtValidator: JwtValidator;
     private readonly _logEntry: LogEntry;
     private readonly _httpProxy: HttpProxy;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
-        @inject(BASETYPES.TokenValidator) tokenValidator: TokenValidator,
+        @inject(BASETYPES.JwtValidator) jwtValidator: JwtValidator,
         @inject(BASETYPES.LogEntry) logEntry: LogEntry,
         @inject(BASETYPES.HttpProxy) httpProxy: HttpProxy) {
 
         this._configuration = configuration;
-        this._tokenValidator = tokenValidator;
+        this._jwtValidator = jwtValidator;
         this._logEntry = logEntry;
         this._httpProxy = httpProxy;
     }
@@ -38,7 +38,7 @@ export class OAuthAuthenticator {
     public async validateToken(accessToken: string): Promise<ClaimsPayload> {
 
         return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
-            return await this._tokenValidator.validateToken(accessToken);
+            return this._jwtValidator.validateToken(accessToken);
         });
     }
 

@@ -17,11 +17,9 @@ import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 import {ClaimsCachingAuthorizer} from '../oauth/claimsCachingAuthorizer';
+import {JwtValidator} from '../oauth/jwtValidator';
 import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
 import {StandardAuthorizer} from '../oauth/standardAuthorizer';
-import {IntrospectionValidator} from '../oauth/tokenvalidation/introspectionValidator';
-import {JwtValidator} from '../oauth/tokenvalidation/jwtValidator';
-import {TokenValidator} from '../oauth/tokenvalidation/tokenValidator';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {HttpProxy} from '../utilities/httpProxy';
 
@@ -177,7 +175,7 @@ export class BaseCompositionRoot {
     private _registerOAuthDependencies(): void {
 
         // Create the authorizer, which provides the overall algorithm for handling requests
-        if (this._oauthConfiguration!.strategy === 'claims-caching') {
+        if (this._oauthConfiguration!.provider === 'cognito') {
 
             // Create an authorizer for Cognito, which looks up claims within the API
             // This is used when the Authorization Server does not support custom claims in the desired manner
@@ -201,28 +199,18 @@ export class BaseCompositionRoot {
         this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
             .to(OAuthAuthenticator).inRequestScope();
 
-        // Wire up the token validator depending on the strategy
-        if (this._oauthConfiguration!.tokenValidationStrategy === 'introspection') {
+        // Create the singleton JWKS client, which caches JWKS keys between requests
+        const proxyUrl = this._httpProxy!.getUrl();
+        const jwksClient = jwksRsa({
+            jwksUri: this._oauthConfiguration!.jwksEndpoint,
+            proxy: proxyUrl ? proxyUrl : undefined,
+        });
+        this._container.bind<JwksClient>(BASETYPES.JwksClient)
+            .toConstantValue(jwksClient);
 
-            // The introspection validator is created per request
-            this._container.bind<TokenValidator>(BASETYPES.TokenValidator)
-                .to(IntrospectionValidator).inRequestScope();
-
-        } else {
-
-            // Create the singleton JWKS client, which caches JWKS keys between requests
-            const proxyUrl = this._httpProxy!.getUrl();
-            const jwksClient = jwksRsa({
-                jwksUri: this._oauthConfiguration!.jwksEndpoint,
-                proxy: proxyUrl ? proxyUrl : undefined,
-            });
-            this._container.bind<JwksClient>(BASETYPES.JwksClient)
-                .toConstantValue(jwksClient);
-
-            // The JWT validator is created per request
-            this._container.bind<TokenValidator>(BASETYPES.TokenValidator)
-                .to(JwtValidator).inRequestScope();
-        }
+        // The JWT validator is created per request
+        this._container.bind<JwtValidator>(BASETYPES.JwtValidator)
+            .to(JwtValidator).inRequestScope();
     }
 
     /*
@@ -231,7 +219,7 @@ export class BaseCompositionRoot {
     private _registerClaimsDependencies(): void {
 
         // Register the singleton cache if using claims caching
-        if (this._oauthConfiguration!.strategy === 'claims-caching') {
+        if (this._oauthConfiguration!.provider === 'cognito') {
 
             const claimsCache = new ClaimsCache(
                 this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
