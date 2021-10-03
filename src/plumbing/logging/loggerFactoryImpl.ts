@@ -6,10 +6,9 @@ import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntryImpl} from './logEntryImpl';
 import {LoggerFactory} from './loggerFactory';
-import {PerformanceThreshold} from './performanceThreshold';
 
 /*
- * Techniacl logger names
+ * Technical logger names
  */
 const ROOT_DEVELOPMENT_LOGGER_NAME = 'root';
 const PRODUCTION_LOGGER_NAME = 'production';
@@ -20,8 +19,7 @@ const PRODUCTION_LOGGER_NAME = 'production';
 export class LoggerFactoryImpl implements LoggerFactory {
 
     private _apiName: string;
-    private _defaultPerformanceThresholdMilliseconds: number;
-    private _thresholdOverrides: PerformanceThreshold[];
+    private _performanceThresholdMilliseconds: number;
 
     /*
      * We create the logger factory before reading configuration, since we need to log problems loading configuration
@@ -30,8 +28,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
 
         // Initialise logging fields
         this._apiName = '';
-        this._defaultPerformanceThresholdMilliseconds = 1000;
-        this._thresholdOverrides = [];
+        this._performanceThresholdMilliseconds = 1000;
 
         // Initialise console colours
         winston.addColors({
@@ -40,8 +37,6 @@ export class LoggerFactoryImpl implements LoggerFactory {
             info: 'white',
             debug: 'blue',
         });
-
-        this._setupCallbacks();
     }
 
     /*
@@ -51,11 +46,11 @@ export class LoggerFactoryImpl implements LoggerFactory {
 
         // Initialise behaviour
         this._apiName = configuration.apiName;
+        this._performanceThresholdMilliseconds = configuration.production.performanceThresholdMilliseconds;
 
         // Create the production logger
         const productionLogConfig = configuration.production;
-        this._createProductionLogger(productionLogConfig.level, productionLogConfig.transports);
-        this._loadPerformanceThresholds(productionLogConfig);
+        this._createProductionLogger('info', productionLogConfig.transports);
 
         // Create development loggers
         const developmentLogConfig = configuration.development;
@@ -76,7 +71,11 @@ export class LoggerFactoryImpl implements LoggerFactory {
         const error = ErrorUtils.createServerError(exception);
 
         // Create a log entry and set error details
-        const logEntry = new LogEntryImpl(this._apiName, this._getProductionLogger(), null);
+        const logEntry = new LogEntryImpl(
+            this._apiName,
+            this._getProductionLogger(),
+            this._performanceThresholdMilliseconds);
+
         logEntry.setOperationName('startup');
         logEntry.setServerError(error);
         logEntry.write();
@@ -100,7 +99,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
      */
     public createLogEntry(): LogEntryImpl {
 
-        return new LogEntryImpl(this._apiName, this._getProductionLogger(), this._getPerformanceThreshold);
+        return new LogEntryImpl(this._apiName, this._getProductionLogger(), this._performanceThresholdMilliseconds);
     }
 
     /*
@@ -226,50 +225,5 @@ export class LoggerFactoryImpl implements LoggerFactory {
             winston.format.timestamp(),
             winston.format.printf((info: any) => `${info.level}: ${info.timestamp} : ${loggerName} : ${info.message}`),
         );
-    }
-
-    /*
-     * Extract performance details from the log configuration, for use later when creating log entries
-     */
-    private _loadPerformanceThresholds(productionLogConfig: any) {
-
-        // Read the default performance threshold and update the default
-        const thresholds = productionLogConfig.performanceThresholdsMilliseconds;
-        this._defaultPerformanceThresholdMilliseconds = thresholds.default;
-
-        // Support operation specific overrides, which will be set against the log entry on creation
-        if (thresholds.operationOverrides) {
-            for (const name in thresholds.operationOverrides) {
-                if (name) {
-                    const milliseconds = thresholds.operationOverrides[name];
-                    const performanceThreshold = {
-                        name,
-                        milliseconds,
-                    };
-
-                    this._thresholdOverrides.push(performanceThreshold);
-                }
-            }
-        }
-    }
-
-    /*
-     * Given an operation name, return its performance threshold
-     */
-    private _getPerformanceThreshold(name: string): number {
-
-        const found = this._thresholdOverrides.find((o) => o.name.toLowerCase() === name.toLowerCase());
-        if (found) {
-            return found.milliseconds;
-        }
-
-        return this._defaultPerformanceThresholdMilliseconds;
-    }
-
-    /*
-     * Plumbing to ensure the this parameter is available
-     */
-    private _setupCallbacks(): void {
-        this._getPerformanceThreshold = this._getPerformanceThreshold.bind(this);
     }
 }

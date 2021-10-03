@@ -12,7 +12,7 @@
     "logging": {
         "apiName": "SampleApi",
         "production": {
-            "level": "info",
+            "performanceThresholdMilliseconds": 500,
             "transports": [
                 {
                     "type": "console",
@@ -25,10 +25,7 @@
                     "maxSize": "10m",
                     "maxFiles": "7d"
                 }
-            ],
-            "performanceThresholdsMilliseconds": {
-                "default": 250
-            }
+            ]
         },
         "development": {
             "level": "info",

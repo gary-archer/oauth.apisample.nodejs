@@ -18,22 +18,21 @@ import {RouteMetadataHandler} from './routeMetadataHandler';
 export class LogEntryImpl implements LogEntry {
 
     private readonly _logger: Logger;
-    private readonly _getPerformanceThreshold: ((op: string) => number) | null;
     private readonly _data: LogEntryData;
 
     /*
      * A log entry is created once per API request
      */
-    public constructor(apiName: string, logger: Logger, getPerformanceThreshold: ((op: string) => number) | null) {
+    public constructor(apiName: string, logger: Logger, performanceThresholdMilliseconds: number) {
 
         // Record the logger details
         this._logger = logger;
-        this._getPerformanceThreshold = getPerformanceThreshold;
 
         // Initialise data
         this._data = new LogEntryData();
         this._data.apiName = apiName;
         this._data.hostName = os.hostname();
+        this._data.performanceThresholdMilliseconds = performanceThresholdMilliseconds;
     }
 
     /*
@@ -86,11 +85,8 @@ export class LogEntryImpl implements LogEntry {
         const metadata = routeMetadataHandler.getOperationRouteInfo(request);
         if (metadata) {
 
-            // Record the operation name and also ensure that the correct performance threshold is used
+            // Record the operation name
             this._data.operationName = metadata.operationName;
-            if (this._getPerformanceThreshold) {
-                this._data.performanceThresholdMilliseconds = this._getPerformanceThreshold(this._data.operationName);
-            }
 
             // Also log URL path segments for resource ids
             this._data.resourceId = metadata.resourceIds.join('/');
