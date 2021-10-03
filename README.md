@@ -30,8 +30,6 @@ Run the start script to begin listening over SSL:
 
 * Express is used to host the API
 * AWS Cognito is used as the default Authorization Server
-* The [JSON Web Token Library](https://github.com/auth0/node-jsonwebtoken) is used for in memory validation of JWTs
-* The [JWKS RSA Library](https://github.com/auth0/node-jwks-rsa) is used for efficient download of JWT public keys
-* The [OpenId-Client Library](https://github.com/panva/node-openid-client) is used for other OAuth operations
+* The [JOSE Library](https://github.com/panva/jose) is used for to manage in memory validation of JWTs
 * [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
 * API logs can be aggregated to [Elastic Search](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)

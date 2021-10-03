@@ -8,7 +8,6 @@ export const BASETYPES = {
     CustomClaims: Symbol.for('CustomClaims'),
     HttpProxy: Symbol.for('HttpProxy'),
     JwksClient: Symbol.for('JwksClient'),
-    JwtValidator: Symbol.for('JwtValidator'),
     LogEntry: Symbol.for('LogEntry'),
     LoggerFactory: Symbol.for('LoggerFactory'),
     LoggingConfiguration: Symbol.for('Configuration'),

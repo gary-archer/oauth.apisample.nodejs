@@ -1,52 +1,26 @@
-import TunnelAgent from 'tunnel-agent';
-import url from 'url';
+import ProxyAgent from 'proxy-agent';
 
 /*
- * Manage supplying the HTTP proxy on calls from the API to the Authorization Server
+ * Manage routing outbound calls from the API via an HTTP proxy
  */
 export class HttpProxy {
 
-    private readonly _proxyUrl: string;
-    private readonly _agent: any = null;
+    private readonly _agent: any;
 
+    /*
+     * Create an HTTP agent to route requests to
+     */
     public constructor(useProxy: boolean, proxyUrl: string) {
 
-        this._proxyUrl = '';
-        this._agent = null;
-        this._setupCallbacks();
-
         if (useProxy) {
-            const opts = url.parse(proxyUrl);
-            this._proxyUrl = proxyUrl;
-            this._agent = TunnelAgent.httpsOverHttp({
-                proxy: opts,
-            });
+            this._agent = new ProxyAgent(proxyUrl);
         }
     }
 
     /*
-     * Set HTTP options as required by the Open ID Client library
+     * Return the agent to other parts of the app
      */
-    public setOptions(options: any): any {
-
-        options.agent = {
-            https: this._agent,
-        };
-
-        return options;
-    }
-
-    /*
-     * Return the URL when needed
-     */
-    public getUrl(): string {
-        return this._proxyUrl;
-    }
-
-    /*
-     * Plumbing to ensure the this parameter is available
-     */
-    private _setupCallbacks(): void {
-        this.setOptions = this.setOptions.bind(this);
+    public get agent(): any {
+        return this._agent;
     }
 }

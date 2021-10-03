@@ -6,11 +6,14 @@ export interface OAuthConfiguration {
     // Certain behaviour may be triggered by a provider's capabilities
     provider: string;
 
-    // The expected issuer of access tokens
+    // The expected issuer in JWT access tokens received
     issuer: string;
 
-    // The expected audience of access tokens
+    // The expected audience in JWT access tokens received
     audience: string;
+
+    // The expected algorithm in JWT access tokens received
+    algorithm: string;
 
     // The endpoint from which to download the token signing public key
     jwksEndpoint: string;

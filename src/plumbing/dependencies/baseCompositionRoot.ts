@@ -1,7 +1,6 @@
 import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
-import jwksRsa, {JwksClient} from 'jwks-rsa';
 import {ClaimsCache} from '../claims/claimsCache';
 import {ClaimsProvider} from '../claims/claimsProvider';
 import {BaseClaims} from '../claims/baseClaims';
@@ -17,7 +16,6 @@ import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 import {ClaimsCachingAuthorizer} from '../oauth/claimsCachingAuthorizer';
-import {JwtValidator} from '../oauth/jwtValidator';
 import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
 import {StandardAuthorizer} from '../oauth/standardAuthorizer';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
@@ -198,19 +196,6 @@ export class BaseCompositionRoot {
         // The OAuth client object is created per request to call the Authorization Server when needed
         this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
             .to(OAuthAuthenticator).inRequestScope();
-
-        // Create the singleton JWKS client, which caches JWKS keys between requests
-        const proxyUrl = this._httpProxy!.getUrl();
-        const jwksClient = jwksRsa({
-            jwksUri: this._oauthConfiguration!.jwksEndpoint,
-            proxy: proxyUrl ? proxyUrl : undefined,
-        });
-        this._container.bind<JwksClient>(BASETYPES.JwksClient)
-            .toConstantValue(jwksClient);
-
-        // The JWT validator is created per request
-        this._container.bind<JwtValidator>(BASETYPES.JwtValidator)
-            .to(JwtValidator).inRequestScope();
     }
 
     /*

@@ -1,13 +1,15 @@
+import axios, {AxiosRequestConfig} from 'axios';
 import {inject, injectable} from 'inversify';
-import {custom, Issuer} from 'openid-client';
+import {createRemoteJWKSet} from 'jose/jwks/remote';
+import {jwtVerify} from 'jose/jwt/verify';
 import {ClaimsPayload} from '../claims/claimsPayload';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
+import {ErrorFactory} from '../errors/errorFactory';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntry} from '../logging/logEntry';
 import {HttpProxy} from '../utilities/httpProxy';
 import {using} from '../utilities/using';
-import {JwtValidator} from './jwtValidator';
 
 /*
  * The entry point for calls to the Authorization Server
@@ -16,18 +18,15 @@ import {JwtValidator} from './jwtValidator';
 export class OAuthAuthenticator {
 
     private readonly _configuration: OAuthConfiguration;
-    private readonly _jwtValidator: JwtValidator;
     private readonly _logEntry: LogEntry;
     private readonly _httpProxy: HttpProxy;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
-        @inject(BASETYPES.JwtValidator) jwtValidator: JwtValidator,
         @inject(BASETYPES.LogEntry) logEntry: LogEntry,
         @inject(BASETYPES.HttpProxy) httpProxy: HttpProxy) {
 
         this._configuration = configuration;
-        this._jwtValidator = jwtValidator;
         this._logEntry = logEntry;
         this._httpProxy = httpProxy;
     }
@@ -37,33 +36,67 @@ export class OAuthAuthenticator {
      */
     public async validateToken(accessToken: string): Promise<ClaimsPayload> {
 
-        return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
-            return this._jwtValidator.validateToken(accessToken);
+        return using (this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
+
+            try {
+
+                // Download token signing public keys from the Authorization Server, which are then cached
+                const jwksOptions = {
+                    agent: this._httpProxy.agent,
+                };
+                const remoteJwkSet = createRemoteJWKSet(new URL(this._configuration.jwksEndpoint), jwksOptions);
+
+                // Perform the JWT validation according to best practices
+                const options = {
+                    algorithms: [this._configuration.algorithm],
+                    issuer: this._configuration.issuer,
+                    audience: this._configuration.audience,
+                };
+                const result = await jwtVerify(accessToken, remoteJwkSet, options);
+
+                // Return a claims result to the API's business logic
+                return new ClaimsPayload(result.payload);
+
+            } catch (e: any) {
+
+                // Generic errors are returned when the JWKS download fails
+                if (e.code === 'ERR_JOSE_GENERIC') {
+                    throw ErrorUtils.fromSigningKeyDownloadError(e, this._configuration.jwksEndpoint)
+                }
+
+                // Log the cause behind 401 errors
+                let details = 'JWT verification failed';
+                if (e.message) {
+                    details += ` : ${e.message}`;
+                }
+
+                throw ErrorFactory.createClient401Error(details);
+            }
         });
     }
 
     /*
      * Perform OAuth user info lookup when required
-    * We supply a dummy client id to the library, since no client id should be needed for this OAuth message
      */
     public async getUserInfo(accessToken: string): Promise<ClaimsPayload> {
 
-        return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
-
-            const issuer = new Issuer({
-                issuer: this._configuration.issuer,
-                userinfo_endpoint: this._configuration.userInfoEndpoint,
-            });
-
-            const client = new issuer.Client({
-                client_id: 'dummy',
-            });
-            client[custom.http_options] = this._httpProxy.setOptions;
+        return using (this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
 
             try {
 
-                const data = await client.userinfo(accessToken);
-                return new ClaimsPayload(data);
+                const options = {
+                    url: this._configuration.userInfoEndpoint,
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/x-www-form-urlencoded',
+                        'accept': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
+                    httpsAgent: this._httpProxy.agent,
+                };
+
+                const response = await axios.request(options as AxiosRequestConfig);
+                return new ClaimsPayload(response.data);
 
             } catch (e) {
 
