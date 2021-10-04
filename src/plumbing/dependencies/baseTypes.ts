@@ -4,7 +4,7 @@
 export const BASETYPES = {
     BaseClaims: Symbol.for('BaseClaims'),
     ClaimsCache: Symbol.for('ClaimsCache'),
-    ClaimsProvider: Symbol.for('ClaimsProvider'),
+    CustomClaimsProvider: Symbol.for('CustomClaimsProvider'),
     CustomClaims: Symbol.for('CustomClaims'),
     HttpProxy: Symbol.for('HttpProxy'),
     JwksClient: Symbol.for('JwksClient'),

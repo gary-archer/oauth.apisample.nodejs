@@ -8,6 +8,7 @@ import {CompanyService} from '../../logic/services/companyService';
 import {BaseClaims} from '../../plumbing/claims/baseClaims';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory';
+import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
 
 /*
  * Our API controller runs after claims handling has completed
@@ -34,7 +35,7 @@ export class CompanyController extends BaseHttpController {
     public async getCompanyList(): Promise<Company[]> {
 
         // First check scopes
-        this._claims.verifyScope('transactions_read');
+        ScopeVerifier.enforce(this._claims.scopes, 'transactions_read');
 
         // Next return filtered data based on claims
         return this._service.getCompanyList();
@@ -47,7 +48,7 @@ export class CompanyController extends BaseHttpController {
     public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
 
         // First check scopes
-        this._claims.verifyScope('transactions_read');
+        ScopeVerifier.enforce(this._claims.scopes, 'transactions_read');
 
         // Parse the id and throw a 400 error if it is invalid
         const companyId = parseInt(id, 10);

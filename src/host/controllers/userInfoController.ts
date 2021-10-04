@@ -3,6 +3,7 @@ import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
 import {BaseClaims} from '../../plumbing/claims/baseClaims';
 import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
+import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
 
 /*
  * A controller class to return user info
@@ -29,7 +30,7 @@ export class UserInfoController extends BaseHttpController {
     public getUserInfo(): any {
 
         // First check scopes
-        this._baseClaims.verifyScope('profile');
+        ScopeVerifier.enforce(this._baseClaims.scopes, 'profile');
 
         // Return OAuth profile data for display in the UI
         return {

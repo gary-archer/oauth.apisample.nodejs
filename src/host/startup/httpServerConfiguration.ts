@@ -6,7 +6,7 @@ import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
-import {SampleClaimsProvider} from '../claims/sampleClaimsProvider';
+import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
 
@@ -37,7 +37,7 @@ export class HttpServerConfiguration {
             .useApiBasePath('/api/')
             .addUnsecuredPath('/api/customclaims')
             .useOAuth(this._configuration.oauth)
-            .withClaimsProvider(new SampleClaimsProvider())
+            .withCustomClaimsProvider(new SampleCustomClaimsProvider())
             .withLogging(this._configuration.logging, this._loggerFactory)
             .withProxyConfiguration(this._configuration.api.useProxy, this._configuration.api.proxyUrl)
             .register();

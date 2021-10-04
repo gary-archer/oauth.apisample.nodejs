@@ -1,8 +1,9 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
-import {ClaimsProvider} from '../../plumbing/claims/claimsProvider';
+import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
+import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
-import {SampleClaimsProvider} from '../claims/sampleClaimsProvider';
+import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 
 /*
  * A controller called during token issuing to ask the API for custom claim values
@@ -11,11 +12,11 @@ import {SampleClaimsProvider} from '../claims/sampleClaimsProvider';
 @controller('/customclaims')
 export class ClaimsController extends BaseHttpController {
 
-    private readonly _claimsProvider: SampleClaimsProvider;
+    private readonly _customClaimsProvider: SampleCustomClaimsProvider;
 
-    public constructor(@inject(BASETYPES.ClaimsProvider) claimsProvider: ClaimsProvider) {
+    public constructor(@inject(BASETYPES.CustomClaimsProvider) customClaimsProvider: CustomClaimsProvider) {
         super();
-        this._claimsProvider = claimsProvider as SampleClaimsProvider;
+        this._customClaimsProvider = customClaimsProvider as SampleCustomClaimsProvider;
     }
 
     /*
@@ -25,7 +26,7 @@ export class ClaimsController extends BaseHttpController {
     @httpGet('/:subject')
     public async getCustomClaims(@requestParam('subject') subject: string): Promise<any> {
 
-        const customClaims = await this._claimsProvider.supplyCustomClaimsFromSubject(subject);
+        const customClaims = await this._customClaimsProvider.issue(subject) as SampleCustomClaims;
 
         return {
             user_id: customClaims.userId,

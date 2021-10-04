@@ -2,7 +2,9 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {inject, injectable} from 'inversify';
 import {createRemoteJWKSet} from 'jose/jwks/remote';
 import {jwtVerify} from 'jose/jwt/verify';
-import {ClaimsPayload} from '../claims/claimsPayload';
+import {JWTPayload} from 'jose/types';
+import {ClaimsReader} from '../claims/claimsReader';
+import {UserInfoClaims} from '../claims/userInfoClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ErrorFactory} from '../errors/errorFactory';
@@ -34,9 +36,9 @@ export class OAuthAuthenticator {
     /*
      * Do the work of performing token validation via the injected class
      */
-    public async validateToken(accessToken: string): Promise<ClaimsPayload> {
+    public async validateToken(accessToken: string): Promise<JWTPayload> {
 
-        return using (this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
+        return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
 
             try {
 
@@ -53,15 +55,13 @@ export class OAuthAuthenticator {
                     audience: this._configuration.audience,
                 };
                 const result = await jwtVerify(accessToken, remoteJwkSet, options);
-
-                // Return a claims result to the API's business logic
-                return new ClaimsPayload(result.payload);
+                return result.payload;
 
             } catch (e: any) {
 
                 // Generic errors are returned when the JWKS download fails
                 if (e.code === 'ERR_JOSE_GENERIC') {
-                    throw ErrorUtils.fromSigningKeyDownloadError(e, this._configuration.jwksEndpoint)
+                    throw ErrorUtils.fromSigningKeyDownloadError(e, this._configuration.jwksEndpoint);
                 }
 
                 // Log the cause behind 401 errors
@@ -78,9 +78,9 @@ export class OAuthAuthenticator {
     /*
      * Perform OAuth user info lookup when required
      */
-    public async getUserInfo(accessToken: string): Promise<ClaimsPayload> {
+    public async getUserInfo(accessToken: string): Promise<UserInfoClaims> {
 
-        return using (this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
+        return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
 
             try {
 
@@ -96,7 +96,7 @@ export class OAuthAuthenticator {
                 };
 
                 const response = await axios.request(options as AxiosRequestConfig);
-                return new ClaimsPayload(response.data);
+                return ClaimsReader.userInfoClaims(response.data);
 
             } catch (e) {
 

@@ -1,6 +1,7 @@
 import {Request} from 'express';
 import {ApiClaims} from '../claims/apiClaims';
-import {ClaimsProvider} from '../claims/claimsProvider';
+import {ClaimsReader} from '../claims/claimsReader';
+import {CustomClaimsProvider} from '../claims/customClaimsProvider';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper';
 import {ErrorFactory} from '../errors/errorFactory';
@@ -19,7 +20,7 @@ export class StandardAuthorizer extends BaseAuthorizer {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     protected async execute(
         request: Request,
-        claimsProvider: ClaimsProvider): Promise<ApiClaims> {
+        customClaimsProvider: CustomClaimsProvider): Promise<ApiClaims> {
 
         // First read the access token
         const accessToken = super.readAccessToken(request);
@@ -27,14 +28,17 @@ export class StandardAuthorizer extends BaseAuthorizer {
             throw ErrorFactory.createClient401Error('No access token was supplied in the bearer header');
         }
 
-        // Get the child container for this HTTP request
+        // Get per request dependencies
         const perRequestContainer = ChildContainerHelper.resolve(request);
-
-        // Do the token validation work
         const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
-        const tokenData = await authenticator.validateToken(accessToken);
 
-        // Ask the claims provider to create the final claims object
-        return claimsProvider.readClaims(tokenData);
+        // On every API request we validate the JWT, in a zero trust manner
+        const payload = await authenticator.validateToken(accessToken);
+
+        // Then read all claims from the token
+        const tokenClaims = ClaimsReader.baseClaims(payload);
+        const userInfo = ClaimsReader.userInfoClaims(payload);
+        const customClaims = await customClaimsProvider.get(accessToken, tokenClaims, userInfo);
+        return new ApiClaims(tokenClaims, userInfo, customClaims);
     }
 }

@@ -2,9 +2,9 @@ import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
 import {ClaimsCache} from '../claims/claimsCache';
-import {ClaimsProvider} from '../claims/claimsProvider';
 import {BaseClaims} from '../claims/baseClaims';
 import {CustomClaims} from '../claims/customClaims';
+import {CustomClaimsProvider} from '../claims/customClaimsProvider';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
@@ -31,7 +31,7 @@ export class BaseCompositionRoot {
     private _unsecuredPaths: string[];
     private _oauthConfiguration?: OAuthConfiguration;
     private _authorizer?: BaseAuthorizer;
-    private _claimsProvider?: ClaimsProvider;
+    private _customClaimsProvider?: CustomClaimsProvider;
     private _loggingConfiguration?: LoggingConfiguration;
     private _loggerFactory?: LoggerFactory;
     private _loggerMiddleware?: LoggerMiddleware;
@@ -75,8 +75,8 @@ export class BaseCompositionRoot {
     /*
      * A class to provide custom claims when a new token is processed
      */
-    public withClaimsProvider(claimsProvider: ClaimsProvider): BaseCompositionRoot {
-        this._claimsProvider = claimsProvider;
+    public withCustomClaimsProvider(customClaimsProvider: CustomClaimsProvider): BaseCompositionRoot {
+        this._customClaimsProvider = customClaimsProvider;
         return this;
     }
 
@@ -208,7 +208,7 @@ export class BaseCompositionRoot {
 
             const claimsCache = new ClaimsCache(
                 this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
-                this._claimsProvider!,
+                this._customClaimsProvider!,
                 this._loggerFactory!);
 
             this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
@@ -216,8 +216,8 @@ export class BaseCompositionRoot {
         }
 
         // Register an object to manage providing claims
-        this._container.bind<ClaimsProvider>(BASETYPES.ClaimsProvider)
-            .toConstantValue(this._claimsProvider!);
+        this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
+            .toConstantValue(this._customClaimsProvider!);
 
         // Register dummy claims values that are overridden later by the authorizer middleware
         this._container.bind<BaseClaims>(BASETYPES.BaseClaims)

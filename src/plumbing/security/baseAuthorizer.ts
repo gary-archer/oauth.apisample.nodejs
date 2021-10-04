@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
 import {ApiClaims} from '../claims/apiClaims';
 import {CustomClaims} from '../claims/customClaims';
-import {ClaimsProvider}  from '../claims/claimsProvider';
+import {CustomClaimsProvider}  from '../claims/customClaimsProvider';
 import {BaseClaims} from '../claims/baseClaims';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {BASETYPES} from '../dependencies/baseTypes';
@@ -44,11 +44,11 @@ export abstract class BaseAuthorizer {
         try {
 
             // Resolve per request objects
-            const claimsProvider =  perRequestContainer.get<ClaimsProvider>(BASETYPES.ClaimsProvider);
+            const customClaimsProvider =  perRequestContainer.get<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider);
             const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
 
             // Do authorization processing for this request, to get all claims the API needs
-            const claims = await this.execute(request, claimsProvider, logEntry);
+            const claims = await this.execute(request, customClaimsProvider, logEntry);
 
             // Bind claims objects to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<BaseClaims>(BASETYPES.BaseClaims).toConstantValue(claims.token);
@@ -89,7 +89,7 @@ export abstract class BaseAuthorizer {
     // Concrete classes must override this
     protected abstract execute(
         request: Request,
-        claimsProvider: ClaimsProvider,
+        customClaimsProvider: CustomClaimsProvider,
         logEntry: LogEntryImpl): Promise<ApiClaims>;
 
     /*

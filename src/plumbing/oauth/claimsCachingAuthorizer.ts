@@ -1,8 +1,10 @@
 import {Request} from 'express';
 import hasher from 'js-sha256';
 import {ApiClaims} from '../claims/apiClaims';
+import {CachedClaims} from '../claims/cachedClaims';
 import {ClaimsCache} from '../claims/claimsCache';
-import {ClaimsProvider} from '../claims/claimsProvider';
+import {ClaimsReader} from '../claims/claimsReader';
+import {CustomClaimsProvider} from '../claims/customClaimsProvider';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper';
 import {ErrorFactory} from '../errors/errorFactory';
@@ -19,7 +21,7 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
      */
     protected async execute(
         request: Request,
-        claimsProvider: ClaimsProvider): Promise<ApiClaims> {
+        customClaimsProvider: CustomClaimsProvider): Promise<ApiClaims> {
 
         // First read the access token
         const accessToken = super.readAccessToken(request);
@@ -27,31 +29,31 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
             throw ErrorFactory.createClient401Error('No access token was supplied in the bearer header');
         }
 
-        // Get the child container for this HTTP request
+        // Get per request dependencies
         const perRequestContainer = ChildContainerHelper.resolve(request);
-
-        // If cached results already exist for this token then return them immediately
-        const accessTokenHash = hasher.sha256(accessToken);
-        const cache = perRequestContainer.get<ClaimsCache>(BASETYPES.ClaimsCache);
-        const cachedClaims = await cache.getClaimsForToken(accessTokenHash);
-        if (cachedClaims) {
-            return cachedClaims;
-        }
-
-        // Get an OAuth client for this request
         const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
 
-        // Validate the token and read token claims
-        const tokenData = await authenticator.validateToken(accessToken);
+        // On every API request we validate the JWT, in a zero trust manner
+        const payload = await authenticator.validateToken(accessToken);
+        const tokenClaims = ClaimsReader.baseClaims(payload);
 
-        // Do the work for user info lookup
-        const userInfoData = await authenticator.getUserInfo(accessToken);
+        // If cached results exist for other claims then return them
+        const accessTokenHash = hasher.sha256(accessToken);
+        const cache = perRequestContainer.get<ClaimsCache>(BASETYPES.ClaimsCache);
+        const cachedClaims = await cache.getExtraUserClaims(accessTokenHash);
+        if (cachedClaims) {
+            return new ApiClaims(tokenClaims, cachedClaims.userInfo, cachedClaims.custom);
+        }
 
-        // Ask the claims provider to create the final claims object
-        const claims = await claimsProvider.supplyClaims(tokenData, userInfoData);
+        // Otherwise look up user info claims and domain specific claims
+        const userInfo = await authenticator.getUserInfo(accessToken);
+        const customClaims = await customClaimsProvider.get(accessToken, tokenClaims, userInfo);
+        const claimsToCache = new CachedClaims(userInfo, customClaims);
 
-        // Cache the claims against the token hash until the token's expiry time
-        await cache.addClaimsForToken(accessTokenHash, claims);
-        return claims;
+        // Cache the extra claims for subsequent requests with the same access token
+        await cache.setExtraUserClaims(accessTokenHash, claimsToCache, payload.exp!);
+
+        // Return the final claims
+        return new ApiClaims(tokenClaims, userInfo, customClaims);
     }
 }

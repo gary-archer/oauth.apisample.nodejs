@@ -2,8 +2,9 @@ import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
 import {LoggerFactory} from '../logging/loggerFactory';
-import {ApiClaims} from './apiClaims';
-import {ClaimsProvider} from './claimsProvider';
+import {CachedClaims} from './cachedClaims';
+import {CustomClaimsProvider} from './customClaimsProvider';
+import {UserInfoClaims} from '../claims/userInfoClaims';
 
 /*
  * A simple in memory claims cache for our API
@@ -12,7 +13,7 @@ import {ClaimsProvider} from './claimsProvider';
 export class ClaimsCache {
 
     private readonly _cache: NodeCache;
-    private readonly _claimsProvider: ClaimsProvider;
+    private readonly _customClaimsProvider: CustomClaimsProvider;
     private readonly _traceLogger: Logger;
 
     /*
@@ -20,10 +21,10 @@ export class ClaimsCache {
      */
     public constructor(
         timeToLiveMinutes: number,
-        claimsProvider: ClaimsProvider,
+        customClaimsProvider: CustomClaimsProvider,
         loggerFactory: LoggerFactory) {
 
-        this._claimsProvider = claimsProvider;
+        this._customClaimsProvider = customClaimsProvider;
         this._traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
@@ -40,32 +41,19 @@ export class ClaimsCache {
     }
 
     /*
-     * Get claims from the cache or return null if not found
-     */
-    public async getClaimsForToken(accessTokenHash: string): Promise<ApiClaims | null> {
-
-        // Get the token hash and see if it exists in the cache
-        const claimsText = await this._cache.get<string>(accessTokenHash);
-        if (!claimsText) {
-
-            // If this is a new token and we need to do claims processing
-            this._traceLogger.debug(`New token will be added to claims cache (hash: ${accessTokenHash})`);
-            return null;
-        }
-
-        // Otherwise return cached claims
-        this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
-        return this._claimsProvider.deserializeFromCache(claimsText);
-    }
-
-    /*
      * Add claims to the cache until the token's time to live
      */
-    public async addClaimsForToken(accessTokenHash: string, claims: ApiClaims): Promise<void> {
+    public async setExtraUserClaims(accessTokenHash: string, claims: CachedClaims, exp: number): Promise<void> {
+
+        // Get the data in way that handles private property names
+        const dataAsJson = {
+            userInfo: claims.userInfo.exportData(),
+            custom: claims.custom.exportData(),
+        };
 
         // Use the exp field to work out the token expiry time
         const epochSeconds = Math.floor((new Date() as any) / 1000);
-        let secondsToCache = claims.token.expiry - epochSeconds;
+        let secondsToCache = exp - epochSeconds;
         if (secondsToCache > 0) {
 
             // Output debug info
@@ -80,8 +68,32 @@ export class ClaimsCache {
             // Cache the claims until the above time
             this._traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
-            const claimsText = this._claimsProvider.serializeToCache(claims);
+            const claimsText = JSON.stringify(dataAsJson);
             await this._cache.set(accessTokenHash, claimsText, secondsToCache);
         }
+    }
+
+    /*
+     * Get claims from the cache or return null if not found
+     */
+    public async getExtraUserClaims(accessTokenHash: string): Promise<CachedClaims | null> {
+
+        // Get the token hash and see if it exists in the cache
+        const claimsText = await this._cache.get<string>(accessTokenHash);
+        if (!claimsText) {
+
+            // If this is a new token and we need to do claims processing
+            this._traceLogger.debug(`New token will be added to claims cache (hash: ${accessTokenHash})`);
+            return null;
+        }
+
+        // Otherwise return cached claims
+        this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
+
+        // Get the data in way that handles private property names
+        const dataAsJson = JSON.parse(claimsText);
+        return new CachedClaims(
+            UserInfoClaims.importData(dataAsJson.userInfo),
+            this._customClaimsProvider.deserialize(dataAsJson.custom));
     }
 }
