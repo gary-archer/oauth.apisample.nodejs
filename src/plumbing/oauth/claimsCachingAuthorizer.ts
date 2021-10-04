@@ -45,7 +45,7 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
             return new ApiClaims(tokenClaims, cachedClaims.userInfo, cachedClaims.custom);
         }
 
-        // Otherwise look up user info claims and domain specific claims
+        // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
         const userInfo = await authenticator.getUserInfo(accessToken);
         const customClaims = await customClaimsProvider.get(accessToken, tokenClaims, userInfo);
         const claimsToCache = new CachedClaims(userInfo, customClaims);
