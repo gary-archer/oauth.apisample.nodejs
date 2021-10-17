@@ -8,8 +8,7 @@
 
 The Final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
 
-- The API takes finer control over OAuth processing via a certified JOSE library
-- The API provides two mechanisms for managing domain specific claims, to enable secure authorization
+- The API takes finer control over OAuth processing via a certified JOSE library, and uses domain specific claims
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
 ### Quick Start
