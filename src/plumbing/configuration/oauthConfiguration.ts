@@ -12,9 +12,6 @@ export interface OAuthConfiguration {
     // The expected audience in JWT access tokens received
     audience: string;
 
-    // The expected algorithm in JWT access tokens received
-    algorithm: string;
-
     // The endpoint from which to download the token signing public key
     jwksEndpoint: string;
 

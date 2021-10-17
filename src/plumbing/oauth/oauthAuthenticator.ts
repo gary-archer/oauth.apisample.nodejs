@@ -50,7 +50,7 @@ export class OAuthAuthenticator {
 
                 // Perform the JWT validation according to best practices
                 const options = {
-                    algorithms: [this._configuration.algorithm],
+                    algorithms: ['RS256'],
                     issuer: this._configuration.issuer,
                     audience: this._configuration.audience,
                 };
