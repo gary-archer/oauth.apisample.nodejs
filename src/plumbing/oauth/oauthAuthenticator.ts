@@ -3,6 +3,7 @@ import {inject, injectable} from 'inversify';
 import {createRemoteJWKSet} from 'jose/jwks/remote';
 import {jwtVerify} from 'jose/jwt/verify';
 import {JWTPayload} from 'jose/types';
+import {URL} from 'url';
 import {ClaimsReader} from '../claims/claimsReader';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
