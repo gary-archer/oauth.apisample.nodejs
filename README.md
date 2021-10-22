@@ -6,7 +6,7 @@
 
 ### Overview
 
-The Final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
+The final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
 
 - The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
