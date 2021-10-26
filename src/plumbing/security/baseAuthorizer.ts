@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
-import {ApiClaims} from '../claims/apiClaims';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal';
 import {CustomClaims} from '../claims/customClaims';
 import {CustomClaimsProvider}  from '../claims/customClaimsProvider';
 import {BaseClaims} from '../claims/baseClaims';
@@ -90,7 +90,7 @@ export abstract class BaseAuthorizer {
     protected abstract execute(
         request: Request,
         customClaimsProvider: CustomClaimsProvider,
-        logEntry: LogEntryImpl): Promise<ApiClaims>;
+        logEntry: LogEntryImpl): Promise<ClaimsPrincipal>;
 
     /*
      * Plumbing to ensure the this parameter is available

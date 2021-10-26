@@ -1,6 +1,6 @@
 import {Request} from 'express';
 import hasher from 'js-sha256';
-import {ApiClaims} from '../claims/apiClaims';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal';
 import {CachedClaims} from '../claims/cachedClaims';
 import {ClaimsCache} from '../claims/claimsCache';
 import {ClaimsReader} from '../claims/claimsReader';
@@ -22,7 +22,7 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
      */
     protected async execute(
         request: Request,
-        customClaimsProvider: CustomClaimsProvider): Promise<ApiClaims> {
+        customClaimsProvider: CustomClaimsProvider): Promise<ClaimsPrincipal> {
 
         // First read the access token
         const accessToken = super.readAccessToken(request);
@@ -43,7 +43,7 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
         const cache = perRequestContainer.get<ClaimsCache>(BASETYPES.ClaimsCache);
         const cachedClaims = await cache.getExtraUserClaims(accessTokenHash);
         if (cachedClaims) {
-            return new ApiClaims(baseClaims, cachedClaims.userInfo, cachedClaims.custom);
+            return new ClaimsPrincipal(baseClaims, cachedClaims.userInfo, cachedClaims.custom);
         }
 
         // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
@@ -55,6 +55,6 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
         await cache.setExtraUserClaims(accessTokenHash, claimsToCache, payload.exp!);
 
         // Return the final claims
-        return new ApiClaims(baseClaims, userInfo, customClaims);
+        return new ClaimsPrincipal(baseClaims, userInfo, customClaims);
     }
 }

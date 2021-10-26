@@ -1,5 +1,5 @@
 import {Request} from 'express';
-import {ApiClaims} from '../claims/apiClaims';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal';
 import {ClaimsReader} from '../claims/claimsReader';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
 import {BASETYPES} from '../dependencies/baseTypes';
@@ -20,7 +20,7 @@ export class StandardAuthorizer extends BaseAuthorizer {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     protected async execute(
         request: Request,
-        customClaimsProvider: CustomClaimsProvider): Promise<ApiClaims> {
+        customClaimsProvider: CustomClaimsProvider): Promise<ClaimsPrincipal> {
 
         // First read the access token
         const accessToken = super.readAccessToken(request);
@@ -39,6 +39,6 @@ export class StandardAuthorizer extends BaseAuthorizer {
         const baseClaims = ClaimsReader.baseClaims(payload);
         const userInfo = ClaimsReader.userInfoClaims(payload);
         const customClaims = await customClaimsProvider.get(accessToken,baseClaims, userInfo);
-        return new ApiClaims(baseClaims, userInfo, customClaims);
+        return new ClaimsPrincipal(baseClaims, userInfo, customClaims);
     }
 }
