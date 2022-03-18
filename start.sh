@@ -9,6 +9,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 # Download SSL certificates from a central repo if needed
 #
+rm -rf ./resources
 git clone https://github.com/gary-archer/oauth.developmentcertificates ./resources
 if [ $? -ne 0 ]; then
     echo 'Problem encountered downloading development certificates'
