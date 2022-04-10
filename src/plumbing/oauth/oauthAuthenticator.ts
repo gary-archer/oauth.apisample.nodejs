@@ -1,8 +1,6 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import {inject, injectable} from 'inversify';
-import {createRemoteJWKSet} from 'jose/jwks/remote';
-import {jwtVerify} from 'jose/jwt/verify';
-import {JWTPayload} from 'jose/types';
+import {createRemoteJWKSet, JWTPayload, jwtVerify} from 'jose';
 import {URL} from 'url';
 import {ClaimsReader} from '../claims/claimsReader';
 import {UserInfoClaims} from '../claims/userInfoClaims';

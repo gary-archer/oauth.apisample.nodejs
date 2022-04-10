@@ -1,4 +1,4 @@
-import {JWTPayload} from 'jose/types';
+import {JWTPayload} from 'jose';
 import {BaseClaims} from './baseClaims';
 import {CustomClaims} from './customClaims';
 import {UserInfoClaims} from './userInfoClaims';

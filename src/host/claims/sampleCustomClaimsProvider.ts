@@ -1,4 +1,4 @@
-import {JWTPayload} from 'jose/types';
+import {JWTPayload} from 'jose';
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
 import {BaseClaims} from '../../plumbing/claims/baseClaims';
 import {CustomClaims} from '../../plumbing/claims/customClaims';
