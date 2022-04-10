@@ -30,7 +30,7 @@ Also add host names for the API and Authorization Server to your hosts file:
 
 ## Run Integration Tests
 
-To test the API's endpoints, run the integration test script:
+To test the API's endpoints, stop the API if it is running, then run the integration test script:
 
 ```bash
 npm test
