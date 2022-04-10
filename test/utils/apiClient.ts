@@ -1,4 +1,5 @@
 import axios, {AxiosRequestConfig} from 'axios';
+import {Guid} from 'guid-typescript';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy';
 import {ApiRequestOptions} from './apiRequestOptions';
 import {ApiResponse} from './apiResponse';
@@ -50,6 +51,10 @@ export class ApiClient {
 
     private async _callApi(requestOptions: ApiRequestOptions, metrics: ApiResponseMetrics): Promise<ApiResponse> {
 
+        metrics.startTime = new Date();
+        metrics.correlationId = Guid.create().toString();
+        const hrtimeStart = process.hrtime();
+
         const options = {
             url: this._baseUrl + requestOptions.apiPath,
             method: requestOptions.httpMethod,
@@ -57,6 +62,7 @@ export class ApiClient {
                 authorization: `Bearer ${requestOptions.accessToken}`,
                 'x-mycompany-api-client': this._clientName,
                 'x-mycompany-session-id': this._sessionId,
+                'x-mycompany-correlation-id': metrics.correlationId,
             },
             httpsAgent: this._httpProxy.agent,
         } as AxiosRequestConfig;
@@ -65,10 +71,6 @@ export class ApiClient {
             options.headers!['x-mycompany-test-exception'] = 'SampleApi';
         }
 
-        // Start measuring performance
-        metrics.startTime = new Date();
-        const hrtimeStart = process.hrtime();
-        
         try {
 
             const axiosResponse = await axios(options);

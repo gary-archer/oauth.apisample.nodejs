@@ -4,8 +4,6 @@
 export interface ApiResponseMetrics {
     operation: string;
     startTime: Date;
+    correlationId: string;
     millisecondsTaken: number;
-    statusCode: number;
-    errorCode: string;
-    errorId: string;
 }

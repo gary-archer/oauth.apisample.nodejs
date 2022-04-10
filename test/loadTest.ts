@@ -50,13 +50,14 @@ export class LoadTest {
         const startTime = process.hrtime();
         const headings = [
             'OPERATION'.padEnd(25),
+            'CORRELATION-ID'.padEnd(38),
             'START-TIME'.padEnd(28),
             'MILLISECONDS-TAKEN'.padEnd(21),
             'STATUS-CODE'.padEnd(14),
             'ERROR-CODE'.padEnd(24),
             'ERROR-ID'.padEnd(12),
-        ]
-        const header = '\n' + headings.join('');
+        ];
+        const header = headings.join('');
         console.log(color.yellow(header));
 
         // Next execute the main body of requests
@@ -279,7 +280,7 @@ export class LoadTest {
 
         let errorCode = '';
         let errorId   = '';
-        
+
         if (response.statusCode >= 400 && response.body.code) {
             errorCode = response.body.code;
         }
@@ -290,6 +291,7 @@ export class LoadTest {
 
         const values = [
             response.metrics.operation.padEnd(25),
+            response.metrics.correlationId.padEnd(38),
             response.metrics.startTime.toISOString().padEnd(28),
             response.metrics.millisecondsTaken.toString().padEnd(21),
             response.statusCode.toString().padEnd(14),
