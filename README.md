@@ -20,8 +20,7 @@ You need to run the script at least once in order to download development SSL ce
 
 ## Integration Test Setup
 
-Wiremock is used to mock the Authorization Server for testing.\
-This requires a Java runtime to be installed as a prerequisite.\
+Wiremock is used to mock the Authorization Server, which requires a Java runtime to be installed as a prerequisite.\
 Also add host names for the API and Authorization Server to your hosts file:
 
 ```text
