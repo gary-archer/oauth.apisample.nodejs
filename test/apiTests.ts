@@ -1,5 +1,4 @@
 import assert from 'assert';
-import fs from 'fs-extra';
 import {Guid} from 'guid-typescript';
 import {ApiClient} from './utils/apiClient';
 import {TokenIssuer} from './utils/tokenIssuer';
@@ -19,7 +18,7 @@ describe('OAuth API Tests', () => {
     const wiremockAdmin = new WiremockAdmin(false);
 
     // Create the API client
-    const apiBaseUrl = 'https://api.authsamples-dev.com:445'
+    const apiBaseUrl = 'https://api.authsamples-dev.com:445';
     const sessionId = Guid.create().toString();
     const apiClient = new ApiClient(apiBaseUrl, sessionId, false);
 
@@ -62,7 +61,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/userinfo',
             accessToken,
         };
-        
+
         const response = await apiClient.callApi(options);
 
         // Assert results
