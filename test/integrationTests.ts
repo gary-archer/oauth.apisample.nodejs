@@ -67,7 +67,7 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.regions.length, 1, 'Unexpected regions claim');
 
-    }).timeout(10000);
+    });
 
     /*
      * Test getting claims for the admin user
@@ -97,7 +97,7 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.regions.length, 3, 'Unexpected regions claim');
 
-    }).timeout(10000);
+    });
 
     /*
      * Test getting companies
@@ -127,7 +127,7 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.length, 2, 'Unexpected companies list');
 
-    }).timeout(10000);
+    });
 
     /*
      * Test getting companies for the admin user
@@ -157,7 +157,7 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.length, 4, 'Unexpected companies list');
 
-    }).timeout(10000);
+    });
 
     /*
      * Test getting allowed transactions
@@ -187,7 +187,7 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.transactions.length, 8, 'Unexpected transactions');
 
-    }).timeout(10000);
+    });
 
     /*
      * Test getting unauthorized transactions
@@ -217,7 +217,7 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 404, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.code, 'company_not_found', 'Unexpected error code');
 
-    }).timeout(10000);
+    });
 
     /*
      * Rehearse an API 500 error
@@ -249,5 +249,5 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.statusCode, 500, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.code, 'exception_simulation', 'Unexpected error code');
 
-    }).timeout(10000);
+    });
 });
