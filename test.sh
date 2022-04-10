@@ -75,4 +75,4 @@ fi
 #
 # Restore the API configuration
 #
-#cp environments/api.config.json ./api.config.json
+cp environments/api.config.json ./api.config.json
