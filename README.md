@@ -4,14 +4,14 @@
 
 [![Known Vulnerabilities](https://snyk.io/test/github/gary-archer/oauth.apisample.nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/gary-archer/oauth.apisample.nodejs?targetFile=package.json)
 
-### Overview
+## Overview
 
 The final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
 
 - The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
-### Build the API
+## Build the API
 
 Run the following script to build the API and start listening over HTTPS.\
 You need to run the script at least once in order to download development SSL certificates.
@@ -86,16 +86,16 @@ getCompanyList           2022-04-10T19:02:48.175Z    12                   200
 getCompanyTransactions   2022-04-10T19:02:48.173Z    14                   200                                         
 ```
 
-### Details
+## Details
 
 * See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API
 * See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for key implementation details
 
-### Programming Languages
+## Programming Languages
 
 * Node.js with TypeScript is used to implement the REST API
 
-### Middleware Used
+## Middleware Used
 
 * Express is used to host the API over SSL port 443
 * AWS Cognito is used as the default Authorization Server
