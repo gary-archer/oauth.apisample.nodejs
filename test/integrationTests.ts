@@ -66,7 +66,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.regions.length, 1, 'Unexpected regions claim');
-
     });
 
     /*
@@ -96,7 +95,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.regions.length, 3, 'Unexpected regions claim');
-
     });
 
     /*
@@ -126,7 +124,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.length, 2, 'Unexpected companies list');
-
     });
 
     /*
@@ -156,7 +153,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.length, 4, 'Unexpected companies list');
-
     });
 
     /*
@@ -186,7 +182,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.transactions.length, 8, 'Unexpected transactions');
-
     });
 
     /*
@@ -216,7 +211,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 404, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.code, 'company_not_found', 'Unexpected error code');
-
     });
 
     /*
@@ -248,6 +242,5 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 500, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.code, 'exception_simulation', 'Unexpected error code');
-
     });
 });
