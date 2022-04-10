@@ -1,6 +1,8 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
+import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
 import {BaseClaims} from '../../plumbing/claims/baseClaims';
+import {CustomClaims} from '../../plumbing/claims/customClaims';
 import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
@@ -13,14 +15,17 @@ export class UserInfoController extends BaseHttpController {
 
     private readonly _baseClaims: BaseClaims;
     private readonly _userInfoClaims: UserInfoClaims;
+    private readonly _customClaims: SampleCustomClaims;
 
     public constructor(
         @inject(BASETYPES.BaseClaims) baseClaims: BaseClaims,
-        @inject(BASETYPES.UserInfoClaims) userInfoClaims: UserInfoClaims) {
+        @inject(BASETYPES.UserInfoClaims) userInfoClaims: UserInfoClaims,
+        @inject(BASETYPES.CustomClaims) customClaims: CustomClaims) {
         super();
 
         this._baseClaims = baseClaims;
         this._userInfoClaims = userInfoClaims;
+        this._customClaims = customClaims as SampleCustomClaims;
     }
 
     /*
@@ -32,10 +37,11 @@ export class UserInfoController extends BaseHttpController {
         // First check scopes
         ScopeVerifier.enforce(this._baseClaims.scopes, 'profile');
 
-        // Return OAuth profile data for display in the UI
+        // Return a payload with whatever the UI needs
         return {
             givenName: this._userInfoClaims.givenName,
             familyName: this._userInfoClaims.familyName,
+            regions: this._customClaims.userRegions,
         };
     }
 }

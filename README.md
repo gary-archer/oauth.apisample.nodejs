@@ -11,12 +11,50 @@ The final OAuth secured Node.js API code sample, referenced in my blog at https:
 - The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
-### Quick Start
+### Build the API
 
-Run the start script to begin listening over HTTPS.\
+Run the following script to build the API and start listening over HTTPS.\
 You need to run the script at least once in order to download development SSL certificates.
 
 - ./start.sh
+
+## Integration Test Setup
+
+Wiremock is used to mock the Authorization Server for testing.\
+This requires a Java runtime to be installed as a prerequisite.\
+Also add host names for the API and Authorization Server to your hosts file:
+
+```text
+127.0.0.1     localhost api.authsamples-dev.com login.mycompany.com
+::1           localhost
+```
+
+## Run Integration Tests
+
+To test the API's endpoints, run the integration test script:
+
+```bash
+npm test
+```
+
+The API then runs some integration tests to demonstrate key API behaviour:
+
+```text
+Running Wiremock and API ...
+Waiting for Wiremock endpoints to come up ...
+Waiting for API endpoints to come up ...
+Running integration tests ...
+
+
+  OAuth API Tests
+    ✔ Get user claims returns a single region for the standard user
+    ✔ Get user claims returns all regions for the admin user
+    ✔ Get companies list returns 2 items for the standard user
+    ✔ Get companies list returns all items for the admin user
+    ✔ Get transactions is allowed for companies that match the regions claim
+    ✔ Get transactions returns 404 for companies that do not match the regions claim
+    ✔ API exceptions return 500 with a supportable error response
+```
 
 ### Details
 
