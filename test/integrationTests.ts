@@ -20,7 +20,7 @@ describe('OAuth API Tests', () => {
     // Create the API client
     const apiBaseUrl = 'https://api.authsamples-dev.com:445';
     const sessionId = Guid.create().toString();
-    const apiClient = new ApiClient(apiBaseUrl, sessionId, false);
+    const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, false);
 
     /*
      * Initialize the test configuration and token issuer, then register a mock keyset the API will use to validate JWTs
@@ -47,7 +47,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -61,7 +61,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/userinfo',
             accessToken,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getUserInfoClaims(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
@@ -77,7 +77,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Admin',
             family_name: 'User',
@@ -91,7 +91,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/userinfo',
             accessToken,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getUserInfoClaims(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
@@ -107,7 +107,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -121,7 +121,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/companies',
             accessToken,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getCompanyList(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
@@ -137,7 +137,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Admin',
             family_name: 'User',
@@ -151,7 +151,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/companies',
             accessToken,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getCompanyList(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
@@ -167,7 +167,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -181,7 +181,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/companies/2/transactions',
             accessToken,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getCompanyTransactions(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
@@ -197,7 +197,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -211,7 +211,7 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/companies/3/transactions',
             accessToken,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getCompanyTransactions(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 404, 'Unexpected HTTP status code');
@@ -227,7 +227,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response
+        // Register the Authorization Server response to a user info request from the API
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -243,7 +243,7 @@ describe('OAuth API Tests', () => {
             sessionId,
             rehearseException: true,
         };
-        const response = await apiClient.callApi(options);
+        const response = await apiClient.getCompanyTransactions(options);
 
         // Assert results
         assert.strictEqual(response.statusCode, 500, 'Unexpected HTTP status code');

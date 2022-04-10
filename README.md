@@ -32,7 +32,7 @@ Also add host names for the API and Authorization Server to your hosts file:
 
 ## Run Integration Tests
 
-To test the API's endpoints, stop the API if it is running, then run the integration test script:
+To test the API's endpoints, stop the API if it is running, then run integration tests:
 
 ```bash
 npm test
@@ -55,6 +55,35 @@ Running integration tests ...
     ✔ Get transactions is allowed for companies that match the regions claim
     ✔ Get transactions returns 404 for companies that do not match the regions claim
     ✔ API exceptions return 500 with a supportable error response
+```
+
+## Run a Basic Load Test
+
+To run a basic load test, stop the API and Wiremock if running, then run the load test:
+
+```bash
+npm run loadtest
+```
+
+This sends parallel requests to the API to verify that the code has no concurrency problems.\
+The API then reports metrics to enable early visualization of errors and slowness:
+
+```text
+OPERATION                START-TIME                  MILLISECONDS-TAKEN   STATUS-CODE   ERROR-CODE              ERROR-ID    
+getUserInfoClaims        2022-04-10T19:02:48.126Z    25                   200                                               
+getCompanyList           2022-04-10T19:02:48.130Z    22                   200                                               
+getCompanyList           2022-04-10T19:02:48.131Z    22                   200                                               
+getCompanyTransactions   2022-04-10T19:02:48.129Z    24                   200                                               
+getCompanyTransactions   2022-04-10T19:02:48.129Z    25                   200                                               
+getUserInfoClaims        2022-04-10T19:02:48.154Z    13                   200                                               
+getCompanyList           2022-04-10T19:02:48.158Z    12                   200                                               
+getCompanyList           2022-04-10T19:02:48.157Z    13                   200                                               
+getCompanyTransactions   2022-04-10T19:02:48.156Z    15                   200                                               
+getCompanyTransactions   2022-04-10T19:02:48.155Z    16                   200                                               
+getCompanyList           2022-04-10T19:02:48.174Z    11                   500           exception_simulation    79162       
+getUserInfoClaims        2022-04-10T19:02:48.172Z    14                   401           unauthorized                        
+getCompanyList           2022-04-10T19:02:48.175Z    12                   200                                               
+getCompanyTransactions   2022-04-10T19:02:48.173Z    14                   200                                         
 ```
 
 ### Details

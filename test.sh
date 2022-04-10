@@ -5,6 +5,7 @@
 ###################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+TYPE="$1"
 
 #
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
@@ -60,10 +61,18 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 #
 # Run the integration tests
 #
-echo 'Running integration tests ...'
-./node_modules/.bin/mocha -r ts-node/register test/apiTests.ts
+if [ "$TYPE" == 'INTEGRATION' ]; then
+
+    echo 'Running integration tests ...'
+    ./node_modules/.bin/mocha -r ts-node/register test/integrationTests.ts
+
+elif [ "$TYPE" == 'LOAD' ]; then
+
+    echo 'Running load test ...'
+    ts-node test/loadTest.ts
+fi
 
 #
 # Restore the API configuration
 #
-cp environments/api.config.json ./api.config.json
+#cp environments/api.config.json ./api.config.json

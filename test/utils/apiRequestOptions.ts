@@ -1,7 +1,7 @@
 /*
  * Some options suitable for our API tests
  */
-export interface ApiClientOptions {
+export interface ApiRequestOptions {
     httpMethod: string;
     apiPath: string;
     accessToken: string;
