@@ -16,8 +16,8 @@ The final OAuth secured Node.js API code sample, referenced in my blog at https:
 Run the following script to build the API and start listening over HTTPS.\
 You need to run the script at least once in order to download development SSL certificates.
 
-``bash
-- ./start.sh
+```bash
+./start.sh
 ```
 
 ## Integration Test Setup
