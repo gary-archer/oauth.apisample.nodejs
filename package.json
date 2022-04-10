@@ -8,8 +8,6 @@
     "start": "nodemon -e ts --exec \"npm run build\"",
     "test": "./test.sh INTEGRATION",
     "loadtest": "./test.sh LOAD",
-    "it": "./node_modules/.bin/mocha -r ts-node/register test/integrationTests.ts",
-    "lt": "ts-node test/loadTest.ts",
     "buildRelease": "rimraf dist && tsc",
     "startRelease": "node dist/host/startup/app.js"
   },

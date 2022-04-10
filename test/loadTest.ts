@@ -124,7 +124,7 @@ export class LoadTest {
 
         // Next produce some requests that will run in parallel
         const requests: (() => Promise<ApiResponse>)[] = [];
-        for (let index = 0; index < 10000; index++) {
+        for (let index = 0; index < 100; index++) {
 
             // Create a 401 error on request 10, by making the access token act expired
             let accessToken = accessTokens[index % 5];
