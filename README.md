@@ -86,7 +86,7 @@ getCompanyList           2022-04-10T19:02:48.175Z    12                   200
 getCompanyTransactions   2022-04-10T19:02:48.173Z    14                   200                                         
 ```
 
-## Details
+## Further Details
 
 * See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API
 * See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for key implementation details
