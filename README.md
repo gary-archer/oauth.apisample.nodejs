@@ -93,7 +93,7 @@ getCompanyList           055c6711-59a6-e6b4-0369-5517fdab2cdb  2022-04-10T21:00:
 getUserInfoClaims        ab5257a0-3a4a-e1b3-5b31-bfbf506edf75  2022-04-10T21:00:14.299Z    19                   200
 ```
 
-## Details
+## Further Details
 
 * See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API
 * See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for key implementation details
