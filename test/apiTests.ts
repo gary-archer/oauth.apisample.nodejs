@@ -61,7 +61,6 @@ describe('OAuth API Tests', () => {
             apiPath: '/api/userinfo',
             accessToken,
         };
-
         const response = await apiClient.callApi(options);
 
         // Assert results
