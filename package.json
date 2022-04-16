@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "npx eslint . --ext .ts",
     "build": "ts-node --files src/host/startup/app.ts",
-    "start": "nodemon -e ts --exec \"npm run build\"",
+    "start": "nodemon --watch 'src/**/*' -e ts --exec \"npm run build\"",
     "testsetup": "./test/scripts/testsetup.sh",
     "test": "./test/scripts/test.sh",
     "loadtest": "./test/scripts/loadtest.sh",

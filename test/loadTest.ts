@@ -140,12 +140,12 @@ export class LoadTest {
 
             } else if (index % 5 === 1) {
 
-                requests.push(this._createTransactionsRequest(accessToken, '2'));
+                requests.push(this._createTransactionsRequest(accessToken, 2));
 
             } else if (index % 5 === 2) {
 
-                // On request 32 try to access unauthorized data for company 3, to create a 404 error
-                const companyId = (index === 32) ? '3' : '2';
+                // On request 71 try to access unauthorized data for company 3, to create a 404 error
+                const companyId = (index === 71) ? 3 : 2;
                 requests.push(this._createTransactionsRequest(accessToken, companyId));
 
             } else {
@@ -163,11 +163,7 @@ export class LoadTest {
      */
     private _createUserInfoRequest(accessToken: string): () => Promise<ApiResponse> {
 
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/userinfo',
-            accessToken,
-        } as ApiRequestOptions;
+        const options = new ApiRequestOptions(accessToken);
         this._initializeApiRequest(options);
 
         return () => this._apiClient.getUserInfoClaims(options);
@@ -178,11 +174,7 @@ export class LoadTest {
      */
     private _createCompaniesRequest(accessToken: string): () => Promise<ApiResponse> {
 
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/companies',
-            accessToken,
-        } as ApiRequestOptions;
+        const options = new ApiRequestOptions(accessToken);
         this._initializeApiRequest(options);
 
         return () => this._apiClient.getCompanyList(options);
@@ -191,16 +183,12 @@ export class LoadTest {
     /*
      * Create a get transactions request callback
      */
-    private _createTransactionsRequest(accessToken: string, companyId: string): () => Promise<ApiResponse> {
+    private _createTransactionsRequest(accessToken: string, companyId: number): () => Promise<ApiResponse> {
 
-        const options = {
-            httpMethod: 'GET',
-            apiPath: `/api/companies/${companyId}/transactions`,
-            accessToken,
-        } as ApiRequestOptions;
+        const options = new ApiRequestOptions(accessToken);
         this._initializeApiRequest(options);
 
-        return () => this._apiClient.getCompanyTransactions(options);
+        return () => this._apiClient.getCompanyTransactions(options, companyId);
     }
 
     /*
@@ -208,9 +196,9 @@ export class LoadTest {
      */
     private _initializeApiRequest(options: ApiRequestOptions): void {
 
-        // On request 14 we'll simulate a 500 error via a custom header
+        // On request 85 we'll simulate a 500 error via a custom header
         this._totalCount++;
-        if (this._totalCount === 14) {
+        if (this._totalCount === 85) {
             options.rehearseException = true;
         }
     }

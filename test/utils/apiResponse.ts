@@ -6,5 +6,5 @@ import {ApiResponseMetrics} from './apiResponseMetrics';
 export interface ApiResponse {
     statusCode: number;
     body: any;
-    metrics: ApiResponseMetrics
+    metrics: ApiResponseMetrics;
 }

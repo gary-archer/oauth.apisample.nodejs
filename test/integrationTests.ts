@@ -1,6 +1,7 @@
 import assert from 'assert';
 import {Guid} from 'guid-typescript';
 import {ApiClient} from './utils/apiClient';
+import {ApiRequestOptions} from './utils/apiRequestOptions';
 import {TokenIssuer} from './utils/tokenIssuer';
 import {WiremockAdmin} from './utils/wiremockAdmin';
 
@@ -56,11 +57,7 @@ describe('OAuth API Tests', () => {
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/userinfo',
-            accessToken,
-        };
+        const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getUserInfoClaims(options);
 
         // Assert results
@@ -85,11 +82,7 @@ describe('OAuth API Tests', () => {
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/userinfo',
-            accessToken,
-        };
+        const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getUserInfoClaims(options);
 
         // Assert results
@@ -114,11 +107,7 @@ describe('OAuth API Tests', () => {
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/companies',
-            accessToken,
-        };
+        const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getCompanyList(options);
 
         // Assert results
@@ -143,11 +132,7 @@ describe('OAuth API Tests', () => {
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/companies',
-            accessToken,
-        };
+        const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getCompanyList(options);
 
         // Assert results
@@ -172,12 +157,8 @@ describe('OAuth API Tests', () => {
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/companies/2/transactions',
-            accessToken,
-        };
-        const response = await apiClient.getCompanyTransactions(options);
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyTransactions(options, 2);
 
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
@@ -201,12 +182,8 @@ describe('OAuth API Tests', () => {
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/companies/3/transactions',
-            accessToken,
-        };
-        const response = await apiClient.getCompanyTransactions(options);
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyTransactions(options, 3);
 
         // Assert results
         assert.strictEqual(response.statusCode, 404, 'Unexpected HTTP status code');
@@ -229,15 +206,10 @@ describe('OAuth API Tests', () => {
         };
         await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
-        // Company 3 is associated to a region the user is not authorized to access
-        const options = {
-            httpMethod: 'GET',
-            apiPath: '/api/companies/2/transactions',
-            accessToken,
-            sessionId,
-            rehearseException: true,
-        };
-        const response = await apiClient.getCompanyTransactions(options);
+        // Call a valid API operation but pass a custom header to cause an API exception
+        const options = new ApiRequestOptions(accessToken);
+        options.rehearseException = true;
+        const response = await apiClient.getCompanyTransactions(options, 2);
 
         // Assert results
         assert.strictEqual(response.statusCode, 500, 'Unexpected HTTP status code');
