@@ -5,5 +5,9 @@
 #############################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-cd ..
+cd ../..
+
+#
+# Run the API in this terminal
+#
 npm start

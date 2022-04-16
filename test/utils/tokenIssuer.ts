@@ -1,3 +1,4 @@
+import {Guid} from 'guid-typescript';
 import {generateKeyPair, exportJWK, KeyLike, SignJWT} from 'jose';
 
 /*
@@ -8,11 +9,13 @@ export class TokenIssuer {
     private readonly _algorithm: string;
     private _tokenSigningPrivateKey: KeyLike | null;
     private _tokenSigningPublicKey: KeyLike | null;
+    private _keyId: string;
 
     public constructor() {
         this._algorithm = 'RS256';
         this._tokenSigningPrivateKey = null;
         this._tokenSigningPublicKey = null;
+        this._keyId = Guid.create().toString();
     }
 
     /*
@@ -38,7 +41,7 @@ export class TokenIssuer {
             aud: 'api.mycompany.com',
             scope: 'openid profile email https://api.authsamples.com/api/transactions_read',
         })
-            .setProtectedHeader( { kid: '1', alg: this._algorithm } )
+            .setProtectedHeader( { kid: this._keyId, alg: this._algorithm } )
             .setIssuedAt(now - 30000)
             .setExpirationTime(now + 30000)
             .sign(this._tokenSigningPrivateKey!);
@@ -51,7 +54,7 @@ export class TokenIssuer {
 
         const jwk = await exportJWK(this._tokenSigningPublicKey!);
 
-        jwk.kid = '1';
+        jwk.kid = this._keyId;
         jwk.alg = this._algorithm;
         const keys = {
             keys: [

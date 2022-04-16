@@ -1,11 +1,19 @@
 #!/bin/bash
 
-###################################################
-# A script to run integration tests against the API
-###################################################
+########################################################################
+# A script to run the API with a test configuration, along with Wiremock
+########################################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-TYPE="$1"
+cd ../..
+
+#
+# Download development SSL certificates if required
+#
+./downloadcerts.sh
+if [ $? -ne 0 ]; then
+    exit
+fi
 
 #
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
@@ -31,11 +39,11 @@ esac
 #
 echo 'Running Wiremock and API ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
-    open -a Terminal ./test/run_wiremock.sh
-    open -a Terminal ./test/run_api.sh
+    open -a Terminal ./test/scripts/run_wiremock.sh
+    open -a Terminal ./test/scripts/run_api.sh
 else
-    "$GIT_BASH" -c ./test/run_wiremock.sh &
-    "$GIT_BASH" -c ./test/run_api.sh &
+    "$GIT_BASH" -c ./test/scripts/run_wiremock.sh &
+    "$GIT_BASH" -c ./test/scripts/run_api.sh &
 fi
 
 #
@@ -54,25 +62,11 @@ while [ "$(curl -k -s -X GET -o /dev/null -w '%{http_code}' "$API_URL")" != '401
 done
 
 #
-# Tests will call the API over SSL, so trust the development root certificate
-#
-export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
-
-#
-# Run the integration tests
-#
-if [ "$TYPE" == 'INTEGRATION' ]; then
-
-    echo 'Running integration tests ...'
-    ./node_modules/.bin/mocha -r ts-node/register test/integrationTests.ts
-
-elif [ "$TYPE" == 'LOAD' ]; then
-
-    echo 'Running load test ...'
-    ts-node test/loadTest.ts
-fi
-
-#
-# Restore the API configuration
+# Restore the API configuration once the API is loaded
 #
 cp environments/api.config.json ./api.config.json
+
+#
+# 
+#
+echo "Test setup succeeded, now run 'npm test' or 'npm run loadtest' ..."

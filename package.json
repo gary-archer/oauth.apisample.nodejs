@@ -6,8 +6,9 @@
     "lint": "npx eslint . --ext .ts",
     "build": "ts-node --files src/host/startup/app.ts",
     "start": "nodemon -e ts --exec \"npm run build\"",
-    "test": "./test.sh INTEGRATION",
-    "loadtest": "./test.sh LOAD",
+    "testsetup": "./test/scripts/testsetup.sh",
+    "test": "./test/scripts/test.sh",
+    "loadtest": "./test/scripts/loadtest.sh",
     "buildRelease": "rimraf dist && tsc",
     "startRelease": "node dist/host/startup/app.js"
   },
