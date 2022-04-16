@@ -30,7 +30,7 @@ Also add host names for the API and Authorization Server to your hosts file:
 ::1           localhost
 ```
 
-Then run the following command:
+Then run the following command, to run the API with a test configuration, along with Wiremock:
 
 ```bash
 npm run testsetup
@@ -47,24 +47,19 @@ npm test
 The API then runs some integration tests to demonstrate key API behaviour:
 
 ```text
-Running Wiremock and API ...
-Waiting for Wiremock endpoints to come up ...
-Waiting for API endpoints to come up ...
-Running integration tests ...
-
-  OAuth API Tests
-    ✔ Get user claims returns a single region for the standard user
-    ✔ Get user claims returns all regions for the admin user
-    ✔ Get companies list returns 2 items for the standard user
-    ✔ Get companies list returns all items for the admin user
-    ✔ Get transactions is allowed for companies that match the regions claim
-    ✔ Get transactions returns 404 for companies that do not match the regions claim
-    ✔ API exceptions return 500 with a supportable error response
+OAuth API Tests
+  ✔ Get user claims returns a single region for the standard user
+  ✔ Get user claims returns all regions for the admin user
+  ✔ Get companies list returns 2 items for the standard user
+  ✔ Get companies list returns all items for the admin user
+  ✔ Get transactions is allowed for companies that match the regions claim
+  ✔ Get transactions returns 404 for companies that do not match the regions claim
+  ✔ API exceptions return 500 with a supportable error response
 ```
 
 ## Run a Basic Load Test
 
-To run a basic load test, stop the API and Wiremock if running, then run the load test:
+To run a basic load test, stop the API and Wiremock if running, then run this command:
 
 ```bash
 npm run loadtest
