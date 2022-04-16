@@ -17,6 +17,7 @@ import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
 import {ClaimsCachingAuthorizer} from '../oauth/claimsCachingAuthorizer';
 import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
+import {JwksRetriever} from '../oauth/jwksRetriever';
 import {StandardAuthorizer} from '../oauth/standardAuthorizer';
 import {BaseAuthorizer} from '../security/baseAuthorizer';
 import {HttpProxy} from '../utilities/httpProxy';
@@ -191,6 +192,10 @@ export class BaseCompositionRoot {
         // Make the configuration injectable
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
             .toConstantValue(this._oauthConfiguration!);
+
+        // Register a singleton to cache JWKS keys
+        this._container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
+            .toConstantValue(new JwksRetriever(this._oauthConfiguration!, this._httpProxy!));
 
         // The authenticator object is created per request and deals with token validation and getting user info
         this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)

@@ -1,7 +1,6 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import {inject, injectable} from 'inversify';
-import {createRemoteJWKSet, JWTPayload, jwtVerify} from 'jose';
-import {URL} from 'url';
+import {JWTPayload, jwtVerify} from 'jose';
 import {ClaimsReader} from '../claims/claimsReader';
 import {UserInfoClaims} from '../claims/userInfoClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
@@ -11,6 +10,7 @@ import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntry} from '../logging/logEntry';
 import {HttpProxy} from '../utilities/httpProxy';
 import {using} from '../utilities/using';
+import {JwksRetriever} from './jwksRetriever';
 
 /*
  * The entry point for calls to the Authorization Server
@@ -20,15 +20,18 @@ export class OAuthAuthenticator {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _logEntry: LogEntry;
+    private readonly _jwksRetriever: JwksRetriever;
     private readonly _httpProxy: HttpProxy;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
         @inject(BASETYPES.LogEntry) logEntry: LogEntry,
+        @inject(BASETYPES.JwksRetriever) jwksRetriever: JwksRetriever,
         @inject(BASETYPES.HttpProxy) httpProxy: HttpProxy) {
 
         this._configuration = configuration;
         this._logEntry = logEntry;
+        this._jwksRetriever = jwksRetriever;
         this._httpProxy = httpProxy;
     }
 
@@ -41,19 +44,13 @@ export class OAuthAuthenticator {
 
             try {
 
-                // Download token signing public keys from the Authorization Server, which are then cached
-                const jwksOptions = {
-                    agent: this._httpProxy.agent,
-                };
-                const remoteJwkSet = createRemoteJWKSet(new URL(this._configuration.jwksEndpoint), jwksOptions);
-
                 // Perform the JWT validation according to best practices
                 const options = {
                     algorithms: ['RS256'],
                     issuer: this._configuration.issuer,
                     audience: this._configuration.audience,
                 };
-                const result = await jwtVerify(accessToken, remoteJwkSet, options);
+                const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
                 return result.payload;
 
             } catch (e: any) {
