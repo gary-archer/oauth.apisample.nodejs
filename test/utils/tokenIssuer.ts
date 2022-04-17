@@ -71,7 +71,6 @@ export class TokenIssuer {
     public async issueMaliciousAccessToken(sub: string): Promise<string> {
 
         const maliciousKeys = await generateKeyPair(this._algorithm);
-        
         const now = Date.now();
 
         return await new SignJWT( {
