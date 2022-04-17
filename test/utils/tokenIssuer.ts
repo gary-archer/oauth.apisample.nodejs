@@ -29,6 +29,24 @@ export class TokenIssuer {
     }
 
     /*
+     * Get the token signing public keys as a JSON Web Keyset
+     */
+    public async getTokenSigningPublicKeys(): Promise<string> {
+
+        const jwk = await exportJWK(this._tokenSigningPublicKey!);
+
+        jwk.kid = this._keyId;
+        jwk.alg = this._algorithm;
+        const keys = {
+            keys: [
+                jwk,
+            ],
+        };
+
+        return JSON.stringify(keys);
+    }
+
+    /*
      * Issue an access token with the supplied subject claim
      */
     public async issueAccessToken(sub: string): Promise<string> {
@@ -48,20 +66,23 @@ export class TokenIssuer {
     }
 
     /*
-     * Get the token signing public keys as a JSON Web Keyset
+     * Issue an access token signed with an untrusted JWK
      */
-    public async getTokenSigningPublicKeys(): Promise<string> {
+    public async issueMaliciousAccessToken(sub: string): Promise<string> {
 
-        const jwk = await exportJWK(this._tokenSigningPublicKey!);
+        const maliciousKeys = await generateKeyPair(this._algorithm);
+        
+        const now = Date.now();
 
-        jwk.kid = this._keyId;
-        jwk.alg = this._algorithm;
-        const keys = {
-            keys: [
-                jwk,
-            ],
-        };
-
-        return JSON.stringify(keys);
+        return await new SignJWT( {
+            sub,
+            iss: 'testissuer.com',
+            aud: 'api.mycompany.com',
+            scope: 'openid profile email https://api.authsamples.com/api/transactions_read',
+        })
+            .setProtectedHeader( { kid: this._keyId, alg: this._algorithm } )
+            .setIssuedAt(now - 30000)
+            .setExpirationTime(now + 30000)
+            .sign(maliciousKeys.privateKey);
     }
 }

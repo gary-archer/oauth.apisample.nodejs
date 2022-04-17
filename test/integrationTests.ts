@@ -141,6 +141,23 @@ describe('OAuth API Tests', () => {
     });
 
     /*
+     * Test getting companies with a malicious JWT
+     */
+    it ('Get companies list with malicious JWT returns a 401 error', async () => {
+
+        // Get an access token for the end user of this test
+        const accessToken = await tokenIssuer.issueMaliciousAccessToken(guestUserId);
+
+        // Call the API
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'unauthorized');
+    });
+
+    /*
      * Test getting allowed transactions
      */
     it ('Get transactions is allowed for companies that match the regions claim', async () => {
