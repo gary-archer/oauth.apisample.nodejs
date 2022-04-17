@@ -35,6 +35,7 @@ export class LoadTest {
 
     /*
      * Call the API with a volume of requests, with batches that run in parallel
+     * The tests can be used to verify that Elasticsearch logging is working as requested
      */
     public async execute(): Promise<void> {
 
@@ -119,7 +120,7 @@ export class LoadTest {
     }
 
     /*
-     * Create the main body of API requests
+     * Run the main body of API requests, including some invalid requests that trigger errors
      */
     private async _sendLoadTestRequests(accessTokens: string[]): Promise<void> {
 
@@ -145,7 +146,7 @@ export class LoadTest {
             } else if (index % 5 === 2) {
 
                 // On request 71 try to access unauthorized data for company 3, to create a 404 error
-                const companyId = (index === 71) ? 3 : 2;
+                const companyId = (index === 72) ? 3 : 2;
                 requests.push(this._createTransactionsRequest(accessToken, companyId));
 
             } else {

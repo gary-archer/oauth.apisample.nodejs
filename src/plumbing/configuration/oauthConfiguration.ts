@@ -15,6 +15,9 @@ export interface OAuthConfiguration {
     // The endpoint from which to download the token signing public key
     jwksEndpoint: string;
 
+    // In test environments this is set to zero
+    jwksCooldownDuration?: number;
+
     // The URL to the Authorization Server's user info endpoint, if needed
     userInfoEndpoint: string;
 

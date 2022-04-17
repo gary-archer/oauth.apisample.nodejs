@@ -67,6 +67,6 @@ done
 cp environments/api.config.json ./api.config.json
 
 #
-# 
+# Indicate success
 #
-echo "Test setup succeeded, now run 'npm test' or 'npm run loadtest' ..."
+echo "Start tests via 'npm test' or 'npm run loadtest' ..."

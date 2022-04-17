@@ -37,6 +37,7 @@
         "issuer":                        "testissuer.com",
         "audience":                      "api.mycompany.com",
         "jwksEndpoint":                  "http://login.mycompany.com/.well-known/jwks.json",
+        "jwksCooldownDuration":          0,
         "userInfoEndpoint":              "http://login.mycompany.com/oauth2/userInfo",
         "claimsCacheTimeToLiveMinutes":  30
     }
