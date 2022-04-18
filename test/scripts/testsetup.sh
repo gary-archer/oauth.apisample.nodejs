@@ -35,6 +35,17 @@ case "$(uname -s)" in
 esac
 
 #
+# Install dependencies if needed
+#
+if [ ! -d 'node_modules' ]; then
+    npm install
+    if [ $? -ne 0 ]; then
+        echo 'Problem encountered building the API'
+        exit
+    fi
+fi
+
+#
 # Run Wiremock and the API in child windows
 #
 echo 'Running Wiremock and API ...'

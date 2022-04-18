@@ -1,5 +1,5 @@
 import {inject} from 'inversify';
-import {BaseHttpController, controller, httpPost, requestParam} from 'inversify-express-utils';
+import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
 import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
@@ -23,7 +23,7 @@ export class ClaimsController extends BaseHttpController {
      * This is called during token issuance when the Authorization Server supports it
      * The Authorization Server will then include claims returned in the JWT access token
      */
-    @httpPost('/:subject')
+    @httpGet('/:subject')
     public async getCustomClaims(@requestParam('subject') subject: string): Promise<any> {
 
         const customClaims = await this._customClaimsProvider.issue(subject) as SampleCustomClaims;
