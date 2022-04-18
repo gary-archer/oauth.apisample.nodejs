@@ -48,7 +48,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -73,7 +73,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Admin',
             family_name: 'User',
@@ -98,7 +98,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -123,7 +123,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Admin',
             family_name: 'User',
@@ -165,7 +165,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -190,7 +190,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
@@ -215,7 +215,7 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // Register the Authorization Server response to a user info request from the API
+        // The API will call the Authorization Server to get user info for the token, so register a mock response
         const mockUserInfo = {
             given_name: 'Guest',
             family_name: 'User',
