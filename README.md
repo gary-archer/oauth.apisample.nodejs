@@ -11,9 +11,9 @@ The final OAuth secured Node.js API code sample, referenced in my blog at https:
 - The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 - The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
 
-## Build the API
+## Build and Run the API
 
-Run the following script to build the API and start listening over HTTPS.\
+Run the following script to build the API then start listening over HTTPS.\
 Development SSL certificates must be downloaded before `npm start` will work.
 
 ```bash
@@ -30,7 +30,7 @@ Also add host names for the API and Authorization Server to your hosts file:
 ::1           localhost
 ```
 
-Then run the following command, to run the API with a test configuration, along with Wiremock:
+Stop the API if it is listening, then run this command to run the API with a test configuration, along with Wiremock:
 
 ```bash
 npm run testsetup
@@ -38,13 +38,11 @@ npm run testsetup
 
 ## Run Integration Tests
 
-To run integration tests that call the API's HTTPS endpoints, run this command:
+Next run integration tests that call the running API's HTTPS endpoints, via this command:
 
 ```bash
 npm test
 ```
-
-The API then runs some integration tests to demonstrate key API behaviour:
 
 ```text
 OAuth API Tests
@@ -60,7 +58,7 @@ OAuth API Tests
 
 ## Run a Basic Load Test
 
-To run a basic load test that calls the API's HTTPS endpoints, run this command:
+Or run a basic load test that calls the API's HTTPS endpoints, via this command:
 
 ```bash
 npm run loadtest
