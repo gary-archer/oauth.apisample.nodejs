@@ -38,7 +38,7 @@ npm run testsetup
 
 ## Run Integration Tests
 
-To test the API's endpoints, stop the API if it is running, then run integration tests:
+To run integration tests that call the API's HTTPS endpoints, run this command:
 
 ```bash
 npm test
@@ -60,7 +60,7 @@ OAuth API Tests
 
 ## Run a Basic Load Test
 
-To run a basic load test, stop the API and Wiremock if running, then run this command:
+To run a basic load test that calls the API's HTTPS endpoints, run this command:
 
 ```bash
 npm run loadtest
