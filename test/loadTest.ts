@@ -216,7 +216,6 @@ export class LoadTest {
         let current = 0;
 
         // Process one batch at a time
-        const results: ApiResponse[] = [];
         while (current < total) {
 
             // Get a batch of requests
@@ -226,10 +225,7 @@ export class LoadTest {
             const batchPromises = requestBatch.map((r) => this._executeApiRequest(r));
 
             // Wait for the batch to complete
-            const batchResults = await Promise.all(batchPromises);
-
-            // Process results
-            batchResults.forEach((r) => results.push(r));
+            await Promise.all(batchPromises);
             current += batchSize;
         }
     }
