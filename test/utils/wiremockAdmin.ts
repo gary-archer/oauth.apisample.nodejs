@@ -48,7 +48,7 @@ export class WiremockAdmin {
     }
 
     /*
-     * Register a user at the start of an individual test
+     * Register a user at the start of a test
      */
     public async registerUserInfo(userJson: string): Promise<void> {
 
@@ -69,7 +69,7 @@ export class WiremockAdmin {
     }
 
     /*
-     * Unregister a user at the end of an individual test
+     * Unregister a user at the end of a test
      */
     public async unregisterUserInfo(): Promise<void> {
         return this._unregister(this._userInfoId);
@@ -97,7 +97,7 @@ export class WiremockAdmin {
     }
 
     /*
-     * Delete a stubbed response to Wiremock via its Admin API
+     * Delete a stubbed response from Wiremock via its Admin API
      */
     private async _unregister(id: string): Promise<void> {
 
