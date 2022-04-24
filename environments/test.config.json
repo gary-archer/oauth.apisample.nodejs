@@ -36,9 +36,9 @@
         "provider":                      "cognito",
         "issuer":                        "testissuer.com",
         "audience":                      "api.mycompany.com",
-        "jwksEndpoint":                  "http://login.authsamples-dev.com/.well-known/jwks.json",
+        "jwksEndpoint":                  "http://login.authsamples-dev.com:446/.well-known/jwks.json",
         "jwksCooldownDuration":          0,
-        "userInfoEndpoint":              "http://login.authsamples-dev.com/oauth2/userInfo",
+        "userInfoEndpoint":              "http://login.authsamples-dev.com:446/oauth2/userInfo",
         "claimsCacheTimeToLiveMinutes":  30
     }
 }
