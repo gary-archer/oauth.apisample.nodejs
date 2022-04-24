@@ -13,7 +13,7 @@ export class WiremockAdmin {
     private readonly _httpProxy: HttpProxy;
 
     public constructor(useProxy: boolean) {
-        this._baseUrl = 'http://login.authsamples-dev.com:446/__admin/mappings';
+        this._baseUrl = 'https://login.authsamples-dev.com:446/__admin/mappings';
         this._jsonWebKeysId = Guid.create().toString();
         this._userInfoId = Guid.create().toString();
         this._httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
@@ -87,7 +87,7 @@ export class WiremockAdmin {
             headers: {
                 'content-type': 'application/json',
             },
-            httpAgent: this._httpProxy.agent,
+            httpsAgent: this._httpProxy.agent,
         } as AxiosRequestConfig;
 
         const response = await axios(options);
@@ -104,7 +104,7 @@ export class WiremockAdmin {
         const options = {
             url: `${this._baseUrl}/${id}`,
             method: 'DELETE',
-            httpAgent: this._httpProxy.agent,
+            httpsAgent: this._httpProxy.agent,
         } as AxiosRequestConfig;
 
         const response = await axios(options);
