@@ -8,94 +8,35 @@
 
 The final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
 
-- The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
-- The API also implements other [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/), for good technical quality
+* The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
+* The API uses JSON request logging and Elasticsearch log aggregation, for measurability
 
-## Build and Run the API
+## API integrates with UI Clients
 
-Run the following script to build the API then start listening over HTTPS.\
-Development SSL certificates must be downloaded before `npm start` will work.
+The API can run as part of an OAuth end-to-end setup, to server my blog's UI code samples.\
+Running the API in this manner forces it to be consumer focused to its clients:
 
-```bash
-./start.sh
-```
+![SPA and API](./doc/spa-and-api.png)
 
-## Integration Test Setup
+## API can be Productively Tested
 
-Wiremock is used to mock the Authorization Server, which requires a Java runtime to be installed as a prerequisite.\
-Also add host names for the API and Authorization Server to your hosts file:
+The API's clients are UIs, which get user level access tokens by running an OpenID Connect code flow.\
+For productive test driven development, the API instead mocks the Authorization Server:
 
-```text
-127.0.0.1     localhost api.authsamples-dev.com login.mycompany.com
-::1           localhost
-```
+![Test Driven Development](./doc/tests.png)
 
-Stop the API if it is listening, then run this command to run the API with a test configuration, along with Wiremock:
+## API can be Load Tested
 
-```bash
-npm run testsetup
-```
+A basic load test uses promises to fire 5 parallel requests at a time at the API.\
+This ensures no concurrency problems, and error rehearsal is used to verify that the API is supportable:
 
-## Run Integration Tests
-
-Next run integration tests that call the running API's HTTPS endpoints, via this command:
-
-```bash
-npm test
-```
-
-```text
-OAuth API Tests
-  ✔ Get user claims returns a single region for the standard user
-  ✔ Get user claims returns all regions for the admin user
-  ✔ Get companies list returns 2 items for the standard user
-  ✔ Get companies list returns all items for the admin user
-  ✔ Get companies list with malicious JWT signing key returns a 401 error
-  ✔ Get transactions is allowed for companies that match the regions claim
-  ✔ Get transactions returns 404 for companies that do not match the regions claim
-  ✔ API exceptions return 500 with a supportable error response
-```
-
-## Run a Basic Load Test
-
-Or run a basic load test that calls the API's HTTPS endpoints, via this command:
-
-```bash
-npm run loadtest
-```
-
-This sends parallel requests to the API to verify that the code has no concurrency problems.\
-The API then reports metrics to enable early visualization of errors and slowness:
-
-```text
-OPERATION                CORRELATION-ID                        START-TIME                  MILLISECONDS-TAKEN   STATUS-CODE   ERROR-CODE              ERROR-ID    
-getUserInfoClaims        920387a0-4196-24af-acf3-55e61769da9e  2022-04-10T21:00:14.081Z    72                   200
-getCompanyList           dec2dca9-0dbb-4bf0-c16b-50b8e515022c  2022-04-10T21:00:14.091Z    69                   200
-getCompanyList           fae39ffe-4d9a-20e3-c240-f1b4ba069152  2022-04-10T21:00:14.093Z    68                   200
-getCompanyTransactions   cfa99c2c-67e4-5353-6521-fa33c5a194ac  2022-04-10T21:00:14.087Z    75                   200
-getCompanyTransactions   02379802-2680-22d3-23a6-b41086efdb71  2022-04-10T21:00:14.089Z    75                   200
-getUserInfoClaims        7a42b19a-c028-f1bb-f57a-c9f94b911507  2022-04-10T21:00:14.164Z    38                   200
-getCompanyList           66eb315f-f4a4-334f-63dc-fa7ff9628117  2022-04-10T21:00:14.173Z    40                   200
-getCompanyList           69f5ffb8-6b9a-b806-1ccc-3a1607d56deb  2022-04-10T21:00:14.171Z    44                   200
-getCompanyTransactions   0a93d119-5385-257f-c4f3-668ba5a0f6dd  2022-04-10T21:00:14.167Z    50                   200
-getCompanyTransactions   65b2f261-056c-d0af-87aa-b4c25b65039a  2022-04-10T21:00:14.169Z    49                   200
-getCompanyList           54c9bbe8-dcaa-bded-cacc-23ebd3b23cbc  2022-04-10T21:00:14.224Z    33                   500           exception_simulation    24398
-getUserInfoClaims        8f4d1228-cad8-9d1a-72e0-0ccbbeefa663  2022-04-10T21:00:14.218Z    39                   401           unauthorized
-getCompanyList           348d8dd6-e8ee-e811-553e-6815c58e6e80  2022-04-10T21:00:14.226Z    38                   200
-getCompanyTransactions   65dc3711-d5ef-178b-2d2b-728a991a18e8  2022-04-10T21:00:14.222Z    43                   200
-getCompanyTransactions   822ef51e-6219-de6e-3e13-909df036c49a  2022-04-10T21:00:14.220Z    46                   200
-getUserInfoClaims        f244f6e0-5ccc-e1f7-8c1c-d15e3ae8ca06  2022-04-10T21:00:14.266Z    27                   200
-getCompanyList           bc0c89c6-9e34-8284-060b-5fb5322aee95  2022-04-10T21:00:14.269Z    27                   200
-getCompanyTransactions   26457ca5-7ca8-99fe-19f6-56dc4572d81f  2022-04-10T21:00:14.268Z    29                   200
-getCompanyTransactions   14a60e83-5f0a-4dbd-ac26-5e1b0252b16d  2022-04-10T21:00:14.267Z    30                   200
-getCompanyList           055c6711-59a6-e6b4-0369-5517fdab2cdb  2022-04-10T21:00:14.269Z    29                   200
-getUserInfoClaims        ab5257a0-3a4a-e1b3-5b31-bfbf506edf75  2022-04-10T21:00:14.299Z    19                   200
-```
+![Load Test](./doc/loadtest.png)
 
 ## Further Details
 
 * See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API
 * See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for key implementation details
+* See the [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/) page for a summary of overall qualities
 
 ## Programming Languages
 
@@ -108,3 +49,4 @@ getUserInfoClaims        ab5257a0-3a4a-e1b3-5b31-bfbf506edf75  2022-04-10T21:00:
 * The [JOSE Library](https://github.com/panva/jose) is used to manage in memory validation of JWTs
 * [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
 * API logs can be aggregated to [Elasticsearch](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
+* The API is designed for cloud native deployment to Kubernetes
