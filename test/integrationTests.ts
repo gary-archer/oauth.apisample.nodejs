@@ -24,7 +24,7 @@ describe('OAuth API Tests', () => {
     const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, false);
 
     /*
-     * Initialize the test configuration and token issuer, then register a mock keyset the API will use to validate JWTs
+     * Initialize the token issuer, then register a mock keyset the API will use to validate JWTs
      */
     before( async () => {
         await tokenIssuer.initialize();
@@ -33,7 +33,7 @@ describe('OAuth API Tests', () => {
     });
 
     /*
-     * Restore the API's main configuration and clean up wiremock resources
+     * Clean up wiremock resources
      */
     after( async () => {
         await wiremockAdmin.unregisterJsonWebWeys();
@@ -154,7 +154,7 @@ describe('OAuth API Tests', () => {
 
         // Assert results
         assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
-        assert.strictEqual(response.body.code, 'unauthorized');
+        assert.strictEqual(response.body.code, 'unauthorized', 'Unexpected error code');
     });
 
     /*
