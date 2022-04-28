@@ -44,7 +44,7 @@ This ensures no concurrency problems, and error rehearsal is used to verify that
 
 ## Middleware Used
 
-* Express is used to host the API over SSL port 443
+* Express is used to host the API over SSL
 * AWS Cognito is used as the default Authorization Server
 * The [JOSE Library](https://github.com/panva/jose) is used to manage in memory validation of JWTs
 * [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
