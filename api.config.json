@@ -3,7 +3,7 @@
         "port": 445,
         "sslCertificateFileName": "./certs/authsamples-dev.ssl.p12",
         "sslCertificatePassword": "Password1",
-        "useProxy": true,
+        "useProxy": false,
         "proxyUrl": "http://127.0.0.1:8888"
     },
     "logging": {
