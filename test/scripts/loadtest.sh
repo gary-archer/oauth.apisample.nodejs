@@ -13,6 +13,6 @@ cd ../..
 export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 
 #
-# Run the integration tests
+# Run the load test
 #
 ./node_modules/.bin/ts-node test/loadTest.ts

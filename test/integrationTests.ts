@@ -1,5 +1,6 @@
 import assert from 'assert';
 import {Guid} from 'guid-typescript';
+import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts';
 import {ApiClient} from './utils/apiClient';
 import {ApiRequestOptions} from './utils/apiRequestOptions';
 import {TokenIssuer} from './utils/tokenIssuer';
@@ -27,6 +28,7 @@ describe('OAuth API Tests', () => {
      * Initialize the token issuer, then register a mock keyset the API will use to validate JWTs
      */
     before( async () => {
+        ExtraCaCerts.initialize();
         await tokenIssuer.initialize();
         const keyset = await tokenIssuer.getTokenSigningPublicKeys();
         await wiremockAdmin.registerJsonWebWeys(keyset);

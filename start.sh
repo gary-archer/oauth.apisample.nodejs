@@ -11,25 +11,32 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 ./downloadcerts.sh
 if [ $? -ne 0 ]; then
-    exit
+  exit
 fi
 
 #
 # Install dependencies if needed
 #
 if [ ! -d 'node_modules' ]; then
-    npm install
-    if [ $? -ne 0 ]; then
-        echo 'Problem encountered building the API'
-        exit
-    fi
+  npm install
+  if [ $? -ne 0 ]; then
+    echo 'Problem encountered building the API'
+    exit
+  fi
 fi
 
 #
-# Then start listening
+# Then start listening in watch mode
 #
-npm start
+npm run watch
 if [ $? -ne 0 ]; then
-    echo 'Problem encountered running the API'
-    exit
+  echo 'Problem encountered running the API'
+  exit
+fi
+
+#
+# Prevent automatic terminal closure on Linux
+#
+if [ "$(uname -s)" == 'Linux' ]; then
+  read -n 1
 fi

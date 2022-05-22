@@ -1,5 +1,6 @@
 import color from 'colors';
 import {Guid} from 'guid-typescript';
+import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts';
 import {ApiClient} from './utils/apiClient';
 import {ApiRequestOptions} from './utils/apiRequestOptions';
 import {ApiResponse} from './utils/apiResponse';
@@ -40,6 +41,7 @@ export class LoadTest {
     public async execute(): Promise<void> {
 
         // First prepare the system
+        ExtraCaCerts.initialize();
         await this._oauthSetup();
 
         // Get some access tokens to send to the API

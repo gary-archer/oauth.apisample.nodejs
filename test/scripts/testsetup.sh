@@ -12,7 +12,7 @@ cd ../..
 #
 ./downloadcerts.sh
 if [ $? -ne 0 ]; then
-    exit
+  exit
 fi
 
 #
@@ -26,11 +26,15 @@ cp environments/test.config.json ./api.config.json
 case "$(uname -s)" in
 
   Darwin)
-    PLATFORM='MACOS'
+    PLATFORM="MACOS"
  	;;
 
   MINGW64*)
-    PLATFORM='WINDOWS'
+    PLATFORM="WINDOWS"
+	;;
+
+  Linux)
+    PLATFORM="LINUX"
 	;;
 esac
 
@@ -38,23 +42,30 @@ esac
 # Install dependencies if needed
 #
 if [ ! -d 'node_modules' ]; then
-    npm install
-    if [ $? -ne 0 ]; then
-        echo 'Problem encountered building the API'
-        exit
-    fi
+  npm install
 fi
-
+if [ $? -ne 0 ]; then
+  echo 'Problem encountered building the API'
+  exit
+fi
 #
 # Run Wiremock and the API in child windows
 #
 echo 'Running Wiremock and API ...'
 if [ "$PLATFORM" == 'MACOS' ]; then
-    open -a Terminal ./test/scripts/run_wiremock.sh
-    open -a Terminal ./test/scripts/run_api.sh
-else
-    "$GIT_BASH" -c ./test/scripts/run_wiremock.sh &
-    "$GIT_BASH" -c ./test/scripts/run_api.sh &
+
+  open -a Terminal ./test/scripts/run_wiremock.sh
+  open -a Terminal ./test/scripts/run_api.sh
+
+elif [ "$PLATFORM" == 'WINDOWS' ]; then
+
+  "$GIT_BASH" -c ./test/scripts/run_wiremock.sh &
+  "$GIT_BASH" -c ./test/scripts/run_api.sh &
+
+elif [ "$PLATFORM" == 'LINUX' ]; then
+
+  gnome-terminal -- ./test/scripts/run_wiremock.sh
+  gnome-terminal -- ./test/scripts/run_api.sh
 fi
 
 #
@@ -63,13 +74,13 @@ fi
 echo 'Waiting for Wiremock endpoints to come up ...'
 WIREMOCK_URL='https://login.authsamples-dev.com:446/__admin/mappings'
 while [ "$(curl -k -s -X GET -o /dev/null -w '%{http_code}' "$WIREMOCK_URL")" != '200' ]; do
-    sleep 2
+  sleep 2
 done
 
 echo 'Waiting for API endpoints to come up ...'
 API_URL='https://api.authsamples-dev.com:445/api/companies'
 while [ "$(curl -k -s -X GET -o /dev/null -w '%{http_code}' "$API_URL")" != '401' ]; do
-    sleep 2
+  sleep 2
 done
 
 #

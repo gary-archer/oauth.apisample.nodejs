@@ -5,6 +5,7 @@ import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
+import {ExtraCaCerts} from '../../plumbing/utilities/extraCaCerts';
 import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
@@ -30,6 +31,9 @@ export class HttpServerConfiguration {
      * Configure behaviour before starting the server
      */
     public async configure(): Promise<void> {
+
+        // This is needed on Ubuntu Linux
+        ExtraCaCerts.initialize();
 
         // Use common code and give it any data it needs
         const base = new BaseCompositionRoot(this._container)
