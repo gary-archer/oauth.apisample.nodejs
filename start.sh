@@ -26,7 +26,9 @@ if [ ! -d 'node_modules' ]; then
 fi
 
 #
-# Then start listening in watch mode
+# Run the API in watch mode
+# On Linux first ensure that you have first granted Node.js permissions to listen on port 445:
+# - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
 npm run watch
 if [ $? -ne 0 ]; then

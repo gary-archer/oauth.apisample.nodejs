@@ -8,7 +8,7 @@ import fs from 'fs';
  */
 export class ExtraCaCerts {
 
-    public static initialize() {
+    public static initialize(): void {
 
         if (process.env.NODE_EXTRA_CA_CERTS) {
 
