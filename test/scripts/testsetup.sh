@@ -48,6 +48,7 @@ if [ $? -ne 0 ]; then
   echo 'Problem encountered building the API'
   exit
 fi
+
 #
 # Run Wiremock and the API in child windows
 #
