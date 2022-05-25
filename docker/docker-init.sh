@@ -27,9 +27,4 @@ if [ -s "$TRUSTED_CA_CERTS" ]; then
     echo 'Problem encountered updating root certificates'
     exit 1
   fi
-
-  #
-  # Configure Node.js trust
-  #
-  export NODE_EXTRA_CA_CERTS="$TRUSTED_CA_CERTS"
 fi

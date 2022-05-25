@@ -32,7 +32,7 @@ fi
 #
 # Prepare root CA certificates that the Docker container will trust
 #
-cp ./certs/authsamples-dev.ca.pem docker/trusted.ca.pem
+cp certs/authsamples-dev.ca.pem docker/trusted.ca.pem
 
 #
 # Build the docker image
