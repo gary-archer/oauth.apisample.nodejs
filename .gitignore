@@ -3,4 +3,5 @@ dist
 logs
 resources
 certs
+trusted.ca.pem
 .DS_Store

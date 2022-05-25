@@ -87,7 +87,7 @@ done
 #
 # Restore the API configuration once the API is loaded
 #
-cp environments/api.config.json ./api.config.json
+cp environments/dev.config.json ./api.config.json
 
 #
 # Indicate success
