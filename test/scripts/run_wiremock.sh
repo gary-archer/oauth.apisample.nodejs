@@ -1,8 +1,9 @@
 #!/bin/bash
 
-##############################################
+#######################################################
 # A script to run Wiremock in a child terminal
-##############################################
+# Ensure that Java is installed first as a prerequisite
+#######################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
