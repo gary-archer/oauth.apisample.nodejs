@@ -16,8 +16,6 @@ cd ../..
 --https-keystore './certs/authsamples-dev.ssl.p12' --keystore-type 'pkcs12' --keystore-password 'Password1' --key-manager-password 'Password1'
 
 #
-# Prevent automatic terminal closure on Linux
+# Prevent automatic terminal closure
 #
-if [ "$(uname -s)" == 'Linux' ]; then
-  read -n 1
-fi
+read -n 1

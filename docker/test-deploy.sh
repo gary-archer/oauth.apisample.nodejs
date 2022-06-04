@@ -43,6 +43,11 @@ fi
 cp certs/authsamples-dev.ca.pem docker/trusted.ca.pem
 
 #
+# On Windows, fix problems with trailing newline characters in Docker scripts
+#
+sed -i 's/\r$//' docker/docker-init.sh
+
+#
 # Build the docker image
 #
 docker build -f docker/Dockerfile --build-arg TRUSTED_CA_CERTS='docker/trusted.ca.pem' -t finalapi:v1 .
