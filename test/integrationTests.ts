@@ -20,7 +20,7 @@ describe('OAuth API Tests', () => {
     const wiremockAdmin = new WiremockAdmin(false);
 
     // Create the API client
-    const apiBaseUrl = 'https://api.authsamples-dev.com:445';
+    const apiBaseUrl = 'https://api.authsamples-dev.com:446';
     const sessionId = Guid.create().toString();
     const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, false);
 

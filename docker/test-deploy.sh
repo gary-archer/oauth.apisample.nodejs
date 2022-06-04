@@ -8,6 +8,31 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ..
 
 #
+# Get the platform
+#
+case "$(uname -s)" in
+
+  Darwin)
+    PLATFORM="MACOS"
+ 	;;
+
+  MINGW64*)
+    PLATFORM="WINDOWS"
+	;;
+  Linux)
+    PLATFORM="LINUX"
+	;;
+esac
+
+#
+# Download certificates if required
+#
+./downloadcerts.sh
+if [ $? -ne 0 ]; then
+  exit
+fi
+
+#
 # Install dependencies
 #
 if [ ! -d 'node_modules' ]; then
@@ -35,6 +60,13 @@ fi
 cp certs/authsamples-dev.ca.pem docker/trusted.ca.pem
 
 #
+# On Windows, fix problems with trailing newline characters in Docker scripts
+#
+if [ "$PLATFORM" == 'WINDOWS' ]; then
+  sed -i 's/\r$//' docker/docker-init.sh
+fi
+
+#
 # Build the docker image
 #
 docker build -f docker/Dockerfile --build-arg TRUSTED_CA_CERTS='docker/trusted.ca.pem' -t finalapi:v1 .
@@ -56,7 +88,7 @@ fi
 # Wait for it to become available
 #
 echo 'Waiting for API to become available ...'
-BASE_URL='https://api.authsamples-dev.com:445'
+BASE_URL='https://api.authsamples-dev.com:446'
 while [ "$(curl -k -s -o /dev/null -w ''%{http_code}'' "$BASE_URL/api/companies")" != '401' ]; do
   sleep 2
 done
