@@ -6,9 +6,9 @@
     "lint": "npx eslint . --ext .ts",
     "start": "ts-node --files src/host/startup/app.ts",
     "watch": "nodemon --watch 'src/**/*' -e ts --exec \"npm start\"",
-    "testsetup": "./test/scripts/testsetup.sh",
-    "test": "./test/scripts/test.sh",
-    "loadtest": "./test/scripts/loadtest.sh",
+    "testsetup": "bash ./test/scripts/testsetup.sh",
+    "test": "bash ./test/scripts/test.sh",
+    "loadtest": "bash ./test/scripts/loadtest.sh",
     "buildRelease": "rimraf dist && tsc",
     "startRelease": "node dist/host/startup/app.js"
   },

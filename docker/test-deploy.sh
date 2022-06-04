@@ -8,6 +8,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ..
 
 #
+# Download certificates if required
+#
+./downloadcerts.sh
+if [ $? -ne 0 ]; then
+  exit
+fi
+
+#
 # Install dependencies
 #
 if [ ! -d 'node_modules' ]; then
@@ -56,7 +64,7 @@ fi
 # Wait for it to become available
 #
 echo 'Waiting for API to become available ...'
-BASE_URL='https://api.authsamples-dev.com:445'
+BASE_URL='https://api.authsamples-dev.com:446'
 while [ "$(curl -k -s -o /dev/null -w ''%{http_code}'' "$BASE_URL/api/companies")" != '401' ]; do
   sleep 2
 done

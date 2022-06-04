@@ -27,7 +27,7 @@ fi
 
 #
 # Run the API in watch mode
-# On Linux first ensure that you have first granted Node.js permissions to listen on port 445:
+# On Linux first ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
 npm run watch

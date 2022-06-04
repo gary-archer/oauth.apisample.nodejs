@@ -25,7 +25,7 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 
 #
 # Run the API in this terminal
-# On Linux ensure that you have first granted Node.js permissions to listen on port 445:
+# On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
 npm start
