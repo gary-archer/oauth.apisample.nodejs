@@ -13,7 +13,7 @@ The final OAuth secured Node.js API code sample, referenced in my blog at https:
 
 ## API integrates with UI Clients
 
-The API can run as part of an OAuth end-to-end setup, to server my blog's UI code samples.\
+The API can run as part of an OAuth end-to-end setup, to serve my blog's UI code samples.\
 Running the API in this manner forces it to be consumer focused to its clients:
 
 ![SPA and API](./doc/spa-and-api.png)
@@ -72,7 +72,7 @@ npm run loadtest
 
 * Node.js with TypeScript is used to implement the REST API
 
-## Middleware Used
+## Infrastructure
 
 * Express is used to host the API over SSL
 * AWS Cognito is used as the default Authorization Server
