@@ -47,14 +47,14 @@ Then call an endpoint over port 446:
 curl -k https://localhost:446/api/companies
 ```
 
-Configure proper DNS and SSL trust by adding these domains to your hosts file:
+Configure DNS by adding these domains to your hosts file:
 
 ```text
 127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
 ::1       localhost
 ```
 
-Then run tests via these commands:
+Then run API tests via these commands:
 
 ```bash
 npm run testsetup
