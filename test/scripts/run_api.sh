@@ -14,6 +14,7 @@ if [ ! -d 'node_modules' ]; then
   npm install
   if [ $? -ne 0 ]; then
     echo 'Problem encountered building the API'
+    read -n 1
     exit
   fi
 fi
