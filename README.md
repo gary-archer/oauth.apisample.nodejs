@@ -32,9 +32,39 @@ This ensures no concurrency problems, and error rehearsal is used to verify that
 
 ![Load Test](./doc/loadtest.png)
 
+## Quick Start
+
+Run the API in isolation with these commands:
+
+```bash
+npm install
+npm start
+```
+
+Then call an endpoint over port 446:
+
+```bash
+curl -k https://localhost:446/api/companies
+```
+
+Configure proper DNS and SSL trust by adding these domains to your hosts file:
+
+```text
+127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
+::1       localhost
+```
+
+Then run tests via these commands:
+
+```bash
+npm run testsetup
+npm test
+npm run loadtest
+```
+
 ## Further Details
 
-* See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API
+* See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API in end-to-end setups
 * See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for key implementation details
 * See the [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/) page for a summary of overall qualities
 
