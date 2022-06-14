@@ -26,19 +26,22 @@ if [ ! -d 'node_modules' ]; then
 fi
 
 #
-# Run the API in watch mode
-# On Linux first ensure that you have first granted Node.js permissions to listen on port 446:
-# - sudo setcap 'cap_net_bind_service=+ep' $(which node)
+# Enforce code quality checks
 #
-npm run watch
+npm run lint
 if [ $? -ne 0 ]; then
-  echo 'Problem encountered running the API'
+  echo 'Code quality checks failed'
   exit
 fi
 
 #
-# Prevent automatic terminal closure on Linux
+# Run the API in watch mode
+# On Linux first ensure that you have first granted Node.js permissions to listen on port 446:
+# - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
-if [ "$(uname -s)" == 'Linux' ]; then
-  read -n 1
+RUN_COMMAND="./node_modules/.bin/ts-node --files 'src/host/startup/app.ts'"
+./node_modules/.bin/nodemon --watch 'src/**/*' -e ts --exec "$RUN_COMMAND"
+if [ $? -ne 0 ]; then
+  echo 'Problem encountered running the API'
+  exit
 fi
