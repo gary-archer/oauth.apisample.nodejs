@@ -34,17 +34,10 @@ This ensures no concurrency problems, and error rehearsal is used to verify that
 
 ## Local Development Quick Start
 
-Run the API in isolation with these commands:
+Run the API in isolation with this command:
 
 ```bash
-npm install
-npm start
-```
-
-Then call an endpoint over port 446:
-
-```bash
-curl -k https://localhost:446/api/companies
+./start.sh
 ```
 
 Configure DNS by adding these domains to your hosts file:
@@ -53,10 +46,21 @@ Configure DNS by adding these domains to your hosts file:
 127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
 ```
 
-Then run API tests via these commands:
+Then call an API endpoint over HTTPS:
+
+```bash
+curl -k https://api.authsamples-dev.com:446/api/companies
+```
+
+Next stop the API, then re-run it with a test configuration:
 
 ```bash
 npm run testsetup
+```
+
+Then run integration tests and a load test:
+
+```bash
 npm test
 npm run loadtest
 ```

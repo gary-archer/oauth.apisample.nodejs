@@ -1,4 +1,4 @@
-import color from 'colors';
+import color from '@colors/colors';
 import {Guid} from 'guid-typescript';
 import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts';
 import {ApiClient} from './utils/apiClient';
