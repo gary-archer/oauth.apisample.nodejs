@@ -18,7 +18,7 @@ fi
 #
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
 #
-cp environments/test.config.json ./api.config.json
+cp deployment/environments/test.config.json ./api.config.json
 
 #
 # Get the platform
@@ -88,7 +88,7 @@ done
 #
 # Restore the API configuration once the API is loaded
 #
-cp environments/dev.config.json ./api.config.json
+cp deployment/environments/dev.config.json ./api.config.json
 
 #
 # Indicate success
