@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
       - name: finalapi
-        image: finalapi:v1
+        image: finalnodejsapi:v1
         volumeMounts:
           - name: api-config
             mountPath: /usr/api/api.config.json

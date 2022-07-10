@@ -70,8 +70,8 @@ fi
 #
 # Build the docker image
 #
-docker build -f deployment/docker/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/docker-local/trusted.ca.pem' -t finalapi:v1 .
+docker build -f deployment/docker/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/docker-local/trusted.ca.pem' -t finalnodejsapi:v1 .
 if [ $? -ne 0 ]; then
-  echo 'Problem encountered building the OAuth Agent docker image'
+  echo 'Problem encountered building the API docker image'
   exit
 fi
