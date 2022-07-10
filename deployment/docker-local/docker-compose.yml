@@ -2,12 +2,12 @@ version: '3.8'
 services:
 
   finalapi:
-    image: finalapi:v1
+    image: finalnodejsapi:v1
     hostname: api.authsamples-dev.com
     ports:
       - 446:8000
     volumes:
-      - ../environments/dockercompose.config.json:/usr/api/api.config.json
-      - ../certs/authsamples-dev.ssl.p12:/usr/api/certs/authsamples-dev.ssl.p12
+      - ../environments/docker-local.config.json:/usr/api/api.config.json
+      - ../../certs/authsamples-dev.ssl.p12:/usr/api/certs/authsamples-dev.ssl.p12
     environment:
       NODE_EXTRA_CA_CERTS: '/usr/local/share/certificates/trusted.ca.crt'
