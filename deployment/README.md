@@ -1,6 +1,6 @@
 # Deployment Resources
 
-Resources to manage deployment for this component, which are separated from the built binaries.
+Resources to manage builds and deployment for this component.
 
 ## Environments
 
