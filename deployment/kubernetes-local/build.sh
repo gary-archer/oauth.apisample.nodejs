@@ -41,7 +41,7 @@ fi
 #
 # Copy in the internal cluster root CA from the parent project, to be trusted within the container
 #
-cp ../certs/mycluster.ca.pem deployment/kubernetes-local/trusted.ca.pem
+cp ../certs/mycluster.ca.pem deployment/shared/trusted.ca.pem
 
 #
 # On Windows, fix problems with trailing newline characters in Docker scripts
