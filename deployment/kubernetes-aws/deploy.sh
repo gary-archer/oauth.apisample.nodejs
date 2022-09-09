@@ -11,9 +11,17 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
+# Check preconditions
+#
+if [ "$DOCKERHUB_ACCOUNT" == '' ]; then
+  echo '*** The DOCKERHUB_ACCOUNT environment variable has not been configured'
+  exit 1
+fi
+
+#
 # Give configuration files the correct name
 #
-cp ../environments/kubernetes-local.config.json api.config.json
+cp ../environments/kubernetes-aws.config.json api.config.json
 
 #
 # Create a configmap for the API's JSON configuration file
@@ -39,7 +47,7 @@ fi
 # Produce the final YAML using the envsubst tool
 #
 export API_DOMAIN_NAME='api.mycluster.com'
-export API_DOCKER_IMAGE='finalnodejsapi:v1'
+export API_DOCKER_IMAGE="$DOCKERHUB_ACCOUNT/finalnodejsapi:v1"
 envsubst < '../shared/api.yaml.template' > '../shared/api.yaml'
 if [ $? -ne 0 ]; then
   echo '*** Problem encountered running envsubst to produce the final Kubernetes api.yaml file'
@@ -49,8 +57,8 @@ fi
 #
 # Trigger deployment of the API to the Kubernetes cluster
 #
-kubectl -n applications delete -f ../shared/api.yaml 2>/dev/null
-kubectl -n applications apply  -f ../shared/api.yaml
+kubectl -n applications delete -f api.yaml 2>/dev/null
+kubectl -n applications apply  -f api.yaml
 if [ $? -ne 0 ]; then
   echo '*** API Kubernetes deployment problem encountered'
   exit 1
