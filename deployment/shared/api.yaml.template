@@ -67,7 +67,8 @@ spec:
   selector:
     app: finalapi
   ports:
-  - protocol: "TCP"
+  - name: https
+    protocol: "TCP"
     port: 8101
 ---
 kind: Ingress
@@ -89,4 +90,4 @@ spec:
               service:
                 name: finalapi-svc
                 port:
-                  number: 8101
+                  name: https

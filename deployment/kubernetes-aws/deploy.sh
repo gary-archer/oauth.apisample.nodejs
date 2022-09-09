@@ -11,6 +11,14 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
+# Check preconditions
+#
+if [ "$DOCKERHUB_ACCOUNT" == '' ]; then
+  echo '*** The DOCKERHUB_ACCOUNT environment variable has not been configured'
+  exit 1
+fi
+
+#
 # Give configuration files the correct name
 #
 cp ../environments/kubernetes-aws.config.json api.config.json
@@ -32,6 +40,17 @@ kubectl -n applications delete secret finalapi-pkcs12-password 2>/dev/null
 kubectl -n applications create secret generic finalapi-pkcs12-password --from-literal=password='Password1'
 if [ $? -ne 0 ]; then
   echo '*** Problem encountered creating the API certificate secret'
+  exit 1
+fi
+
+#
+# Produce the final YAML using the envsubst tool
+#
+export API_DOMAIN_NAME='api.mycluster.com'
+export API_DOCKER_IMAGE="$DOCKERHUB_ACCOUNT/finalnodejsapi:v1"
+envsubst < '../shared/api.yaml.template' > '../shared/api.yaml'
+if [ $? -ne 0 ]; then
+  echo '*** Problem encountered running envsubst to produce the final Kubernetes api.yaml file'
   exit 1
 fi
 

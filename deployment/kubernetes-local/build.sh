@@ -39,9 +39,9 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Initialize extra trusted certificates to zero
+# Copy in the internal cluster root CA from the parent project, to be trusted within the container
 #
-touch deployment/kubernetes-local/trusted.ca.pem
+copy ../../../certs/mycluster.ca.pem deployment/kubernetes-local/trusted.ca.pem
 
 #
 # On Windows, fix problems with trailing newline characters in Docker scripts
