@@ -44,7 +44,3 @@ if [ $? -ne 0 ]; then
   echo '*** API Kubernetes deployment problem encountered'
   exit 1
 fi
-
-#
-# TODO: deploy AWS managed ingress later
-#
