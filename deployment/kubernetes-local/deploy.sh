@@ -16,6 +16,18 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../environments/kubernetes-local.config.json api.config.json
 
 #
+# Check that we have the expected environment variable
+#
+if [ "$API_DOMAIN_NAME" == '' ]; then
+  echo '*** The API_DOMAIN_NAME environment variable must be set before running this script'
+  exit 1
+fi
+if [ "$API_DOCKER_IMAGE" == '' ]; then
+  echo '*** The API_DOCKER_IMAGE environment variable must be set before running this script'
+  exit 1
+fi
+
+#
 # Create a configmap for the API's JSON configuration file
 #
 kubectl -n applications delete configmap api-config 2>/dev/null
@@ -36,10 +48,20 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# Produce the final YAML using the envsubst tool
+#
+envsubst < '../shared/api.yaml.template' > '../shared/api.yaml'
+if [ $? -ne 0 ]; then
+  echo '*** Problem encountered running envsubst to produce the final Kubernetes api.yaml file'
+  exit 1
+fi
+exit
+
+#
 # Trigger deployment of the API to the Kubernetes cluster
 #
-kubectl -n applications delete -f api.yaml 2>/dev/null
-kubectl -n applications apply  -f api.yaml
+kubectl -n applications delete -f ../shared/api.yaml 2>/dev/null
+kubectl -n applications apply  -f ../shared/api.yaml
 if [ $? -ne 0 ]; then
   echo '*** API Kubernetes deployment problem encountered'
   exit 1

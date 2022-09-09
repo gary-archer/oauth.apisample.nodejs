@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
       - name: finalapi
-        image: garyarcher/finalnodejsapi:v1
+        image: $API_DOCKER_IMAGE
         volumeMounts:
           - name: api-config
             mountPath: /usr/api/api.config.json
@@ -74,15 +74,13 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: finalapi-ingress
-  #annotations:
-  #  alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-2:090109105180:certificate/210879e2-74fa-4f57-9289-75dc99e81700
 spec:
   ingressClassName: kong
   tls:
     - hosts:
-        - api.authsamples-k8s.com
+        - $API_DOMAIN_NAME
   rules:
-    - host: api.authsamples-k8s.com
+    - host: $API_DOMAIN_NAME
       http:
         paths:
           - path: /
