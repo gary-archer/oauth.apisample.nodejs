@@ -32,11 +32,6 @@ else
 fi
 
 #
-# Give configuration files the correct name
-#
-cp ../environments/kubernetes-local.config.json api.config.json
-
-#
 # Create a configmap for the API's JSON configuration file
 #
 kubectl -n applications delete configmap api-config 2>/dev/null
@@ -59,7 +54,7 @@ fi
 #
 # Produce the final YAML using the envsubst tool
 #
-envsubst < '../shared/api-template.yaml' > '../shared/api.yaml'
+envsubst < ../shared/api-template.yaml > ../shared/api.yaml
 if [ $? -ne 0 ]; then
   echo '*** Problem encountered running envsubst to produce the final Kubernetes api.yaml file'
   exit 1
