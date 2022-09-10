@@ -5,7 +5,7 @@
 ############################################################
 
 #
-# See if the extra trusted certificates file is non-empty
+# Point to the trusted certificate bundle injected into the container
 #
 TRUSTED_CA_CERTS='/usr/local/share/certificates/trusted.ca.crt'
 
