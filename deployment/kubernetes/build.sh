@@ -20,7 +20,6 @@ if [ "$CLUSTER_TYPE" != 'local' ]; then
   fi
 fi
 
-
 #
 # Get the local computer platform
 #
@@ -71,7 +70,7 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Push the Docker image for the API
+# Push the API docker image
 #
 if [ "$CLUSTER_TYPE" == 'local' ]; then
   
