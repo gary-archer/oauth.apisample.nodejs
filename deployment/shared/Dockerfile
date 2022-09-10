@@ -5,6 +5,7 @@ ARG TRUSTED_CA_CERTS
 COPY $TRUSTED_CA_CERTS /usr/local/share/certificates/trusted.ca.crt
 COPY deployment/shared/docker-init.sh /tmp/
 RUN chmod +x /tmp/docker-init.sh && /tmp/docker-init.sh
+ENV NODE_EXTRA_CA_CERTS='/usr/local/share/certificates/trusted.ca.crt'
 
 # Copy files into our docker image and install dependencies
 WORKDIR /usr/api
