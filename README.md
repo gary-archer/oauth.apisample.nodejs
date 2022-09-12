@@ -4,55 +4,68 @@
 
 [![Known Vulnerabilities](https://snyk.io/test/github/gary-archer/oauth.apisample.nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/gary-archer/oauth.apisample.nodejs?targetFile=package.json)
 
-## Overview
+## Behaviour
 
 The final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
 
 * The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 * The API uses JSON request logging and Elasticsearch log aggregation, for measurability
+* The API uses constructoroinjection with request scoped ClaimsPrincipal / LogEntry objects
 
-## API integrates with UI Clients
+### API integrates with UI Clients
 
 The API can run as part of an OAuth end-to-end setup, to serve my blog's UI code samples.\
 Running the API in this manner forces it to be consumer focused to its clients:
 
-![SPA and API](./doc/spa-and-api.png)
+![SPA and API](./images/spa-and-api.png)
 
-## API can be Productively Tested
+### API can be Productively Tested
 
 The API's clients are UIs, which get user level access tokens by running an OpenID Connect code flow.\
 For productive test driven development, the API instead mocks the Authorization Server:
 
-![Test Driven Development](./doc/tests.png)
+![Test Driven Development](./images/tests.png)
 
-## API can be Load Tested
+### API can be Load Tested
 
 A basic load test uses promises to fire 5 parallel requests at a time at the API.\
 This ensures no concurrency problems, and error rehearsal is used to verify that the API is supportable:
 
-![Load Test](./doc/loadtest.png)
+![Load Test](./images/loadtest.png)
 
-## Local Development Quick Start
+### API is Supportable
 
-Run the API in isolation with this command:
+API logs can be analysed according using these [Technical Support Queries](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/):
+
+![Support Queries](./images/support-queries.png)
+
+## Commands
+
+### Run the API
+
+Ensure that Node.js 16+ is installed, then run the API with this command:
 
 ```bash
 ./start.sh
 ```
 
-Configure DNS by adding these domains to your hosts file:
-
-```text
-127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
-```
-
-Then call an API endpoint over HTTPS:
+Then call an endpoint over port 446:
 
 ```bash
 curl -k https://api.authsamples-dev.com:446/api/companies
 ```
 
-Next stop the API, then re-run it with a test configuration:
+### Configure DNS
+
+Configure DNS by adding these domains to your hosts file:
+
+```text
+127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com web.authsamples-dev.com tokenhandler.authsamples-dev.com logs.authsamples-dev.com
+```
+
+### Test the API
+
+Stop the API, then re-run it with a test configuration:
 
 ```bash
 npm run testsetup
@@ -63,6 +76,28 @@ Then run integration tests and a load test:
 ```bash
 npm test
 npm run loadtest
+```
+
+### Run an SPA Client
+
+Run these commands, then login to the SPA with credentials `guestuser@mycompany.com / GuestPassword1`:
+
+```bash
+cd ..
+git clone https://github.com/gary-archer/oauth.websample.final
+cd oauth.websample.final
+./build.sh LOCALAPI && ./run.sh LOCALAPI
+```
+
+### Query API Logs
+
+Deploy Elasticsearch with these commands, signing in to Kibana with credentials `elastic / Password1`:
+
+```bash
+cd ..
+git clone https://github.com/gary-archer/logaggregation.elasticsearch
+cd logaggregation.elasticsearch
+./deployment/docker-local/deploy.sh
 ```
 
 ## Further Details
@@ -81,5 +116,4 @@ npm run loadtest
 * AWS Cognito is used as the default Authorization Server
 * The [JOSE Library](https://github.com/panva/jose) is used to manage in memory validation of JWTs
 * [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
-* API logs can be aggregated to [Elasticsearch](https://authguidance.com/2019/07/19/log-aggregation-setup/) to support [Query Use Cases](https://authguidance.com/2019/08/02/intelligent-api-platform-analysis/)
-* The API is designed for [cloud native deployment](https://github.com/gary-archer/oauth.cloudnative.local) to Kubernetes
+* The API is designed for [Cloud Native Deployment](https://github.com/gary-archer/oauth.cloudnative.local) to Kubernetes
