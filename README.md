@@ -10,7 +10,7 @@ The final OAuth secured Node.js API code sample, referenced in my blog at https:
 
 * The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 * The API uses JSON request logging and Elasticsearch log aggregation, for measurability
-* The API uses constructoroinjection with request scoped ClaimsPrincipal / LogEntry objects
+* The API uses constructor injection with request scoped ClaimsPrincipal / LogEntry objects
 
 ### API integrates with UI Clients
 
