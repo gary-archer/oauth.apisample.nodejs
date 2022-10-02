@@ -25,7 +25,7 @@ fi
 export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 
 #
-# Ensure thay log folders exist
+# Ensure that log folders exist
 #
 if [ ! -d '../oauth.logs' ]; then
   mkdir '../oauth.logs'
