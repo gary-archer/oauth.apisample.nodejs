@@ -30,10 +30,9 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 if [ ! -d '../oauth.logs' ]; then
   mkdir '../oauth.logs'
 fi
-if [ -d '../oauth.logs/api' ]; then
-  rm -rf '../oauth.logs/api'
+if [ ! -d '../oauth.logs/api' ]; then
+  mkdir '../oauth.logs/api'
 fi
-mkdir '../oauth.logs/api'
 
 #
 # Run the API in this terminal
