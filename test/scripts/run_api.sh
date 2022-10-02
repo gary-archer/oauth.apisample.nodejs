@@ -25,6 +25,17 @@ fi
 export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 
 #
+# Ensure thay log folders exist
+#
+if [ ! -d '../oauth.logs' ]; then
+  mkdir '../oauth.logs'
+fi
+if [ -d '../oauth.logs/api' ]; then
+  rm -rf '../oauth.logs/api'
+fi
+mkdir '../oauth.logs/api'
+
+#
 # Run the API in this terminal
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)

@@ -19,7 +19,7 @@
                 {
                     "type": "file",
                     "filePrefix": "api",
-                    "dirname": "./logs",
+                    "dirname": "../oauth.logs/api",
                     "maxSize": "10m",
                     "maxFiles": "7d"
                 }
