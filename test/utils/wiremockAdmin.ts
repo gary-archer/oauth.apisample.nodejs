@@ -37,14 +37,14 @@ export class WiremockAdmin {
             },
         };
 
-        this._register(stubbedResponse);
+        await this._register(stubbedResponse);
     }
 
     /*
      * Unregister our test JWKS values at the end of the test suite
      */
     public async unregisterJsonWebWeys(): Promise<void> {
-        this._unregister(this._jsonWebKeysId);
+        await this._unregister(this._jsonWebKeysId);
     }
 
     /*
