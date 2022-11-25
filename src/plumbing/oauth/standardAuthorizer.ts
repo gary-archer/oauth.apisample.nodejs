@@ -28,6 +28,10 @@ export class StandardAuthorizer extends BaseAuthorizer {
             throw ErrorFactory.createClient401Error('No access token was supplied in the bearer header');
         }
 
+        console.log('*** JWT ***');
+        console.log(accessToken);
+        console.log('*** JWT ***');
+
         // Get per request dependencies
         const perRequestContainer = ChildContainerHelper.resolve(request);
         const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
