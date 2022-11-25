@@ -24,7 +24,7 @@ export class SampleCustomClaimsProvider extends CustomClaimsProvider {
 
         const userId = payload['user_id'] as string;
         const userRole = payload['user_role'] as string;
-        const userRegions = payload['user_role'] as string[];
+        const userRegions = payload['user_regions'] as string[];
         return new SampleCustomClaims(userId, userRole, userRegions);
     }
 
