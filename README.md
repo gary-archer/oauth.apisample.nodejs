@@ -50,18 +50,18 @@ Ensure that Node.js 16+ is installed, then run the API with this command:
 ./start.sh
 ```
 
-Then call an endpoint over port 446:
-
-```bash
-curl -k https://api.authsamples-dev.com:446/api/companies
-```
-
 ### Configure DNS
 
 Configure DNS by adding these domains to your hosts file:
 
 ```text
 127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
+```
+
+Then call an endpoint over port 446:
+
+```bash
+curl -k https://api.authsamples-dev.com:446/api/companies
 ```
 
 ### Test the API
