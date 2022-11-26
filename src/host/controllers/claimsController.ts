@@ -9,7 +9,7 @@ import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
  * A controller called during token issuing to ask the API for custom claim values
  * This requires a capability for the Authorization Server to reach out to the API
  */
-@controller('/customclaims')
+@controller('/customclaims2')
 export class ClaimsController extends BaseHttpController {
 
     private readonly _customClaimsProvider: SampleCustomClaimsProvider;
