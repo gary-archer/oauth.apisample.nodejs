@@ -111,14 +111,13 @@ export class ErrorUtils {
     /*
      * The error thrown if we cannot find an expected claim during security handling
      */
-    public static fromMissingClaim(claimName: string): ServerError {
+    public static fromMissingClaim(claimName: string): ClientError {
 
-        const error = ErrorFactory.createServerError(
+        return ErrorFactory.createClientErrorWithContext(
+            400,
             BaseErrorCodes.claimsFailure,
-            'Authorization Data Not Found');
-
-        error.setDetails(`An empty value was found for the expected claim '${claimName}'`);
-        return error;
+            'Authorization data not found',
+            `Missing claim in input: ${claimName}`);
     }
 
     /*

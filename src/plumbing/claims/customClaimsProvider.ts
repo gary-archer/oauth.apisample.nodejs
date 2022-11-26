@@ -12,7 +12,7 @@ export class CustomClaimsProvider {
      * When using the StandardAuthorizer, this is called at the time of token issuance
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async issue(subject: any): Promise<CustomClaims> {
+    public async issue(subject: string, email: string): Promise<CustomClaims> {
         return new CustomClaims();
     }
 

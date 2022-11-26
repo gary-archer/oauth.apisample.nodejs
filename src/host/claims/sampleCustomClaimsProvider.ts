@@ -13,8 +13,8 @@ export class SampleCustomClaimsProvider extends CustomClaimsProvider {
     /*
      * When using the StandardAuthorizer, this is called at the time of token issuance
      */
-    public async issue(subject: any): Promise<CustomClaims> {
-        return this._get(subject);
+    public async issue(subject: string, email: string): Promise<CustomClaims> {
+        return this._get(subject, email);
     }
 
     /*
@@ -37,16 +37,16 @@ export class SampleCustomClaimsProvider extends CustomClaimsProvider {
         baseClaims: BaseClaims,
         userInfo: UserInfoClaims): Promise<CustomClaims> {
 
-        return this._get(baseClaims.subject);
+        return this._get(baseClaims.subject, userInfo.email);
     }
 
     /*
-     * Determine the user in business terms from the Authorization Server's subject claim
+     * Receive user attributes from identity data, and return user attributes from business data
      */
-    private async _get(subject: string): Promise<CustomClaims> {
+    private async _get(subject: string, email: string): Promise<CustomClaims> {
 
-        // A real system wuld do a database lookup herem, but I am hard coding based on an AWS Cognito user
-        const isAdmin = subject === '77a97e5b-b748-45e5-bb6f-658e85b2df91';
+        // A real system wuld do a database lookup herem, but I am hard coding for demo purposes
+        const isAdmin = email.indexOf('admin') !== -1;
         if (isAdmin) {
 
             // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions

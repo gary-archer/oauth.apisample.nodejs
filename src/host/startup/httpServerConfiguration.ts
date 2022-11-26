@@ -52,6 +52,9 @@ export class HttpServerConfiguration {
         new InversifyExpressServer(this._container, null, {rootPath: '/api/'}, this._expressApp)
             .setConfig(() => {
 
+                // Parse JSON into the request body when required
+                this._expressApp.use(express.json());
+
                 // Our API requests are not designed for caching
                 this._expressApp.set('etag', false);
 
