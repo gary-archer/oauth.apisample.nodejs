@@ -45,7 +45,7 @@ export class SampleCustomClaimsProvider extends CustomClaimsProvider {
      */
     private async _get(subject: string, email: string): Promise<CustomClaims> {
 
-        // A real system wuld do a database lookup herem, but I am hard coding for demo purposes
+        // A real system would do a database lookup here
         const isAdmin = email.indexOf('admin') !== -1;
         if (isAdmin) {
 
