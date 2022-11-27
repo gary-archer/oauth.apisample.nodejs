@@ -44,8 +44,6 @@ export class OAuthAuthenticator {
 
             try {
 
-                console.log('*** Access token: ' + accessToken);
-
                 // Perform the JWT validation according to best practices
                 const options = {
                     algorithms: ['RS256'],
@@ -54,7 +52,6 @@ export class OAuthAuthenticator {
                 };
                 const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
 
-                console.log('*** Access token subject: ' + result.payload.sub);
                 return result.payload;
 
             } catch (e: any) {
