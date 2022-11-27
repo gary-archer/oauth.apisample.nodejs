@@ -30,7 +30,6 @@ export class ClaimsController extends BaseHttpController {
 
         const subject = request.body?.subject;
         const email   = request.body?.email;
-        console.log(`*** Issuing claims for subject ${subject} and email ${email}`);
         
         if (!subject) {
             throw ErrorUtils.fromMissingClaim('subject');
