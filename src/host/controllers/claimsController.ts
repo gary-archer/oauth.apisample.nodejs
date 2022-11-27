@@ -28,6 +28,7 @@ export class ClaimsController extends BaseHttpController {
     @httpPost('')
     public async getCustomClaims(request: Request): Promise<any> {
 
+        // Get identity attributes about the user
         const subject = request.body?.subject;
         const email   = request.body?.email;
         
@@ -38,8 +39,8 @@ export class ClaimsController extends BaseHttpController {
             throw ErrorUtils.fromMissingClaim('email');
         }
 
+        // Return domain specific attributes about the user
         const customClaims = await this._customClaimsProvider.issue(subject, email) as SampleCustomClaims;
-
         return {
             user_id: customClaims.userId,
             user_role: customClaims.userRole,
