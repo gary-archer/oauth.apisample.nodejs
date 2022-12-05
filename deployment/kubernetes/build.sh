@@ -20,10 +20,10 @@ if [ "$CLUSTER_TYPE" != 'local' ]; then
     exit 1
   fi
 
-  DOCKER_IMAGE_NAME="$DOCKERHUB_ACCOUNT/finalnodejsapi:v1"
+  DOCKER_IMAGE_NAME="$DOCKERHUB_ACCOUNT/finalnodejsapi:1.0"
 else
 
-  DOCKER_IMAGE_NAME='finalnodejsapi:v1'
+  DOCKER_IMAGE_NAME='finalnodejsapi:1.0'
 fi
 
 #

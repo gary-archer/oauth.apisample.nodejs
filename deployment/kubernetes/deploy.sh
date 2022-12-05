@@ -17,7 +17,7 @@ if [ "$CLUSTER_TYPE" == 'local' ]; then
   
   ENVIRONMENT_FOLDER='kubernetes-local';
   export API_DOMAIN_NAME='api.mycluster.com'
-  export API_DOCKER_IMAGE='finalnodejsapi:v1'
+  export API_DOCKER_IMAGE='finalnodejsapi:1.0'
 
 else
 
@@ -28,7 +28,7 @@ else
 
   ENVIRONMENT_FOLDER='kubernetes-aws';
   export API_DOMAIN_NAME='api.authsamples-k8s.com'
-  export API_DOCKER_IMAGE="$DOCKERHUB_ACCOUNT/finalnodejsapi:v1"
+  export API_DOCKER_IMAGE="$DOCKERHUB_ACCOUNT/finalnodejsapi:1.0"
 fi
 
 #
