@@ -209,7 +209,7 @@ export class BaseCompositionRoot {
         this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
             .toConstantValue(this._customClaimsProvider!);
 
-        // Register the singleton cache if using claims caching
+        // Register extra objects if using claims caching
         if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
 
             const claimsCache = new ClaimsCache(

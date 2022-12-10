@@ -4,8 +4,10 @@ import {BaseHttpController, controller, httpPost} from 'inversify-express-utils'
 import {SampleCustomClaimsProvider} from '../../logic/claims/sampleCustomClaimsProvider';
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
 import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
+import {OAuthConfiguration} from '../../plumbing/configuration/oauthConfiguration';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {ErrorUtils} from '../../plumbing/errors/errorUtils';
+import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
 
 /*
  * A controller called during token issuing to ask the API for custom claim values
@@ -14,10 +16,15 @@ import {ErrorUtils} from '../../plumbing/errors/errorUtils';
 @controller('/customclaims')
 export class ClaimsController extends BaseHttpController {
 
+    private readonly _configuration: OAuthConfiguration;
     private readonly _customClaimsProvider: SampleCustomClaimsProvider;
 
-    public constructor(@inject(BASETYPES.CustomClaimsProvider) customClaimsProvider: CustomClaimsProvider) {
+    public constructor(
+        @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
+        @inject(BASETYPES.CustomClaimsProvider) customClaimsProvider: CustomClaimsProvider) {
+
         super();
+        this._configuration = configuration;
         this._customClaimsProvider = customClaimsProvider as SampleCustomClaimsProvider;
     }
 
@@ -27,6 +34,11 @@ export class ClaimsController extends BaseHttpController {
      */
     @httpPost('')
     public async getCustomClaims(request: Request): Promise<any> {
+
+        // The endpoint is only enabled when this claims strategy is used
+        if (this._configuration.claimsStrategy !== 'jwt') {
+            ScopeVerifier.deny();
+        }
 
         // Get identity attributes about the user
         const subject = request.body?.subject;

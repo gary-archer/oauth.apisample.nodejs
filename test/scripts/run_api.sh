@@ -39,7 +39,8 @@ fi
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
-npm start
+RUN_COMMAND="./node_modules/.bin/ts-node --files src/host/startup/app.ts"
+./node_modules/.bin/nodemon --watch 'src/**/*' -e ts --exec "$RUN_COMMAND"
 if [ $? -ne 0 ]; then
   echo 'Problem encountered starting the API'
   read -n 1
