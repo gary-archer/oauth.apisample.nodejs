@@ -3,10 +3,10 @@ import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
 import {InversifyExpressServer} from 'inversify-express-utils';
+import {SampleCustomClaimsProvider} from '../../logic/claims/sampleCustomClaimsProvider';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory';
 import {ExtraCaCerts} from '../../plumbing/utilities/extraCaCerts';
-import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 import {Configuration} from '../configuration/configuration';
 import {CompositionRoot} from '../dependencies/compositionRoot';
 

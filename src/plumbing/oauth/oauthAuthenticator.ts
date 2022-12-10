@@ -1,14 +1,10 @@
-import axios, {AxiosRequestConfig} from 'axios';
 import {inject, injectable} from 'inversify';
 import {JWTPayload, jwtVerify} from 'jose';
-import {ClaimsReader} from '../claims/claimsReader';
-import {UserInfoClaims} from '../claims/userInfoClaims';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {ErrorFactory} from '../errors/errorFactory';
 import {ErrorUtils} from '../errors/errorUtils';
 import {LogEntry} from '../logging/logEntry';
-import {HttpProxy} from '../utilities/httpProxy';
 import {using} from '../utilities/using';
 import {JwksRetriever} from './jwksRetriever';
 
@@ -21,18 +17,15 @@ export class OAuthAuthenticator {
     private readonly _configuration: OAuthConfiguration;
     private readonly _logEntry: LogEntry;
     private readonly _jwksRetriever: JwksRetriever;
-    private readonly _httpProxy: HttpProxy;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
         @inject(BASETYPES.LogEntry) logEntry: LogEntry,
-        @inject(BASETYPES.JwksRetriever) jwksRetriever: JwksRetriever,
-        @inject(BASETYPES.HttpProxy) httpProxy: HttpProxy) {
+        @inject(BASETYPES.JwksRetriever) jwksRetriever: JwksRetriever) {
 
         this._configuration = configuration;
         this._logEntry = logEntry;
         this._jwksRetriever = jwksRetriever;
-        this._httpProxy = httpProxy;
     }
 
     /*
@@ -68,35 +61,6 @@ export class OAuthAuthenticator {
                 }
 
                 throw ErrorFactory.createClient401Error(details);
-            }
-        });
-    }
-
-    /*
-     * Perform OAuth user info lookup when required
-     */
-    public async getUserInfo(accessToken: string): Promise<UserInfoClaims> {
-
-        return using(this._logEntry.createPerformanceBreakdown('userInfoLookup'), async () => {
-
-            try {
-
-                const options = {
-                    url: this._configuration.claimsCache!.userInfoEndpoint,
-                    method: 'POST',
-                    headers: {
-                        'accept': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`,
-                    },
-                    httpsAgent: this._httpProxy.agent,
-                };
-
-                const response = await axios.request(options as AxiosRequestConfig);
-                return ClaimsReader.userInfoClaims(response.data);
-
-            } catch (e: any) {
-
-                throw ErrorUtils.fromUserInfoError(e, this._configuration.claimsCache!.userInfoEndpoint);
             }
         });
     }

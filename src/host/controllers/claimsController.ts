@@ -1,11 +1,11 @@
 import {Request} from 'express';
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpPost} from 'inversify-express-utils';
+import {SampleCustomClaimsProvider} from '../../logic/claims/sampleCustomClaimsProvider';
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
 import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
 import {ErrorUtils} from '../../plumbing/errors/errorUtils';
-import {SampleCustomClaimsProvider} from '../claims/sampleCustomClaimsProvider';
 
 /*
  * A controller called during token issuing to ask the API for custom claim values

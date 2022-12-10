@@ -1,7 +1,6 @@
 import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
-import {ClaimsCache} from '../claims/claimsCache';
 import {BaseClaims} from '../claims/baseClaims';
 import {CustomClaims} from '../claims/customClaims';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider';
@@ -15,7 +14,9 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
-import {ClaimsCachingAuthorizer} from '../oauth/claimsCachingAuthorizer';
+import {ClaimsCache} from '../oauth/claimsCaching/claimsCache';
+import {ClaimsCachingAuthorizer} from '../oauth/claimsCaching/claimsCachingAuthorizer';
+import {UserInfoClient} from '../oauth/claimsCaching/userInfoClient';
 import {OAuthAuthenticator} from '../oauth/oauthAuthenticator';
 import {JwksRetriever} from '../oauth/jwksRetriever';
 import {StandardAuthorizer} from '../oauth/standardAuthorizer';
@@ -169,43 +170,44 @@ export class BaseCompositionRoot {
     }
 
     /*
-     * Register OAuth depencencies, which depend on the strategies from the configuration file
+     * Register OAuth depencencies
      */
     private _registerOAuthDependencies(): void {
+
+        // Make the configuration injectable
+        this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
+            .toConstantValue(this._oauthConfiguration!);
+
+        // The authenticator manages JWT access token validation
+        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
+            .to(OAuthAuthenticator).inRequestScope();
 
         // Create the authorizer, which provides the overall algorithm for setting up the API's claims
         if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
 
-            // For AWS Cognito we will look up extra claims in the API when an access token is first received
             this._authorizer = new ClaimsCachingAuthorizer();
 
         } else {
 
-            // Create a standard authorizer, when all claims are added to access tokens at the time of token issuance
-            // This is used when the Authorization Server can reach out to the API to retrieve domain specific claims
             this._authorizer = new StandardAuthorizer();
         }
 
         // Allow anonymous access when needed
         this._authorizer.setUnsecuredPaths(this._unsecuredPaths);
 
-        // Make the configuration injectable
-        this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
-            .toConstantValue(this._oauthConfiguration!);
-
         // Register a singleton to cache JWKS keys
         this._container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
             .toConstantValue(new JwksRetriever(this._oauthConfiguration!, this._httpProxy!));
-
-        // The authenticator object is created per request and deals with token validation and getting user info
-        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
-            .to(OAuthAuthenticator).inRequestScope();
     }
 
     /*
      * Register claims related depencencies
      */
     private _registerClaimsDependencies(): void {
+
+        // Register an object to provide custom claims
+        this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
+            .toConstantValue(this._customClaimsProvider!);
 
         // Register the singleton cache if using claims caching
         if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
@@ -217,11 +219,10 @@ export class BaseCompositionRoot {
 
             this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
                 .toConstantValue(claimsCache);
-        }
 
-        // Register an object to manage providing domain specific claims
-        this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
-            .toConstantValue(this._customClaimsProvider!);
+            this._container.bind<UserInfoClient>(BASETYPES.UserInfoClient)
+                .to(UserInfoClient).inRequestScope();
+        }
 
         // Register dummy claims values that are overridden later by the authorizer middleware
         this._container.bind<BaseClaims>(BASETYPES.BaseClaims)
