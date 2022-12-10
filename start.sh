@@ -15,6 +15,11 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# Ensure that the development configuration is used
+#
+cp deployment/environments/dev/api.config.json ./api.config.json
+
+#
 # Install dependencies if needed
 #
 if [ ! -d 'node_modules' ]; then

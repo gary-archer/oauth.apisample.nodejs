@@ -174,7 +174,7 @@ export class BaseCompositionRoot {
     private _registerOAuthDependencies(): void {
 
         // Create the authorizer, which provides the overall algorithm for setting up the API's claims
-        if (this._oauthConfiguration!.provider === 'cognito') {
+        if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
 
             // For AWS Cognito we will look up extra claims in the API when an access token is first received
             this._authorizer = new ClaimsCachingAuthorizer();
@@ -208,10 +208,10 @@ export class BaseCompositionRoot {
     private _registerClaimsDependencies(): void {
 
         // Register the singleton cache if using claims caching
-        if (this._oauthConfiguration!.provider === 'cognito') {
+        if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
 
             const claimsCache = new ClaimsCache(
-                this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
+                this._oauthConfiguration!.claimsCache!.timeToLiveMinutes,
                 this._customClaimsProvider!,
                 this._loggerFactory!);
 

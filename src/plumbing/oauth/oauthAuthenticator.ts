@@ -82,7 +82,7 @@ export class OAuthAuthenticator {
             try {
 
                 const options = {
-                    url: this._configuration.userInfoEndpoint,
+                    url: this._configuration.claimsCache!.userInfoEndpoint,
                     method: 'POST',
                     headers: {
                         'accept': 'application/json',
@@ -96,7 +96,7 @@ export class OAuthAuthenticator {
 
             } catch (e: any) {
 
-                throw ErrorUtils.fromUserInfoError(e, this._configuration.userInfoEndpoint);
+                throw ErrorUtils.fromUserInfoError(e, this._configuration.claimsCache!.userInfoEndpoint);
             }
         });
     }

@@ -1,10 +1,9 @@
+import {ClaimsCacheConfiguration} from './claimsCacheConfiguration';
+
 /*
  * Configuration settings to enable standard security and extensible use of claims
  */
 export interface OAuthConfiguration {
-
-    // Certain behaviour may be triggered by a provider's capabilities
-    provider: string;
 
     // The expected issuer in JWT access tokens received
     issuer: string;
@@ -18,9 +17,9 @@ export interface OAuthConfiguration {
     // In test environments this is set to zero
     jwksCooldownDuration?: number;
 
-    // The URL to the Authorization Server's user info endpoint, if needed
-    userInfoEndpoint: string;
+    // The strategy for domain specific claims, either 'jwt' or 'apiLookup'
+    claimsStrategy: string;
 
-    // The maximum number of minutes for which to cache claims, when applicable
-    claimsCacheTimeToLiveMinutes: number;
+    // Optional claims caching configuration
+    claimsCache: ClaimsCacheConfiguration | null;
 }
