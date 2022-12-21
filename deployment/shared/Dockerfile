@@ -1,5 +1,5 @@
 #
-# Use Node.js temporarily, due to a problem with certmanager issued P12 files in Kubernetes
+# Use Node.js 16 until I resolve a problem with certmanager issued P12 files in Kubernetes
 # FROM node:18.1.0-bullseye
 #
 FROM node:16.17.0-bullseye
