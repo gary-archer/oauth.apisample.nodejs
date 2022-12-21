@@ -1,4 +1,8 @@
-FROM node:18.1.0-bullseye
+#
+# Use Node.js temporarily, due to a problem with certmanager issued P12 files in Kubernetes
+# FROM node:18.1.0-bullseye
+#
+FROM node:16.17.0-bullseye
 
 # Configure trusted root certificate authorities
 ARG TRUSTED_CA_CERTS
