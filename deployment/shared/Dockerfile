@@ -1,8 +1,4 @@
-#
-# Use Node.js 16 until I resolve a problem with certmanager issued P12 files in Kubernetes
-# FROM node:18.1.0-bullseye
-#
-FROM node:16.17.0-bullseye
+FROM node:18.1.0-bullseye
 
 # Configure trusted root certificate authorities
 ARG TRUSTED_CA_CERTS
@@ -20,4 +16,4 @@ RUN npm install --production
 # Run the Express app as a low privilege user
 RUN adduser --disabled-password --home /home/apiuser --gecos '' apiuser
 USER apiuser
-CMD ["npm", "run", "startRelease"]
+CMD ["node", "--openssl-legacy-provider", "dist/host/startup/app.js"]
