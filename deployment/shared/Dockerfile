@@ -13,7 +13,10 @@ COPY data/*              /usr/api/data/
 COPY package*.json       /usr/api/
 RUN npm install --production
 
-# Run the Express app as a low privilege user
+# Create a low privilege user
 RUN adduser --disabled-password --home /home/apiuser --gecos '' apiuser
 USER apiuser
+
+# The openssl option works around a cert-manager and node.js incompatibility with P12 files
+# https://github.com/nodejs/node/issues/40672
 CMD ["node", "--openssl-legacy-provider", "dist/host/startup/app.js"]
