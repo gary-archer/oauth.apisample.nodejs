@@ -95,4 +95,4 @@ npm run loadtest
 * AWS Cognito is used as the default Authorization Server
 * The [JOSE Library](https://github.com/panva/jose) is used to manage in memory validation of JWTs
 * [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
-* The API is designed for [Cloud Native Deployment](https://github.com/gary-archer/oauth.cloudnative.local) to Kubernetes
+* The project includes API deployment resources for Docker and Kubernetes
