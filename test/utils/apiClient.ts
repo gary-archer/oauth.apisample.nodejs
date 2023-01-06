@@ -1,4 +1,4 @@
-import axios, {AxiosHeaders, AxiosRequestConfig} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 import {Guid} from 'guid-typescript';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy';
 import {ApiRequestOptions} from './apiRequestOptions';
