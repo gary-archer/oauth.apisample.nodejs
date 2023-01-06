@@ -1,6 +1,5 @@
 import {inject, injectable} from 'inversify';
-import {createRemoteJWKSet, JWSHeaderParameters, FlattenedJWSInput, RemoteJWKSetOptions} from 'jose';
-import {GetKeyFunction} from 'jose/dist/types/types';
+import {createRemoteJWKSet, JWTVerifyGetKey, RemoteJWKSetOptions} from 'jose';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration';
 import {BASETYPES} from '../dependencies/baseTypes';
 import {HttpProxy} from '../utilities/httpProxy';
@@ -11,7 +10,7 @@ import {HttpProxy} from '../utilities/httpProxy';
 @injectable()
 export class JwksRetriever {
 
-    private readonly _remoteJWKSet: GetKeyFunction<JWSHeaderParameters, FlattenedJWSInput>;
+    private readonly _remoteJWKSet: JWTVerifyGetKey;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
@@ -31,7 +30,7 @@ export class JwksRetriever {
         this._remoteJWKSet = createRemoteJWKSet(new URL(configuration.jwksEndpoint), jwksOptions);
     }
 
-    public get remoteJWKSet(): GetKeyFunction<JWSHeaderParameters, FlattenedJWSInput> {
+    public get remoteJWKSet(): JWTVerifyGetKey {
         return this._remoteJWKSet;
     }
 }

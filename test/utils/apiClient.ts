@@ -1,4 +1,4 @@
-import axios, {AxiosRequestConfig} from 'axios';
+import axios, {AxiosHeaders, AxiosRequestConfig} from 'axios';
 import {Guid} from 'guid-typescript';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy';
 import {ApiRequestOptions} from './apiRequestOptions';
@@ -64,20 +64,22 @@ export class ApiClient {
         metrics.correlationId = Guid.create().toString();
         const hrtimeStart = process.hrtime();
 
+        const headers: any = {
+            authorization: `Bearer ${requestOptions.accessToken}`,
+            'x-mycompany-api-client': this._clientName,
+            'x-mycompany-session-id': this._sessionId,
+            'x-mycompany-correlation-id': metrics.correlationId,
+        };
+        
         const options = {
             url: this._baseUrl + requestOptions.apiPath,
             method: requestOptions.httpMethod,
-            headers: {
-                authorization: `Bearer ${requestOptions.accessToken}`,
-                'x-mycompany-api-client': this._clientName,
-                'x-mycompany-session-id': this._sessionId,
-                'x-mycompany-correlation-id': metrics.correlationId,
-            },
+            headers,
             httpsAgent: this._httpProxy.agent,
         } as AxiosRequestConfig;
 
         if (requestOptions.rehearseException) {
-            options.headers!['x-mycompany-test-exception'] = 'SampleApi';
+            headers['x-mycompany-test-exception'] = 'SampleApi';
         }
 
         try {
