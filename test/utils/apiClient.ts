@@ -70,7 +70,7 @@ export class ApiClient {
             'x-mycompany-session-id': this._sessionId,
             'x-mycompany-correlation-id': metrics.correlationId,
         };
-        
+
         const options = {
             url: this._baseUrl + requestOptions.apiPath,
             method: requestOptions.httpMethod,
