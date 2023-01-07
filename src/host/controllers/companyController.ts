@@ -1,14 +1,14 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes';
-import {Company} from '../../logic/entities/company';
-import {CompanyTransactions} from '../../logic/entities/companyTransactions';
-import {ErrorCodes} from '../../logic/errors/errorCodes';
-import {CompanyService} from '../../logic/services/companyService';
-import {BaseClaims} from '../../plumbing/claims/baseClaims';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
-import {ErrorFactory} from '../../plumbing/errors/errorFactory';
-import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
+import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
+import {Company} from '../../logic/entities/company.js';
+import {CompanyTransactions} from '../../logic/entities/companyTransactions.js';
+import {ErrorCodes} from '../../logic/errors/errorCodes.js';
+import {CompanyService} from '../../logic/services/companyService.js';
+import {BaseClaims} from '../../plumbing/claims/baseClaims.js';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
+import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier.js';
 
 /*
  * Our API controller runs after claims handling has completed

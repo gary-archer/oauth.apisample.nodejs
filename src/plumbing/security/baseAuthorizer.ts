@@ -1,14 +1,14 @@
 import {NextFunction, Request, Response} from 'express';
 import {injectable} from 'inversify';
-import {ClaimsPrincipal} from '../claims/claimsPrincipal';
-import {CustomClaims} from '../claims/customClaims';
-import {CustomClaimsProvider}  from '../claims/customClaimsProvider';
-import {BaseClaims} from '../claims/baseClaims';
-import {UserInfoClaims} from '../claims/userInfoClaims';
-import {BASETYPES} from '../dependencies/baseTypes';
-import {ChildContainerHelper} from '../dependencies/childContainerHelper';
-import {LogEntryImpl} from '../logging/logEntryImpl';
-import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
+import {CustomClaims} from '../claims/customClaims.js';
+import {CustomClaimsProvider}  from '../claims/customClaimsProvider.js';
+import {BaseClaims} from '../claims/baseClaims.js';
+import {UserInfoClaims} from '../claims/userInfoClaims.js';
+import {BASETYPES} from '../dependencies/baseTypes.js';
+import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
+import {LogEntryImpl} from '../logging/logEntryImpl.js';
+import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
 
 /*
  * A base authorizer class that manages base handling related to logging and dependency resolution

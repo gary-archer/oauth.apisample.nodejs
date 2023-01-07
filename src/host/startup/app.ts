@@ -1,9 +1,9 @@
 import fs from 'fs-extra';
 import {Container} from 'inversify';
 import 'reflect-metadata';
-import {LoggerFactoryBuilder} from '../../plumbing/logging/loggerFactoryBuilder';
-import {Configuration} from '../configuration/configuration';
-import {HttpServerConfiguration} from './httpServerConfiguration';
+import {LoggerFactoryBuilder} from '../../plumbing/logging/loggerFactoryBuilder.js';
+import {Configuration} from '../configuration/configuration.js';
+import {HttpServerConfiguration} from './httpServerConfiguration.js';
 
 /*
  * The application entry point

@@ -8,11 +8,12 @@
     "testsetup": "bash ./test/scripts/testsetup.sh",
     "test": "bash ./test/scripts/test.sh",
     "loadtest": "bash ./test/scripts/loadtest.sh",
-    "buildRelease": "rimraf dist && tsc",
+    "buildRelease": "rimraf dist && tsc --sourceMap false",
     "startRelease": "node dist/host/startup/app.js"
   },
   "author": "Gary Archer",
   "license": "MIT",
+  "type": "module",
   "engines": {
     "node": ">=18"
   },

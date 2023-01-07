@@ -1,12 +1,12 @@
 import {inject, injectable} from 'inversify';
 import {JWTPayload, jwtVerify} from 'jose';
-import {OAuthConfiguration} from '../configuration/oauthConfiguration';
-import {BASETYPES} from '../dependencies/baseTypes';
-import {ErrorFactory} from '../errors/errorFactory';
-import {ErrorUtils} from '../errors/errorUtils';
-import {LogEntry} from '../logging/logEntry';
-import {using} from '../utilities/using';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
+import {BASETYPES} from '../dependencies/baseTypes.js';
+import {ErrorFactory} from '../errors/errorFactory.js';
+import {ErrorUtils} from '../errors/errorUtils.js';
 import {JwksRetriever} from './jwksRetriever';
+import {LogEntry} from '../logging/logEntry.js';
+import {using} from '../utilities/using.js';
 
 /*
  * The entry point for calls to the Authorization Server

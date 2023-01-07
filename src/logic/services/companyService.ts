@@ -1,14 +1,14 @@
 import {inject, injectable} from 'inversify';
-import {CustomClaims} from '../../plumbing/claims/customClaims';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
-import {ClientError} from '../../plumbing/errors/clientError';
-import {ErrorFactory} from '../../plumbing/errors/errorFactory';
-import {SAMPLETYPES} from '../dependencies/sampleTypes';
-import {Company} from '../entities/company';
-import {CompanyTransactions} from '../entities/companyTransactions';
-import {SampleCustomClaims} from '../entities/sampleCustomClaims';
-import {ErrorCodes} from '../errors/errorCodes';
-import {CompanyRepository} from '../repositories/companyRepository';
+import {CustomClaims} from '../../plumbing/claims/customClaims.js';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
+import {ClientError} from '../../plumbing/errors/clientError.js';
+import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
+import {Company} from '../entities/company.js';
+import {CompanyTransactions} from '../entities/companyTransactions.js';
+import {SampleCustomClaims} from '../entities/sampleCustomClaims.js';
+import {ErrorCodes} from '../errors/errorCodes.js';
+import {CompanyRepository} from '../repositories/companyRepository.js';
 
 /*
  * Our service layer class authorizes using domain specific custom claims

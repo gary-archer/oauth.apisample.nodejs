@@ -1,9 +1,9 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import {Guid} from 'guid-typescript';
-import {HttpProxy} from '../../src/plumbing/utilities/httpProxy';
-import {ApiRequestOptions} from './apiRequestOptions';
-import {ApiResponse} from './apiResponse';
-import {ApiResponseMetrics} from './apiResponseMetrics';
+import {HttpProxy} from '../../src/plumbing/utilities/httpProxy.js';
+import {ApiRequestOptions} from './apiRequestOptions.js';
+import {ApiResponse} from './apiResponse.js';
+import {ApiResponseMetrics} from './apiResponseMetrics.js';
 
 /*
  * A utility class to call the API in a parameterized manner

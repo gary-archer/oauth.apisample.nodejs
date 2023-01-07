@@ -1,8 +1,8 @@
 import {inject, injectable} from 'inversify';
 import {createRemoteJWKSet, JWTVerifyGetKey, RemoteJWKSetOptions} from 'jose';
-import {OAuthConfiguration} from '../configuration/oauthConfiguration';
-import {BASETYPES} from '../dependencies/baseTypes';
-import {HttpProxy} from '../utilities/httpProxy';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
+import {BASETYPES} from '../dependencies/baseTypes.js';
+import {HttpProxy} from '../utilities/httpProxy.js';
 
 /*
  * A singleton that caches the result of createRemoteJWKSet, to ensure efficient lookup

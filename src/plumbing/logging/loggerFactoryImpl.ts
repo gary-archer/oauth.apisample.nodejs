@@ -1,10 +1,10 @@
 import winston, {LoggerOptions} from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import Transport from 'winston-transport';
-import {LoggingConfiguration} from '../configuration/loggingConfiguration';
-import {ErrorUtils} from '../errors/errorUtils';
-import {LogEntryImpl} from './logEntryImpl';
-import {LoggerFactory} from './loggerFactory';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
+import {ErrorUtils} from '../errors/errorUtils.js';
+import {LogEntryImpl} from './logEntryImpl.js';
+import {LoggerFactory} from './loggerFactory.js';
 
 /*
  * Technical logger names

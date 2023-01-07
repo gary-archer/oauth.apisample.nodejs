@@ -1,13 +1,13 @@
 import {Request} from 'express';
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpPost} from 'inversify-express-utils';
-import {SampleCustomClaimsProvider} from '../../logic/claims/sampleCustomClaimsProvider';
-import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
-import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider';
-import {OAuthConfiguration} from '../../plumbing/configuration/oauthConfiguration';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
-import {ErrorUtils} from '../../plumbing/errors/errorUtils';
-import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
+import {SampleCustomClaimsProvider} from '../../logic/claims/sampleCustomClaimsProvider.js';
+import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims.js';
+import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider.js';
+import {OAuthConfiguration} from '../../plumbing/configuration/oauthConfiguration.js';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
+import {ErrorUtils} from '../../plumbing/errors/errorUtils.js';
+import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier.js';
 
 /*
  * A controller called during token issuing to ask the API for custom claim values

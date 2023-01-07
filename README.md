@@ -42,9 +42,14 @@ Follow the [Technical Support Queries](https://authguidance.com/2019/08/02/intel
 
 ## Commands
 
+### Prerequisites
+
+- Ensure that Node.js 18 or later is installed
+- To run Wiremock, so also install a Java 17+ SDK
+
 ### Run the API
 
-Ensure that Node.js 16+ is installed, then run the API with this command:
+Run the API with this command:
 
 ```bash
 ./start.sh

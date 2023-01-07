@@ -1,5 +1,5 @@
-import {BaseErrorCodes} from '../errors/baseErrorCodes';
-import {ErrorFactory} from '../errors/errorFactory';
+import {BaseErrorCodes} from '../errors/baseErrorCodes.js';
+import {ErrorFactory} from '../errors/errorFactory.js';
 
 /*
  * A utility class to enforce scopes

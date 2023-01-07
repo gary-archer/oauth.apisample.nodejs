@@ -1,11 +1,11 @@
 import {Container} from 'inversify';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes';
-import {CompanyRepository} from '../../logic/repositories/companyRepository';
-import {CompanyService} from '../../logic/services/companyService';
-import {JsonFileReader} from '../../logic/utilities/jsonFileReader';
-import {ClaimsController} from '../controllers/claimsController';
-import {CompanyController} from '../controllers/companyController';
-import {UserInfoController} from '../controllers/userInfoController';
+import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
+import {CompanyRepository} from '../../logic/repositories/companyRepository.js';
+import {CompanyService} from '../../logic/services/companyService.js';
+import {JsonFileReader} from '../../logic/utilities/jsonFileReader.js';
+import {ClaimsController} from '../controllers/claimsController.js';
+import {CompanyController} from '../controllers/companyController.js';
+import {UserInfoController} from '../controllers/userInfoController.js';
 
 /*
  * Compose the application's business dependencies

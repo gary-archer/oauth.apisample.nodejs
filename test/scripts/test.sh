@@ -15,4 +15,4 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 #
 # Run the suite of integration tests
 #
-./node_modules/.bin/mocha -r ts-node/register test/integrationTests.ts
+./node_modules/.bin/mocha

@@ -3,13 +3,13 @@ import {Guid} from 'guid-typescript';
 import {injectable} from 'inversify';
 import os from 'os';
 import {Logger} from 'winston';
-import {BaseClaims} from '../claims/baseClaims';
-import {ClientError} from '../errors/clientError';
-import {ServerError} from '../errors/serverError';
-import {LogEntry} from './logEntry';
-import {LogEntryData} from './logEntryData';
-import {PerformanceBreakdown} from './performanceBreakdown';
-import {RouteMetadataHandler} from './routeMetadataHandler';
+import {BaseClaims} from '../claims/baseClaims.js';
+import {ClientError} from '../errors/clientError.js';
+import {ServerError} from '../errors/serverError.js';
+import {LogEntry} from './logEntry.js';
+import {LogEntryData} from './logEntryData.js';
+import {PerformanceBreakdown} from './performanceBreakdown.js';
+import {RouteMetadataHandler} from './routeMetadataHandler.js';
 
 /*
  * The full implementation class is private to the framework and excluded from the index.ts file

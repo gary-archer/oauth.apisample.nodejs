@@ -1,5 +1,5 @@
 import {Logger} from 'winston';
-import {LoggingConfiguration} from '../configuration/loggingConfiguration';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
 
 /*
  * An interface that allows business logic to access logging objects

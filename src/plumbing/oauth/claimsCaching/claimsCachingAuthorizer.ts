@@ -1,16 +1,16 @@
 import {Request} from 'express';
 import hasher from 'js-sha256';
-import {ClaimsPrincipal} from '../../claims/claimsPrincipal';
-import {CachedClaims} from '../../claims/cachedClaims';
-import {ClaimsReader} from '../../claims/claimsReader';
-import {CustomClaimsProvider} from '../../claims/customClaimsProvider';
-import {BASETYPES} from '../../dependencies/baseTypes';
-import {ChildContainerHelper} from '../../dependencies/childContainerHelper';
-import {ErrorFactory} from '../../errors/errorFactory';
-import {BaseAuthorizer} from '../../security/baseAuthorizer';
-import {OAuthAuthenticator} from '../oauthAuthenticator';
-import {ClaimsCache} from './claimsCache';
-import {UserInfoClient} from './userInfoClient';
+import {ClaimsPrincipal} from '../../claims/claimsPrincipal.js';
+import {CachedClaims} from '../../claims/cachedClaims.js';
+import {ClaimsReader} from '../../claims/claimsReader.js';
+import {CustomClaimsProvider} from '../../claims/customClaimsProvider.js';
+import {BASETYPES} from '../../dependencies/baseTypes.js';
+import {ChildContainerHelper} from '../../dependencies/childContainerHelper.js';
+import {ErrorFactory} from '../../errors/errorFactory.js';
+import {BaseAuthorizer} from '../../security/baseAuthorizer.js';
+import {OAuthAuthenticator} from '../oauthAuthenticator.js';
+import {ClaimsCache} from './claimsCache.js';
+import {UserInfoClient} from './userInfoClient.js';
 
 /*
  * An authorizer used when domain specific claims cannot be included in the access token
