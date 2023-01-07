@@ -2,6 +2,12 @@
   "name": "sampleapi",
   "version": "3.0.0",
   "description": "A Node.js version of the Final OAuth secured API",
+  "author": "Gary Archer",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "lint": "npx eslint . --ext .ts",
     "start": "bash ./start.sh",
@@ -10,12 +16,6 @@
     "loadtest": "bash ./test/scripts/loadtest.sh",
     "buildRelease": "rimraf dist && tsc --sourceMap false",
     "startRelease": "node dist/host/startup/app.js"
-  },
-  "author": "Gary Archer",
-  "license": "MIT",
-  "type": "module",
-  "engines": {
-    "node": ">=18"
   },
   "dependencies": {
     "axios": "^1.2.1",
