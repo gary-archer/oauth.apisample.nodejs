@@ -1,10 +1,10 @@
 import {NextFunction, Request, Response} from 'express';
-import {BASETYPES} from '../dependencies/baseTypes';
-import {ChildContainerHelper} from '../dependencies/childContainerHelper';
-import {LogEntry} from '../logging/logEntry';
-import {LoggerFactory} from '../logging/loggerFactory';
-import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl';
-import {RouteMetadataHandler} from '../logging/routeMetadataHandler';
+import {BASETYPES} from '../dependencies/baseTypes.js';
+import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
+import {LogEntry} from '../logging/logEntry.js';
+import {LoggerFactory} from '../logging/loggerFactory.js';
+import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl.js';
+import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
 
 /*
  * A class to log API requests as JSON objects so that we get structured logging output

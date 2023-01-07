@@ -1,11 +1,11 @@
 import color from '@colors/colors';
 import {Guid} from 'guid-typescript';
-import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts';
-import {ApiClient} from './utils/apiClient';
-import {ApiRequestOptions} from './utils/apiRequestOptions';
-import {ApiResponse} from './utils/apiResponse';
-import {TokenIssuer} from './utils/tokenIssuer';
-import {WiremockAdmin} from './utils/wiremockAdmin';
+import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts.js';
+import {ApiClient} from './utils/apiClient.js';
+import {ApiRequestOptions} from './utils/apiRequestOptions.js';
+import {ApiResponse} from './utils/apiResponse.js';
+import {TokenIssuer} from './utils/tokenIssuer.js';
+import {WiremockAdmin} from './utils/wiremockAdmin.js';
 
 /*
  * A basic load test to run some requests in parallel and report results

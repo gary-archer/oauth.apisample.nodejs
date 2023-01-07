@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
-import {BaseErrorCodes} from '../errors/baseErrorCodes';
-import {ErrorFactory} from '../errors/errorFactory';
+import {BaseErrorCodes} from '../errors/baseErrorCodes.js';
+import {ErrorFactory} from '../errors/errorFactory.js';
 
 /*
  * A class to process custom headers to enable testers to control non functional behaviour

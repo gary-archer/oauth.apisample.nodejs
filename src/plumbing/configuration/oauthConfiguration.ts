@@ -1,4 +1,4 @@
-import {ClaimsCacheConfiguration} from './claimsCacheConfiguration';
+import {ClaimsCacheConfiguration} from './claimsCacheConfiguration.js';
 
 /*
  * Configuration settings to enable standard security and extensible use of claims

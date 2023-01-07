@@ -1,7 +1,7 @@
-import {BaseErrorCodes} from './baseErrorCodes';
-import {ClientError} from './clientError';
-import {ErrorFactory} from './errorFactory';
-import {ServerError} from './serverError';
+import {BaseErrorCodes} from './baseErrorCodes.js';
+import {ClientError} from './clientError.js';
+import {ErrorFactory} from './errorFactory.js';
+import {ServerError} from './serverError.js';
 
 /*
  * General error utility functions

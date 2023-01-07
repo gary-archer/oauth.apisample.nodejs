@@ -1,6 +1,6 @@
 import {Request} from 'express';
 import {interfaces} from 'inversify-express-utils';
-import {RouteMetadata} from './routeMetadata';
+import {RouteMetadata} from './routeMetadata.js';
 
 /*
  * A helper class to use Inversify Express Utils metadata at runtime to capture important logging fields

@@ -1,7 +1,7 @@
 import {JWTPayload} from 'jose';
-import {BaseClaims} from './baseClaims';
-import {CustomClaims} from './customClaims';
-import {UserInfoClaims} from './userInfoClaims';
+import {BaseClaims} from './baseClaims.js';
+import {CustomClaims} from './customClaims.js';
+import {UserInfoClaims} from './userInfoClaims.js';
 
 /*
  * A class to deal with domain specific claims, needed for business authorization

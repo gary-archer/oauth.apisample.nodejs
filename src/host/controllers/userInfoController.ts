@@ -1,11 +1,11 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
-import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims';
-import {BaseClaims} from '../../plumbing/claims/baseClaims';
-import {CustomClaims} from '../../plumbing/claims/customClaims';
-import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes';
-import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier';
+import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims.js';
+import {BaseClaims} from '../../plumbing/claims/baseClaims.js';
+import {CustomClaims} from '../../plumbing/claims/customClaims.js';
+import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims.js';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
+import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier.js';
 
 /*
  * A controller class to return user info

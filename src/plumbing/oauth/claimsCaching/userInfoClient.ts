@@ -1,13 +1,13 @@
 import axios, {AxiosRequestConfig} from 'axios';
 import {inject, injectable} from 'inversify';
-import {ClaimsReader} from '../../claims/claimsReader';
-import {UserInfoClaims} from '../../claims/userInfoClaims';
-import {OAuthConfiguration} from '../../configuration/oauthConfiguration';
-import {BASETYPES} from '../../dependencies/baseTypes';
-import {ErrorUtils} from '../../errors/errorUtils';
-import {LogEntry} from '../../logging/logEntry';
-import {HttpProxy} from '../../utilities/httpProxy';
-import {using} from '../../utilities/using';
+import {ClaimsReader} from '../../claims/claimsReader.js';
+import {UserInfoClaims} from '../../claims/userInfoClaims.js';
+import {OAuthConfiguration} from '../../configuration/oauthConfiguration.js';
+import {BASETYPES} from '../../dependencies/baseTypes.js';
+import {ErrorUtils} from '../../errors/errorUtils.js';
+import {LogEntry} from '../../logging/logEntry.js';
+import {HttpProxy} from '../../utilities/httpProxy.js';
+import {using} from '../../utilities/using.js';
 
 /*
  * The entry point for calls to the Authorization Server

@@ -1,12 +1,12 @@
 import {Request} from 'express';
-import {ClaimsPrincipal} from '../claims/claimsPrincipal';
-import {ClaimsReader} from '../claims/claimsReader';
-import {CustomClaimsProvider} from '../claims/customClaimsProvider';
-import {BASETYPES} from '../dependencies/baseTypes';
-import {ChildContainerHelper} from '../dependencies/childContainerHelper';
-import {ErrorFactory} from '../errors/errorFactory';
-import {BaseAuthorizer} from '../security/baseAuthorizer';
-import {OAuthAuthenticator} from './oauthAuthenticator';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
+import {ClaimsReader} from '../claims/claimsReader.js';
+import {CustomClaimsProvider} from '../claims/customClaimsProvider.js';
+import {BASETYPES} from '../dependencies/baseTypes.js';
+import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
+import {ErrorFactory} from '../errors/errorFactory.js';
+import {BaseAuthorizer} from '../security/baseAuthorizer.js';
+import {OAuthAuthenticator} from './oauthAuthenticator.js';
 
 /*
  * An authorizer that relies on all domain specific claims being included in the JWT

@@ -1,10 +1,10 @@
 import assert from 'assert';
 import {Guid} from 'guid-typescript';
-import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts';
-import {ApiClient} from './utils/apiClient';
-import {ApiRequestOptions} from './utils/apiRequestOptions';
-import {TokenIssuer} from './utils/tokenIssuer';
-import {WiremockAdmin} from './utils/wiremockAdmin';
+import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts.js';
+import {ApiClient} from './utils/apiClient.js';
+import {ApiRequestOptions} from './utils/apiRequestOptions.js';
+import {TokenIssuer} from './utils/tokenIssuer.js';
+import {WiremockAdmin} from './utils/wiremockAdmin.js';
 
 /*
  * Test the API in isolation, without any dependencies on the Authorization Server

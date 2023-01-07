@@ -1,10 +1,10 @@
 import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
-import {CachedClaims} from '../../claims/cachedClaims';
-import {CustomClaimsProvider} from '../../claims/customClaimsProvider';
-import {UserInfoClaims} from '../../claims/userInfoClaims';
-import {LoggerFactory} from '../../logging/loggerFactory';
+import {CachedClaims} from '../../claims/cachedClaims.js';
+import {CustomClaimsProvider} from '../../claims/customClaimsProvider.js';
+import {UserInfoClaims} from '../../claims/userInfoClaims.js';
+import {LoggerFactory} from '../../logging/loggerFactory.js';
 
 /*
  * A simple in memory claims cache for our API
