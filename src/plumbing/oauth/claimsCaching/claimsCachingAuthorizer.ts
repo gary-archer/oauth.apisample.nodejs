@@ -1,5 +1,5 @@
+import {createHash} from 'crypto';
 import {Request} from 'express';
-import {sha256} from 'js-sha256';
 import {ClaimsPrincipal} from '../../claims/claimsPrincipal.js';
 import {CachedClaims} from '../../claims/cachedClaims.js';
 import {ClaimsReader} from '../../claims/claimsReader.js';
@@ -41,7 +41,7 @@ export class ClaimsCachingAuthorizer extends BaseAuthorizer {
         const baseClaims = ClaimsReader.baseClaims(payload);
 
         // If cached results exist for other claims then return them
-        const accessTokenHash = sha256(accessToken);
+        const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
         const cache = perRequestContainer.get<ClaimsCache>(BASETYPES.ClaimsCache);
         const cachedClaims = await cache.getExtraUserClaims(accessTokenHash);
         if (cachedClaims) {
