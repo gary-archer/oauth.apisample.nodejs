@@ -17,7 +17,6 @@ RUN npm install --production
 RUN adduser --disabled-password --home /home/apiuser --gecos '' apiuser
 USER apiuser
 
-# The openssl option works around a cert-manager and node.js incompatibility with P12 files
+# Work around openssl and node.js compatibility in some setups
 # https://github.com/nodejs/node/issues/40672
-# https://github.com/cert-manager/cert-manager/issues/5047
 CMD ["node", "--openssl-legacy-provider", "dist/host/startup/app.js"]
