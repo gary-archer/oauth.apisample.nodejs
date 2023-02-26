@@ -35,7 +35,7 @@ export class CompanyController extends BaseHttpController {
     public async getCompanyList(): Promise<Company[]> {
 
         // First check scopes
-        ScopeVerifier.enforce(this._claims.scopes, 'transactions_read');
+        ScopeVerifier.enforce(this._claims.scopes, 'investments');
 
         // Next return filtered data based on claims
         return this._service.getCompanyList();
@@ -48,7 +48,7 @@ export class CompanyController extends BaseHttpController {
     public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
 
         // First check scopes
-        ScopeVerifier.enforce(this._claims.scopes, 'transactions_read');
+        ScopeVerifier.enforce(this._claims.scopes, 'investments');
 
         // Parse the id and throw a 400 error if it is invalid
         const companyId = parseInt(id, 10);
