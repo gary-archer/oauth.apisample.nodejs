@@ -8,6 +8,7 @@
 
 The final OAuth secured Node.js API code sample, referenced in my blog at https://authguidance.com:
 
+The API has a basic business theme of `investments`, but simply returnshard coded data
 * The API takes finer control over OAuth domain specific claims and uses a certified JOSE library
 * The API uses JSON request logging and Elasticsearch log aggregation, for measurability
 * The API uses constructor injection with request scoped ClaimsPrincipal / LogEntry objects
@@ -66,7 +67,7 @@ Configure DNS by adding these domains to your hosts file:
 Then call an endpoint over port 446:
 
 ```bash
-curl -k https://api.authsamples-dev.com:446/api/companies
+curl --cacert ./certs/mycompany.ca.pem -s https://api.authsamples-dev.com:446/investments/companies | jq
 ```
 
 ### Test the API

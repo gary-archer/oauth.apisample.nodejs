@@ -25,7 +25,7 @@ export class ApiClient {
     public async getUserInfoClaims(options: ApiRequestOptions): Promise<ApiResponse> {
 
         options.httpMethod = 'GET';
-        options.apiPath = '/api/userinfo';
+        options.apiPath = '/investments/userinfo';
 
         const metrics = {
             operation: 'getUserInfoClaims',
@@ -37,7 +37,7 @@ export class ApiClient {
     public async getCompanyList(options: ApiRequestOptions): Promise<ApiResponse> {
 
         options.httpMethod = 'GET';
-        options.apiPath = '/api/companies';
+        options.apiPath = '/investments/companies';
 
         const metrics = {
             operation: 'getCompanyList',
@@ -49,7 +49,7 @@ export class ApiClient {
     public async getCompanyTransactions(options: ApiRequestOptions, companyId: number): Promise<ApiResponse> {
 
         options.httpMethod = 'GET';
-        options.apiPath = `/api/companies/${companyId}/transactions`;
+        options.apiPath = `/investments/companies/${companyId}/transactions`;
 
         const metrics = {
             operation: 'getCompanyTransactions',
