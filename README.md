@@ -67,7 +67,7 @@ Configure DNS by adding these domains to your hosts file:
 Then call an endpoint over port 446:
 
 ```bash
-curl --cacert ./certs/mycompany.ca.pem -s https://api.authsamples-dev.com:446/investments/companies | jq
+curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 ### Test the API
