@@ -33,6 +33,7 @@ export class OAuthAuthenticator {
      */
     public async validateToken(accessToken: string): Promise<JWTPayload> {
 
+        console.log(accessToken);
         return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
 
             try {
