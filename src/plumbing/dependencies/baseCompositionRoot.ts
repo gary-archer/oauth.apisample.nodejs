@@ -46,7 +46,7 @@ export class BaseCompositionRoot {
     }
 
     /*
-     * Set the API base path, such as /api/
+     * Set the API base path
      */
     public useApiBasePath(apiBasePath: string): BaseCompositionRoot {
 

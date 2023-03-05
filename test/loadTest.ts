@@ -25,7 +25,7 @@ export class LoadTest {
         this._tokenIssuer = new TokenIssuer();
         this._wiremockAdmin = new WiremockAdmin(false);
 
-        const apiBaseUrl = 'https://api.authsamples-dev.com:446';
+        const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
         this._sessionId = Guid.create().toString();
         this._apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this._sessionId, false);
 

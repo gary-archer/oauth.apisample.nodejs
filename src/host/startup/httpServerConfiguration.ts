@@ -37,8 +37,8 @@ export class HttpServerConfiguration {
 
         // Use common code and give it any data it needs
         const base = new BaseCompositionRoot(this._container)
-            .useApiBasePath('/api/')
-            .addUnsecuredPath('/api/customclaims')
+            .useApiBasePath('/investments/')
+            .addUnsecuredPath('/investments/customclaims')
             .useOAuth(this._configuration.oauth)
             .withCustomClaimsProvider(new SampleCustomClaimsProvider())
             .withLogging(this._configuration.logging, this._loggerFactory)
@@ -49,7 +49,7 @@ export class HttpServerConfiguration {
         CompositionRoot.registerDependencies(this._container);
 
         // Configure Inversify Express, which will register @controller attributes and set up controller autowiring
-        new InversifyExpressServer(this._container, null, {rootPath: '/api/'}, this._expressApp)
+        new InversifyExpressServer(this._container, null, {rootPath: '/investments/'}, this._expressApp)
             .setConfig(() => {
 
                 // Parse JSON into the request body when required

@@ -71,7 +71,7 @@ export class RouteMetadataHandler {
     }
 
     /*
-     * Use the full request path, such as '/api/companies/2/transactions', which is available in all middleware
+     * Use the full request path, such as '/investments/companies/2/transactions', which is available in all middleware
      */
     private _getRequestPath(request: Request): string {
 
@@ -117,12 +117,12 @@ export class RouteMetadataHandler {
             path += '/' + trimmedOperationPath;
         }
 
-        // Return a value such as '/api/companies/:id/transactions'
+        // Return a value such as '/investments/companies/:id/transactions'
         return this._basePath + path;
     }
 
     /*
-     * Check for a match on the HTTP verb, such as 'GET', and the request path, such as '/api/companies/2/transactions'
+     * Check for a match on method and path, such as 'GET /investments/companies/2/transactions'
      */
     private _getMatchingRouteInfo(
         requestPath: string,
