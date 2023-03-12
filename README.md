@@ -89,7 +89,7 @@ npm run loadtest
 
 * See the [Overview Page](https://authguidance.com/2017/10/27/api-architecture-node) for further details on running the API in end-to-end setups
 * See the [Coding Key Points Page](https://authguidance.com/2017/10/27/final-nodeapi-coding-key-points/) for key implementation details
-* See the [Non Functional Behaviour](https://authguidance.com/2017/10/08/corporate-code-sample-core-behavior/) page for a summary of overall qualities
+* See the [API Platform Design](https://authguidance.com/api-platform-design/) for details on scaling the design to many APIs
 
 ## Programming Languages
 
