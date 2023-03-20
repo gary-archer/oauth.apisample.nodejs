@@ -10,10 +10,10 @@
   },
   "scripts": {
     "lint": "npx eslint . --ext .ts",
-    "start": "bash ./start.sh",
-    "testsetup": "bash ./test/scripts/testsetup.sh",
-    "test": "bash ./test/scripts/test.sh",
-    "loadtest": "bash ./test/scripts/loadtest.sh",
+    "start": "./start.sh",
+    "testsetup": "./test/scripts/testsetup.sh",
+    "test": "./test/scripts/test.sh",
+    "loadtest": "./test/scripts/loadtest.sh",
     "buildRelease": "rimraf dist && tsc --sourceMap false",
     "startRelease": "node dist/host/startup/app.js"
   },

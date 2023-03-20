@@ -1,8 +1,10 @@
 #!/bin/bash
 
-###########################################################################
-# A script to download SSL certificates, then build and run the API locally
-###########################################################################
+##########################################################################
+# A script to build and run the API locally
+# On Windows, ensure that you have first set Git bash as the node.js shell
+# npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+##########################################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
