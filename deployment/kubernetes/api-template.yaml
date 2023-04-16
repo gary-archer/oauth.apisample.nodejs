@@ -25,6 +25,10 @@ spec:
             mountPath: /usr/api/api.config.json
             subPath: api.config.json
             readOnly: true
+      volumes:
+        - name: api-config
+          configMap:
+            name: api-config
 ---
 kind: Service
 apiVersion: v1
