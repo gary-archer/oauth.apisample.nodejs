@@ -9,5 +9,3 @@ services:
     volumes:
       - ../environments/docker-local/api.config.json:/usr/api/api.config.json
       - ../../certs/authsamples-dev.ssl.p12:/usr/api/certs/authsamples-dev.ssl.p12
-    environment:
-      NODE_EXTRA_CA_CERTS: '/usr/local/share/certificates/trusted.ca.crt'
