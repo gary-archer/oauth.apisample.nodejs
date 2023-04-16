@@ -14,7 +14,7 @@ cd ../..
 # Support different docker repositories
 #
 if [ "$DOCKER_REPOSITORY" == "" ]; then
-  DOCKER_IMAGE='finalnetcoreapi:1.0.0'
+  DOCKER_IMAGE='finalnodejsapi:1.0.0'
 else
   DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnodejsapi:1.0.0"
 fi
