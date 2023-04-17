@@ -41,8 +41,12 @@ export class ClaimsController extends BaseHttpController {
         }
 
         // Get identity attributes about the user
+        console.log('*** LOOKUP API CLAIMS START');
         const subject = request.body?.subject;
         const email   = request.body?.email;
+        console.log(`*** subject: ${subject}`);
+        console.log(`*** email: ${email}`);
+        console.log('*** LOOKUP API CLAIMS END');
 
         if (!subject) {
             throw ErrorUtils.fromMissingClaim('subject');
