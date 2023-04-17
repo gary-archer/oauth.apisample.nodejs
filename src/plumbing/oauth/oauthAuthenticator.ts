@@ -43,6 +43,8 @@ export class OAuthAuthenticator {
                     issuer: this._configuration.issuer,
                     audience: this._configuration.audience,
                 };
+
+                console.log(accessToken);
                 const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
 
                 return result.payload;
