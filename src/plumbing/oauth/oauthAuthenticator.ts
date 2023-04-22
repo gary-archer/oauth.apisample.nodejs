@@ -44,12 +44,7 @@ export class OAuthAuthenticator {
                     audience: this._configuration.audience,
                 };
 
-                console.log('*** ACCESS TOKEN START');
-                console.log(accessToken);
-                console.log('*** ACCESS TOKEN END');
-
                 const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
-
                 return result.payload;
 
             } catch (e: any) {
