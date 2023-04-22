@@ -11,19 +11,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
-# Manage differences between local and cloud deployment
+# Support different docker repositories
 #
-if [ "$CLUSTER_TYPE" != 'local' ]; then
-  
-  if [ "$DOCKERHUB_ACCOUNT" == '' ]; then
-    echo '*** The DOCKERHUB_ACCOUNT environment variable has not been configured'
-    exit 1
-  fi
-
-  DOCKER_IMAGE_NAME="$DOCKERHUB_ACCOUNT/finalnodejsapi:1.0"
+if [ "$DOCKER_REPOSITORY" == "" ]; then
+  DOCKER_IMAGE='finalnodejsapi:1.0.0'
 else
-
-  DOCKER_IMAGE_NAME='finalnodejsapi:1.0'
+  DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnodejsapi:1.0.0"
 fi
 
 #
@@ -37,14 +30,9 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Copy in the internal cluster root CA from the parent project, to be trusted within the container
-#
-cp ../certs/cluster.internal.ca.pem deployment/shared/trusted.ca.pem
-
-#
 # Build the Docker container
 #
-docker build --no-cache -f deployment/shared/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/shared/trusted.ca.pem' -t "$DOCKER_IMAGE_NAME" .
+docker build --no-cache -f deployment/kubernetes/Dockerfile -t "$DOCKER_IMAGE" .
 if [ $? -ne 0 ]; then
   echo '*** API docker build problem encountered'
   exit 1
@@ -53,10 +41,10 @@ fi
 #
 # Push the API docker image
 #
-if [ "$CLUSTER_TYPE" == 'local' ]; then
-  kind load docker-image "$DOCKER_IMAGE_NAME" --name oauth
+if [ "$DOCKER_REPOSITORY" == "" ]; then
+  kind load docker-image "$DOCKER_IMAGE" --name oauth
 else
-  docker image push "$DOCKER_IMAGE_NAME"
+  docker image push "$DOCKER_IMAGE"
 fi
 if [ $? -ne 0 ]; then
   echo '*** API docker push problem encountered'

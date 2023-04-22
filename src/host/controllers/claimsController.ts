@@ -42,11 +42,11 @@ export class ClaimsController extends BaseHttpController {
 
         // Get identity attributes about the user
         const subject = request.body?.subject;
-        const email   = request.body?.email;
-
         if (!subject) {
             throw ErrorUtils.fromMissingClaim('subject');
         }
+
+        const email   = request.body?.email;
         if (!email) {
             throw ErrorUtils.fromMissingClaim('email');
         }

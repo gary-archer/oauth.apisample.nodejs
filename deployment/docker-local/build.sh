@@ -38,14 +38,9 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Prepare root CA certificates that the Docker container will trust
-#
-cp certs/authsamples-dev.ca.pem deployment/shared/trusted.ca.pem
-
-#
 # Build the docker image
 #
-docker build -f deployment/shared/Dockerfile --build-arg TRUSTED_CA_CERTS='deployment/shared/trusted.ca.pem' -t finalnodejsapi:v1 .
+docker build -f deployment/docker-local/Dockerfile -t finalnodejsapi:v1 .
 if [ $? -ne 0 ]; then
   echo 'Problem encountered building the API docker image'
   exit

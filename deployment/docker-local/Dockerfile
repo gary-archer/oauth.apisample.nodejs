@@ -1,8 +1,7 @@
 FROM node:18.15.0-bullseye
 
 # Configure trusted root certificate authorities
-ARG TRUSTED_CA_CERTS
-COPY $TRUSTED_CA_CERTS /usr/local/share/certificates/trusted.ca.crt
+COPY certs/authsamples-dev.ca.pem /usr/local/share/certificates/trusted.ca.crt
 RUN update-ca-certificates
 ENV NODE_EXTRA_CA_CERTS='/usr/local/share/certificates/trusted.ca.crt'
 
@@ -13,10 +12,8 @@ COPY data/*              /usr/api/data/
 COPY package*.json       /usr/api/
 RUN npm install --production
 
-# Create a low privilege user
-RUN adduser --disabled-password --home /home/apiuser --gecos '' apiuser
-USER apiuser
-
-# Work around openssl and node.js compatibility in some setups
-# https://github.com/nodejs/node/issues/40672
-CMD ["node", "--openssl-legacy-provider", "dist/host/startup/app.js"]
+# Run the app as a low privilege user
+RUN groupadd --gid 10000 apiuser \
+  && useradd --uid 10001 --gid apiuser --shell /bin/bash --create-home apiuser
+USER 10001
+CMD ["node", "dist/host/startup/app.js"]
