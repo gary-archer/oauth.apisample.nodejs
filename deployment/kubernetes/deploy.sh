@@ -25,7 +25,7 @@ TAG=$(cat ./dockertag.txt)
 if [ "$DOCKER_REPOSITORY" == "" ]; then
   export DOCKER_IMAGE="finalnodejsapi:$TAG"
 else
-  export DOCKER_IMAGE="$DOCKER_REPOSITORY/$TAG"
+  export DOCKER_IMAGE="$DOCKER_REPOSITORY/finalnodejsapi:$TAG"
 fi
 
 #
