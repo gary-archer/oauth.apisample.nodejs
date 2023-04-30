@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   finalapi:
-    image: finalnodejsapi:v1
+    image: finalnodejsapi:latest
     hostname: apilocal.authsamples-dev.com
     ports:
       - 446:8000
