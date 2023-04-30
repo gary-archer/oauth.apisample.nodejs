@@ -8,13 +8,12 @@
 # Ensure that we are in the root folder
 #
 cd "$(dirname "${BASH_SOURCE[0]}")"
-cd ../..
 
 #
 # Use a timestamp based tag and support both KIND and DockerHub repositories
 #
 TAG=$(date +%Y%m%d%H%M%S)
-echo $TAG > ./docker_tag.txt
+echo $TAG > ./dockertag.txt
 if [ "$DOCKER_REPOSITORY" == "" ]; then
   DOCKER_IMAGE="finalnodejsapi:$TAG"
 else
@@ -24,6 +23,7 @@ fi
 #
 # Build the Node.js API
 #
+cd ../..
 npm install
 npm run buildRelease
 if [ $? -ne 0 ]; then

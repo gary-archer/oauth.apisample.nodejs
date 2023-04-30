@@ -21,7 +21,7 @@ fi
 #
 # Use a timestamp based tag and support both KIND and DockerHub repositories
 #
-TAG=$(cat ./docker_tag.txt)
+TAG=$(cat ./dockertag.txt)
 if [ "$DOCKER_REPOSITORY" == "" ]; then
   export DOCKER_IMAGE="finalnodejsapi:$TAG"
 else
