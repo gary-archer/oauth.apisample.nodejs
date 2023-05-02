@@ -38,7 +38,7 @@ export class StandardAuthorizer extends BaseAuthorizer {
         // Then read all claims from the token
         const baseClaims = ClaimsReader.baseClaims(payload);
         const userInfo = ClaimsReader.userInfoClaims(payload);
-        const customClaims = await customClaimsProvider.getFromPayload(payload);
+        const customClaims = customClaimsProvider.getFromPayload(payload);
         return new ClaimsPrincipal(baseClaims, userInfo, customClaims);
     }
 }

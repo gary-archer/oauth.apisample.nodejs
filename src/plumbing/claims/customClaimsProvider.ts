@@ -19,7 +19,7 @@ export class CustomClaimsProvider {
     /*
      * When using the StandardAuthorizer, this is called to read claims from the access token
      */
-    public async getFromPayload(payload: JWTPayload): Promise<CustomClaims> {
+    public getFromPayload(payload: JWTPayload): CustomClaims {
         return new CustomClaims();
     }
 
