@@ -1,5 +1,5 @@
 import {inject, injectable} from 'inversify';
-import {JWTPayload, jwtVerify} from 'jose';
+import {JWTPayload, JWTVerifyOptions, jwtVerify} from 'jose';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ErrorFactory} from '../errors/errorFactory.js';
@@ -41,8 +41,11 @@ export class OAuthAuthenticator {
                 const options = {
                     algorithms: ['RS256'],
                     issuer: this._configuration.issuer,
-                    audience: this._configuration.audience,
-                };
+                } as JWTVerifyOptions;
+
+                if (this._configuration.audience) {
+                    options.audience = this._configuration.audience;
+                }
 
                 const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
                 return result.payload;
