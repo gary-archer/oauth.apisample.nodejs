@@ -41,6 +41,7 @@ export class UserInfoController extends BaseHttpController {
         return {
             givenName: this._userInfoClaims.givenName,
             familyName: this._userInfoClaims.familyName,
+            role: this._customClaims.userRole,
             regions: this._customClaims.userRegions,
         };
     }
