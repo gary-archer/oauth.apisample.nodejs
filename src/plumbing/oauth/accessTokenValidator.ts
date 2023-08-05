@@ -1,7 +1,9 @@
 import {inject, injectable} from 'inversify';
 import {JWTPayload, JWTVerifyOptions, jwtVerify} from 'jose';
+import {ClaimsReader} from '../claims/claimsReader.js';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
+import {BaseErrorCodes} from '../errors/baseErrorCodes.js';
 import {ErrorFactory} from '../errors/errorFactory.js';
 import {ErrorUtils} from '../errors/errorUtils.js';
 import {JwksRetriever} from './jwksRetriever';
@@ -37,18 +39,31 @@ export class AccessTokenValidator {
 
             try {
 
-                // Perform the JWT validation according to best practices
                 const options = {
                     algorithms: ['RS256'],
                     issuer: this._configuration.issuer,
                 } as JWTVerifyOptions;
 
+                // Allow for AWS Cognito, which does not include an audience claim in access tokens
                 if (this._configuration.audience) {
                     options.audience = this._configuration.audience;
                 }
 
+                // Validate the token and get its claims
                 const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
-                return result.payload;
+                const claims = result.payload;
+
+                // The sample API requires the same scope for all endpoints, and it is enforced here
+                const scopes = ClaimsReader.getStringClaim(claims, 'scope').split(' ');
+                if (scopes.indexOf('investments') === -1) {
+
+                    throw ErrorFactory.createClientError(
+                        403,
+                        BaseErrorCodes.insufficientScope,
+                        'The token does not contain sufficient scope for this API');
+                }
+
+                return claims;
 
             } catch (e: any) {
 
