@@ -1,13 +1,13 @@
 import assert from 'assert';
 import {Guid} from 'guid-typescript';
+import {generateKeyPair} from 'jose';
 import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts.js';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
-import {TokenIssuer} from './utils/tokenIssuer.js';
-import {WiremockAdmin} from './utils/wiremockAdmin.js';
+import {MockAuthorizationServer} from './utils/mockAuthorizationServer.js';
 
 /*
- * Test the API in isolation, without any dependencies on the Authorization Server
+ * Test the API in isolation, without any dependencies on real access tokens
  */
 describe('OAuth API Tests', () => {
 
@@ -16,8 +16,7 @@ describe('OAuth API Tests', () => {
     const guestAdminId = '77a97e5b-b748-45e5-bb6f-658e85b2df91';
 
     // A class to issue our own JWTs for testing
-    const tokenIssuer = new TokenIssuer();
-    const wiremockAdmin = new WiremockAdmin(false);
+    const authorizationServer = new MockAuthorizationServer(false);
 
     // Create the API client
     const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
@@ -25,20 +24,19 @@ describe('OAuth API Tests', () => {
     const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, false);
 
     /*
-     * Initialize the token issuer, then register a mock keyset the API will use to validate JWTs
+     * Run a mock authorization server during tests
      */
     before( async () => {
+        
         ExtraCaCerts.initialize();
-        await tokenIssuer.initialize();
-        const keyset = await tokenIssuer.getTokenSigningPublicKeys();
-        await wiremockAdmin.registerJsonWebWeys(keyset);
+        await authorizationServer.start();
     });
 
     /*
-     * Clean up wiremock resources
+     * Teardown that runs when all tests have completed
      */
     after( async () => {
-        await wiremockAdmin.unregisterJsonWebWeys();
+        await authorizationServer.stop();
     });
 
     /*
@@ -47,7 +45,7 @@ describe('OAuth API Tests', () => {
     it ('Get user claims returns a single region for the standard user', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -64,7 +62,7 @@ describe('OAuth API Tests', () => {
     it ('Get user claims returns all regions for the admin user', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
+        const accessToken = await authorizationServer.issueAccessToken(guestAdminId);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -81,7 +79,7 @@ describe('OAuth API Tests', () => {
     it ('Get companies list returns 2 items for the standard user', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -98,7 +96,7 @@ describe('OAuth API Tests', () => {
     it ('Get companies list returns all items for the admin user', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
+        const accessToken = await authorizationServer.issueAccessToken(guestAdminId);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -115,7 +113,8 @@ describe('OAuth API Tests', () => {
     it ('Get companies list with malicious JWT returns a 401 error', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueMaliciousAccessToken(guestUserId);
+        const maliciousJwk = await generateKeyPair('RS256');
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId, maliciousJwk);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -132,7 +131,7 @@ describe('OAuth API Tests', () => {
     it ('Get transactions is allowed for companies that match the regions claim', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -149,7 +148,7 @@ describe('OAuth API Tests', () => {
     it ('Get transactions returns 404 for companies that do not match the regions claim', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -166,7 +165,7 @@ describe('OAuth API Tests', () => {
     it ('API exceptions return 500 with a supportable error response', async () => {
 
         // Get an access token for the end user of this test
-        const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
 
         // Call a valid API operation but pass a custom header to cause an API exception
         const options = new ApiRequestOptions(accessToken);
