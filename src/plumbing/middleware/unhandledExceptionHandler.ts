@@ -45,7 +45,7 @@ export class UnhandledExceptionHandler {
 
         // Write the client response
         const writer = new ResponseWriter();
-        writer.writeObjectResponse(response, clientError.getStatusCode(), clientError.toResponseFormat());
+        writer.writeErrorResponse(response, clientError);
     }
 
     /*

@@ -1,4 +1,5 @@
 import {Response} from 'express';
+import { ClientError } from '../errors/clientError';
 
 /*
  * A helper object for writing standard responses
@@ -6,17 +7,24 @@ import {Response} from 'express';
 export class ResponseWriter {
 
     /*
-     * Return data to the caller, which could be a success or error object
+     * Return a failure HTTP response
      */
-    public writeObjectResponse(response: Response, statusCode: number, data: any): void {
+    public writeErrorResponse(response: Response, clientError: ClientError): void {
 
-        // Write headers
+        // Indicate a JSON response
         response.setHeader('Content-Type', 'application/json');
-        if (statusCode === 401) {
-            response.setHeader('WWW-Authenticate', 'Bearer');
+        
+        // Add the standards based header if required
+        if (clientError.getStatusCode() === 401) {
+
+            const realm = 'mycompany.com';
+            let wwwAuthenticateHeader = `Bearer realm="${realm}"`;
+            wwwAuthenticateHeader += `, error="${clientError.getErrorCode()}"`;
+            wwwAuthenticateHeader += `, error_description="${clientError.message}"`;
+            response.setHeader('WWW-Authenticate', wwwAuthenticateHeader);
         }
 
-        // Write the response data
-        response.status(statusCode).send(JSON.stringify(data));
+        // Also add a more client friendly JSON response with the same fields
+        response.status(clientError.getStatusCode()).send(JSON.stringify(clientError.toResponseFormat()));
     }
 }
