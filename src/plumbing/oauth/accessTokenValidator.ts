@@ -9,10 +9,10 @@ import {LogEntry} from '../logging/logEntry.js';
 import {using} from '../utilities/using.js';
 
 /*
- * The entry point for calls to the Authorization Server
+ * A class to deal with OAuth JWT access token validation
  */
 @injectable()
-export class OAuthAuthenticator {
+export class AccessTokenValidator {
 
     private readonly _configuration: OAuthConfiguration;
     private readonly _logEntry: LogEntry;
@@ -31,9 +31,9 @@ export class OAuthAuthenticator {
     /*
      * Do the work of performing token validation via the injected class
      */
-    public async validateToken(accessToken: string): Promise<JWTPayload> {
+    public async execute(accessToken: string): Promise<JWTPayload> {
 
-        return using(this._logEntry.createPerformanceBreakdown('validateToken'), async () => {
+        return using(this._logEntry.createPerformanceBreakdown('tokenValidator'), async () => {
 
             try {
 

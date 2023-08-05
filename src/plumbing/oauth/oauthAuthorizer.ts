@@ -1,59 +1,62 @@
 import {createHash} from 'crypto';
 import {Request} from 'express';
+import {inject, injectable} from 'inversify';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
-import {CachedClaims} from '../claims/cachedClaims.js';
 import {ClaimsCache} from '../claims/claimsCache.js';
-import {ClaimsReader} from '../claims/claimsReader.js';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
-import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {ErrorFactory} from '../errors/errorFactory.js';
-import {BaseAuthorizer} from '../security/baseAuthorizer.js';
-import {OAuthAuthenticator} from './oauthAuthenticator.js';
+import {AccessTokenValidator} from './accessTokenValidator.js';
+import {BearerToken} from './bearerToken.js';
 
 /*
- * An authorizer used when domain specific claims cannot be included in the access token
- * Our code samples use this approach when AWS Cognito is usFed, as a low cost cloud provider
+ * A class to create the claims principal at the start of every secured request
  */
-export class OAuthAuthorizer extends BaseAuthorizer {
+@injectable()
+export class OAuthAuthorizer {
+
+    private readonly _cache: ClaimsCache;
+    private readonly _accessTokenValidator: AccessTokenValidator;
+    private readonly _customClaimsProvider: CustomClaimsProvider;
+
+    public constructor(
+        @inject(BASETYPES.ClaimsCache) cache: ClaimsCache,
+        @inject(BASETYPES.AccessTokenValidator) accessTokenValidator: AccessTokenValidator,
+        @inject(BASETYPES.CustomClaimsProvider) customClaimsProvider: CustomClaimsProvider) {
+
+        this._cache = cache;
+        this._accessTokenValidator = accessTokenValidator;
+        this._customClaimsProvider = customClaimsProvider;
+    }
 
     /*
-     * Do the OAuth processing via the middleware class
+     * Validate the OAuth access token and then look up other claims
      */
-    protected async execute(
-        request: Request,
-        customClaimsProvider: CustomClaimsProvider): Promise<ClaimsPrincipal> {
+    public async execute(request: Request): Promise<ClaimsPrincipal> {
 
         // First read the access token
-        const accessToken = super.readAccessToken(request);
+        const accessToken = BearerToken.read(request);
         if (!accessToken) {
             throw ErrorFactory.createClient401Error('No access token was supplied in the bearer header');
         }
 
-        // Get per request dependencies
-        const perRequestContainer = ChildContainerHelper.resolve(request);
-        const authenticator = perRequestContainer.get<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator);
-
         // On every API request we validate the JWT, in a zero trust manner
-        const payload = await authenticator.validateToken(accessToken);
-        const baseClaims = ClaimsReader.baseClaims(payload);
+        const jwtClaims = await this._accessTokenValidator.execute(accessToken);
 
-        // If cached results exist for other claims then return them
+        // If cached results already exist for this token then return them immediately
         const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
-        const cache = perRequestContainer.get<ClaimsCache>(BASETYPES.ClaimsCache);
-        const cachedClaims = await cache.getExtraUserClaims(accessTokenHash);
-        if (cachedClaims) {
-            return new ClaimsPrincipal(baseClaims, cachedClaims.custom);
+        let customClaims = await this._cache.getExtraUserClaims(accessTokenHash);
+        if (customClaims) {
+            return new ClaimsPrincipal(jwtClaims, customClaims);
         }
 
-        // In Cognito we cannot issue custom claims so the API looks them up when the access token is first received
-        const customClaims = await customClaimsProvider.getFromLookup(accessToken, baseClaims);
-        const claimsToCache = new CachedClaims(customClaims);
+        // Look up custom claims not in the JWT access token when it is first received
+        customClaims = await this._customClaimsProvider.lookupForNewAccessToken(accessToken, jwtClaims);
 
         // Cache the extra claims for subsequent requests with the same access token
-        await cache.setExtraUserClaims(accessTokenHash, claimsToCache, payload.exp!);
+        await this._cache.setExtraUserClaims(accessTokenHash, customClaims!, jwtClaims.exp!);
 
         // Return the final claims
-        return new ClaimsPrincipal(baseClaims, customClaims);
+        return new ClaimsPrincipal(jwtClaims, customClaims!);
     }
 }

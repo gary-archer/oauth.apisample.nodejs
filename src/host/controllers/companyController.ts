@@ -22,7 +22,7 @@ export class CompanyController extends BaseHttpController {
     }
 
     /*
-     * Return the list of companies
+     * Return a list of companies
      */
     @httpGet('')
     public async getCompanyList(): Promise<Company[]> {
@@ -30,7 +30,7 @@ export class CompanyController extends BaseHttpController {
     }
 
     /*
-     * Return the transaction details for a company
+     * Return a composite object containing company transactions
      */
     @httpGet('/:id/transactions')
     public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {

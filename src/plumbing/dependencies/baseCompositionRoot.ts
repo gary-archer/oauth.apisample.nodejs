@@ -1,9 +1,8 @@
 import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
-import {BaseClaims} from '../claims/baseClaims.js';
 import {ClaimsCache} from '../claims/claimsCache.js';
-import {CustomClaims} from '../claims/customClaims.js';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider.js';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
@@ -11,13 +10,13 @@ import {BASETYPES} from '../dependencies/baseTypes.js';
 import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
 import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
+import {AuthorizerMiddleware} from '../middleware/authorizerMiddleware.js';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
+import {AccessTokenValidator} from '../oauth/accessTokenValidator.js';
 import {JwksRetriever} from '../oauth/jwksRetriever.js';
-import {OAuthAuthenticator} from '../oauth/oauthAuthenticator.js';
 import {OAuthAuthorizer} from '../oauth/oauthAuthorizer.js';
-import {BaseAuthorizer} from '../security/baseAuthorizer.js';
 import {HttpProxy} from '../utilities/httpProxy.js';
 
 /*
@@ -28,10 +27,10 @@ export class BaseCompositionRoot {
     private readonly _container: Container;
     private _apiBasePath?: string;
     private _oauthConfiguration?: OAuthConfiguration;
-    private _authorizer?: BaseAuthorizer;
     private _customClaimsProvider?: CustomClaimsProvider;
     private _loggingConfiguration?: LoggingConfiguration;
     private _loggerFactory?: LoggerFactory;
+    private _authorizerMiddleware?: AuthorizerMiddleware;
     private _loggerMiddleware?: LoggerMiddleware;
     private _exceptionHandler?: UnhandledExceptionHandler;
     private _httpProxy?: HttpProxy;
@@ -112,7 +111,8 @@ export class BaseCompositionRoot {
         expressApp.use(`${this._apiBasePath}*`, this._loggerMiddleware.logRequest);
 
         // The second middleware manages authorization
-        expressApp.use(`${this._apiBasePath}*`, this._authorizer!.authorizeRequestAndGetClaims);
+        this._authorizerMiddleware = new AuthorizerMiddleware();
+        expressApp.use(`${this._apiBasePath}*`, this._authorizerMiddleware!.authorize);
 
         // The third middleware supports non functional testing via headers
         const handler = new CustomHeaderMiddleware(this._loggingConfiguration!.apiName);
@@ -165,13 +165,15 @@ export class BaseCompositionRoot {
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
             .toConstantValue(this._oauthConfiguration!);
 
-        // The authenticator manages JWT access token validation
-        this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
-            .to(OAuthAuthenticator).inRequestScope();
+        // A class to validate JWT access tokens
+        this._container.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
+            .to(AccessTokenValidator).inRequestScope();
 
-        this._authorizer = new OAuthAuthorizer();
+        // The authorizer deals with finalizing the claims principal
+        this._container.bind<OAuthAuthorizer>(BASETYPES.OAuthAuthorizer)
+            .to(OAuthAuthorizer).inRequestScope();
 
-        // Register a singleton to cache JWKS keys
+        // Also register a singleton to cache token signing public keys
         this._container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
             .toConstantValue(new JwksRetriever(this._oauthConfiguration!, this._httpProxy!));
     }
@@ -193,10 +195,8 @@ export class BaseCompositionRoot {
         this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
             .toConstantValue(claimsCache);
 
-        // Register dummy claims values that are overridden later by the authorizer middleware
-        this._container.bind<BaseClaims>(BASETYPES.BaseClaims)
-            .toConstantValue({} as any);
-        this._container.bind<CustomClaims>(BASETYPES.CustomClaims)
+        // Register dummy per request claims that are overridden later by the authorizer middleware
+        this._container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal)
             .toConstantValue({} as any);
     }
 }

@@ -54,7 +54,7 @@ export class HttpServerConfiguration {
                 // Parse JSON into the request body when required
                 this._expressApp.use(express.json());
 
-                // Our API requests are not designed for caching
+                // The demo API does not implement request caching
                 this._expressApp.set('etag', false);
 
                 // We must configure Express cross cutting concerns during this callback

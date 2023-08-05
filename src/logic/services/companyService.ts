@@ -1,5 +1,5 @@
 import {inject, injectable} from 'inversify';
-import {CustomClaims} from '../../plumbing/claims/customClaims.js';
+import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ClientError} from '../../plumbing/errors/clientError.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
@@ -21,10 +21,10 @@ export class CompanyService {
 
     public constructor(
         @inject(SAMPLETYPES.CompanyRepository) repository: CompanyRepository,
-        @inject(BASETYPES.CustomClaims) customClaims: CustomClaims) {
+        @inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
 
         this._repository = repository;
-        this._customClaims = customClaims as SampleCustomClaims;
+        this._customClaims = claims.custom as SampleCustomClaims;
     }
 
     /*
@@ -61,13 +61,13 @@ export class CompanyService {
     private _isUserAuthorizedForCompany(company: Company): boolean {
 
         // First authorize based on the user role
-        const isAdmin = this._customClaims.userRole.toLowerCase().indexOf('admin') !== -1;
+        const isAdmin = this._customClaims.role.toLowerCase().indexOf('admin') !== -1;
         if (isAdmin) {
             return true;
         }
 
         // Next authorize based on a business rule that links the user to regional data
-        const found = this._customClaims.userRegions.find((c) => c === company.region);
+        const found = this._customClaims.regions.find((c) => c === company.region);
         return !!found;
     }
 

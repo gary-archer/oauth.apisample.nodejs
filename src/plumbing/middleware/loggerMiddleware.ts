@@ -19,7 +19,6 @@ export class LoggerMiddleware {
      */
     public constructor(loggerFactory: LoggerFactory) {
         this._loggerFactory = loggerFactory as LoggerFactoryImpl;
-
         this._setupCallbacks();
     }
 

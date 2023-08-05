@@ -7,12 +7,9 @@ import {ApiConfiguration} from './apiConfiguration.js';
  */
 export interface Configuration {
 
-    // API specific configuration
     api: ApiConfiguration;
 
-    // Common logging configuration
     logging: LoggingConfiguration;
 
-    // Common OAuth configuration
     oauth: OAuthConfiguration;
 }

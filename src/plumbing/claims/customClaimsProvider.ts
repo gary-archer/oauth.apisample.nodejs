@@ -1,23 +1,23 @@
-import {BaseClaims} from './baseClaims.js';
+import {JWTPayload} from 'jose';
 import {CustomClaims} from './customClaims.js';
 
 /*
- * A class to deal with domain specific claims, needed for business authorization
+ * A null implementation that can be overridden to provide custom claims
  */
 export class CustomClaimsProvider {
 
     /*
-     * When using the ClaimsCachingAuthorizer, this is called to get extra claims when the token is first received
+     * Look up custom claims when details are not available in the cache, such as for a new access token
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async getFromLookup(accessToken: string, token: BaseClaims): Promise<CustomClaims> {
+    public async lookupForNewAccessToken(accessToken: string, jwtClaims: JWTPayload): Promise<CustomClaims> {
         return new CustomClaims();
     }
 
     /*
-     * This can be overridden by derived classes
+     * Deserialize custom claims after they have been read from the cache
      */
-    public deserialize(data: any): CustomClaims {
+    public deserializeFromCache(data: any): CustomClaims {
         return CustomClaims.importData(data);
     }
 }

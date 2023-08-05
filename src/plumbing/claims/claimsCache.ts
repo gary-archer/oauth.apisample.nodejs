@@ -2,7 +2,7 @@ import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
 import {LoggerFactory} from '../logging/loggerFactory.js';
-import {CachedClaims} from './cachedClaims.js';
+import {CustomClaims} from './customClaims.js';
 import {CustomClaimsProvider} from './customClaimsProvider.js';
 
 /*
@@ -42,11 +42,11 @@ export class ClaimsCache {
     /*
      * Add claims to the cache until the token's time to live
      */
-    public async setExtraUserClaims(accessTokenHash: string, claims: CachedClaims, exp: number): Promise<void> {
+    public async setExtraUserClaims(accessTokenHash: string, claims: CustomClaims, exp: number): Promise<void> {
 
         // Get the data in way that handles private property names
         const dataAsJson = {
-            custom: claims.custom.exportData(),
+            custom: claims.exportData(),
         };
 
         // Use the exp field to work out the token expiry time
@@ -74,7 +74,7 @@ export class ClaimsCache {
     /*
      * Get claims from the cache or return null if not found
      */
-    public async getExtraUserClaims(accessTokenHash: string): Promise<CachedClaims | null> {
+    public async getExtraUserClaims(accessTokenHash: string): Promise<CustomClaims | null> {
 
         // Get the token hash and see if it exists in the cache
         const claimsText = await this._cache.get<string>(accessTokenHash);
@@ -90,7 +90,6 @@ export class ClaimsCache {
 
         // Get the data in way that handles private property names
         const dataAsJson = JSON.parse(claimsText);
-        return new CachedClaims(
-            this._customClaimsProvider.deserialize(dataAsJson.custom));
+        return this._customClaimsProvider.deserializeFromCache(dataAsJson.custom);
     }
 }

@@ -168,7 +168,7 @@ export class LogEntryData {
      */
     private _outputPerformance(output: any): void {
 
-        if (this.performance.millisecondsTaken >= this.performanceThresholdMilliseconds || this.errorId) {
+        if (this.performance.millisecondsTaken >= this.performanceThresholdMilliseconds) {
             output.performance = this.performance.data;
         }
     }
