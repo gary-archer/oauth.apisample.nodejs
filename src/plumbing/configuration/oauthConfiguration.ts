@@ -1,5 +1,3 @@
-import {ClaimsCacheConfiguration} from './claimsCacheConfiguration.js';
-
 /*
  * Configuration settings to enable standard security and extensible use of claims
  */
@@ -17,9 +15,6 @@ export interface OAuthConfiguration {
     // In test environments this is set to zero
     jwksCooldownDuration?: number;
 
-    // The strategy for domain specific claims, either 'jwt' or 'apiLookup'
-    claimsStrategy: string;
-
-    // Optional claims caching configuration
-    claimsCache: ClaimsCacheConfiguration | null;
+    // The maximum number of minutes for which to cache extra claims
+    claimsCacheTimeToLiveMinutes: number;
 }

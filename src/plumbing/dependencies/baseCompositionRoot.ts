@@ -2,9 +2,9 @@ import {Application} from 'express';
 import {Container} from 'inversify';
 import {getRawMetadata} from 'inversify-express-utils';
 import {BaseClaims} from '../claims/baseClaims.js';
+import {ClaimsCache} from '../claims/claimsCache.js';
 import {CustomClaims} from '../claims/customClaims.js';
 import {CustomClaimsProvider} from '../claims/customClaimsProvider.js';
-import {UserInfoClaims} from '../claims/userInfoClaims.js';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
@@ -14,12 +14,9 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
 import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
-import {ClaimsCache} from '../oauth/claimsCaching/claimsCache.js';
-import {ClaimsCachingAuthorizer} from '../oauth/claimsCaching/claimsCachingAuthorizer.js';
-import {UserInfoClient} from '../oauth/claimsCaching/userInfoClient.js';
-import {OAuthAuthenticator} from '../oauth/oauthAuthenticator.js';
 import {JwksRetriever} from '../oauth/jwksRetriever.js';
-import {StandardAuthorizer} from '../oauth/standardAuthorizer.js';
+import {OAuthAuthenticator} from '../oauth/oauthAuthenticator.js';
+import {OAuthAuthorizer} from '../oauth/oauthAuthorizer.js';
 import {BaseAuthorizer} from '../security/baseAuthorizer.js';
 import {HttpProxy} from '../utilities/httpProxy.js';
 
@@ -30,7 +27,6 @@ export class BaseCompositionRoot {
 
     private readonly _container: Container;
     private _apiBasePath?: string;
-    private _unsecuredPaths: string[];
     private _oauthConfiguration?: OAuthConfiguration;
     private _authorizer?: BaseAuthorizer;
     private _customClaimsProvider?: CustomClaimsProvider;
@@ -42,7 +38,6 @@ export class BaseCompositionRoot {
 
     public constructor(container: Container) {
         this._container = container;
-        this._unsecuredPaths = [];
     }
 
     /*
@@ -55,14 +50,6 @@ export class BaseCompositionRoot {
             this._apiBasePath += '/';
         }
 
-        return this;
-    }
-
-    /*
-     * Allow some paths to bypass OAuth security
-     */
-    public addUnsecuredPath(unsecuredPath: string): BaseCompositionRoot {
-        this._unsecuredPaths.push(unsecuredPath);
         return this;
     }
 
@@ -182,18 +169,7 @@ export class BaseCompositionRoot {
         this._container.bind<OAuthAuthenticator>(BASETYPES.OAuthAuthenticator)
             .to(OAuthAuthenticator).inRequestScope();
 
-        // Create the authorizer, which provides the overall algorithm for setting up the API's claims
-        if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
-
-            this._authorizer = new ClaimsCachingAuthorizer();
-
-        } else {
-
-            this._authorizer = new StandardAuthorizer();
-        }
-
-        // Allow anonymous access when needed
-        this._authorizer.setUnsecuredPaths(this._unsecuredPaths);
+        this._authorizer = new OAuthAuthorizer();
 
         // Register a singleton to cache JWKS keys
         this._container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
@@ -205,29 +181,20 @@ export class BaseCompositionRoot {
      */
     private _registerClaimsDependencies(): void {
 
-        // Register an object to provide custom claims
+        // Register a custom claims provider
         this._container.bind<CustomClaimsProvider>(BASETYPES.CustomClaimsProvider)
             .toConstantValue(this._customClaimsProvider!);
 
-        // Register extra objects if using claims caching
-        if (this._oauthConfiguration!.claimsStrategy === 'apiLookup') {
-
-            const claimsCache = new ClaimsCache(
-                this._oauthConfiguration!.claimsCache!.timeToLiveMinutes,
-                this._customClaimsProvider!,
-                this._loggerFactory!);
-
-            this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
-                .toConstantValue(claimsCache);
-
-            this._container.bind<UserInfoClient>(BASETYPES.UserInfoClient)
-                .to(UserInfoClient).inRequestScope();
-        }
+        // Register a claims cache
+        const claimsCache = new ClaimsCache(
+            this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
+            this._customClaimsProvider!,
+            this._loggerFactory!);
+        this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
+            .toConstantValue(claimsCache);
 
         // Register dummy claims values that are overridden later by the authorizer middleware
         this._container.bind<BaseClaims>(BASETYPES.BaseClaims)
-            .toConstantValue({} as any);
-        this._container.bind<UserInfoClaims>(BASETYPES.UserInfoClaims)
             .toConstantValue({} as any);
         this._container.bind<CustomClaims>(BASETYPES.CustomClaims)
             .toConstantValue({} as any);

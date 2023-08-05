@@ -88,14 +88,6 @@ export class LoadTest {
 
         // Register them with Wiremock so that the API uses them to validate access tokens
         await this._wiremockAdmin.registerJsonWebWeys(keyset);
-
-        // Register the user on behalf of whom the load test gets tokens
-        const mockUserInfo = {
-            given_name: 'Guest',
-            family_name: 'User',
-            email: 'guestuser@mycompany.com',
-        };
-        await this._wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
     }
 
     /*
@@ -103,7 +95,6 @@ export class LoadTest {
      */
     private async _oauthTeardown(): Promise<void> {
         await this._wiremockAdmin.unregisterJsonWebWeys();
-        await this._wiremockAdmin.unregisterUserInfo();
     }
 
     /*

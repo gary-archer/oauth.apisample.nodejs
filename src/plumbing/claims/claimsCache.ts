@@ -1,10 +1,9 @@
 import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
-import {CachedClaims} from '../../claims/cachedClaims.js';
-import {CustomClaimsProvider} from '../../claims/customClaimsProvider.js';
-import {UserInfoClaims} from '../../claims/userInfoClaims.js';
-import {LoggerFactory} from '../../logging/loggerFactory.js';
+import {LoggerFactory} from '../logging/loggerFactory.js';
+import {CachedClaims} from './cachedClaims.js';
+import {CustomClaimsProvider} from './customClaimsProvider.js';
 
 /*
  * A simple in memory claims cache for our API
@@ -47,7 +46,6 @@ export class ClaimsCache {
 
         // Get the data in way that handles private property names
         const dataAsJson = {
-            userInfo: claims.userInfo.exportData(),
             custom: claims.custom.exportData(),
         };
 
@@ -93,7 +91,6 @@ export class ClaimsCache {
         // Get the data in way that handles private property names
         const dataAsJson = JSON.parse(claimsText);
         return new CachedClaims(
-            UserInfoClaims.importData(dataAsJson.userInfo),
             this._customClaimsProvider.deserialize(dataAsJson.custom));
     }
 }

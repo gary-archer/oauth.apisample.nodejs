@@ -39,7 +39,6 @@ describe('OAuth API Tests', () => {
      */
     after( async () => {
         await wiremockAdmin.unregisterJsonWebWeys();
-        await wiremockAdmin.unregisterUserInfo();
     });
 
     /*
@@ -49,14 +48,6 @@ describe('OAuth API Tests', () => {
 
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
-
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Guest',
-            family_name: 'User',
-            email: 'guestuser@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -75,14 +66,6 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
 
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Admin',
-            family_name: 'User',
-            email: 'guestadmin@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
-
         // Call the API
         const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getUserInfoClaims(options);
@@ -100,14 +83,6 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Guest',
-            family_name: 'User',
-            email: 'guestuser@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
-
         // Call the API
         const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getCompanyList(options);
@@ -124,14 +99,6 @@ describe('OAuth API Tests', () => {
 
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestAdminId);
-
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Admin',
-            family_name: 'User',
-            email: 'guestadmin@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -156,7 +123,7 @@ describe('OAuth API Tests', () => {
 
         // Assert results
         assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
-        assert.strictEqual(response.body.code, 'unauthorized', 'Unexpected error code');
+        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
     });
 
     /*
@@ -166,14 +133,6 @@ describe('OAuth API Tests', () => {
 
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
-
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Guest',
-            family_name: 'User',
-            email: 'guestuser@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -192,14 +151,6 @@ describe('OAuth API Tests', () => {
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
 
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Guest',
-            family_name: 'User',
-            email: 'guestuser@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
-
         // Call the API
         const options = new ApiRequestOptions(accessToken);
         const response = await apiClient.getCompanyTransactions(options, 3);
@@ -216,14 +167,6 @@ describe('OAuth API Tests', () => {
 
         // Get an access token for the end user of this test
         const accessToken = await tokenIssuer.issueAccessToken(guestUserId);
-
-        // The API will call the Authorization Server to get user info for the token, so register a mock response
-        const mockUserInfo = {
-            given_name: 'Guest',
-            family_name: 'User',
-            email: 'guestuser@mycompany.com',
-        };
-        await wiremockAdmin.registerUserInfo(JSON.stringify(mockUserInfo));
 
         // Call a valid API operation but pass a custom header to cause an API exception
         const options = new ApiRequestOptions(accessToken);

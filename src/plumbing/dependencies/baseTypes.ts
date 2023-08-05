@@ -14,6 +14,5 @@ export const BASETYPES = {
     OAuthAuthenticator: Symbol.for('OAuthAuthenticator'),
     OAuthConfiguration: Symbol.for('OAuthConfiguration'),
     UnhandledExceptionHandler: Symbol.for('UnhandledExceptionHandler'),
-    UserInfoClient: Symbol.for('UserInfoClient'),
     UserInfoClaims: Symbol.for('UserInfoClaims'),
 };

@@ -48,34 +48,6 @@ export class WiremockAdmin {
     }
 
     /*
-     * Register a user at the start of a test
-     */
-    public async registerUserInfo(userJson: string): Promise<void> {
-
-        const stubbedResponse = {
-            id: this._userInfoId,
-            priority: 1,
-            request: {
-                method: 'POST',
-                url: '/oauth2/userInfo'
-            },
-            response: {
-                status: 200,
-                body: userJson,
-            },
-        };
-
-        this._register(stubbedResponse);
-    }
-
-    /*
-     * Unregister a user at the end of a test
-     */
-    public async unregisterUserInfo(): Promise<void> {
-        this._unregister(this._userInfoId);
-    }
-
-    /*
      * Add a stubbed response to Wiremock via its Admin API
      */
     private async _register(stubbedResponse: any): Promise<void> {

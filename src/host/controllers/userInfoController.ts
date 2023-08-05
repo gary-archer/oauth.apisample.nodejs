@@ -1,11 +1,9 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
+import {ClientUserInfo} from '../../logic/entities/clientUserInfo.js';
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims.js';
-import {BaseClaims} from '../../plumbing/claims/baseClaims.js';
 import {CustomClaims} from '../../plumbing/claims/customClaims.js';
-import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
-import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier.js';
 
 /*
  * A controller class to return user info
@@ -13,15 +11,12 @@ import {ScopeVerifier} from '../../plumbing/oauth/scopeVerifier.js';
 @controller('/userinfo')
 export class UserInfoController extends BaseHttpController {
 
-    private readonly _baseClaims: BaseClaims;
     private readonly _customClaims: SampleCustomClaims;
 
     public constructor(
-        @inject(BASETYPES.BaseClaims) baseClaims: BaseClaims,
         @inject(BASETYPES.CustomClaims) customClaims: CustomClaims) {
         super();
 
-        this._baseClaims = baseClaims;
         this._customClaims = customClaims as SampleCustomClaims;
     }
 
@@ -29,9 +24,7 @@ export class UserInfoController extends BaseHttpController {
      * Return user information not stored in the authorization server
      */
     @httpGet('')
-    public getUserInfo(): any {
-
-        ScopeVerifier.enforce(this._baseClaims.scopes, 'profile');
+    public getUserInfo(): ClientUserInfo {
 
         return {
             role: this._customClaims.userRole,

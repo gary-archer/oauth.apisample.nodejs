@@ -4,7 +4,6 @@ import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {CustomClaims} from '../claims/customClaims.js';
 import {CustomClaimsProvider}  from '../claims/customClaimsProvider.js';
 import {BaseClaims} from '../claims/baseClaims.js';
-import {UserInfoClaims} from '../claims/userInfoClaims.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
@@ -21,10 +20,6 @@ export abstract class BaseAuthorizer {
     public constructor() {
         this._unsecuredPaths = [];
         this._setupCallbacks();
-    }
-
-    public setUnsecuredPaths(paths: string[]): void {
-        this._unsecuredPaths = paths;
     }
 
     /*
@@ -52,7 +47,6 @@ export abstract class BaseAuthorizer {
 
             // Bind claims objects to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<BaseClaims>(BASETYPES.BaseClaims).toConstantValue(claims.token);
-            perRequestContainer.bind<UserInfoClaims>(BASETYPES.UserInfoClaims).toConstantValue(claims.userInfo);
             perRequestContainer.bind<CustomClaims>(BASETYPES.CustomClaims).toConstantValue(claims.custom);
 
             // Log caller identity details

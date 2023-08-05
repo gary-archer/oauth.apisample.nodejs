@@ -3,7 +3,6 @@ import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {CompanyRepository} from '../../logic/repositories/companyRepository.js';
 import {CompanyService} from '../../logic/services/companyService.js';
 import {JsonFileReader} from '../../logic/utilities/jsonFileReader.js';
-import {ClaimsController} from '../controllers/claimsController.js';
 import {CompanyController} from '../controllers/companyController.js';
 import {UserInfoController} from '../controllers/userInfoController.js';
 
@@ -19,7 +18,6 @@ export class CompositionRoot {
     public static registerDependencies(container: Container): void {
 
         // Controller classes have a REST based request scope
-        container.bind<ClaimsController>(SAMPLETYPES.ClaimsController).to(ClaimsController).inRequestScope();
         container.bind<UserInfoController>(SAMPLETYPES.UserInfoController).to(UserInfoController).inRequestScope();
         container.bind<CompanyController>(SAMPLETYPES.CompanyController).to(CompanyController).inRequestScope();
 

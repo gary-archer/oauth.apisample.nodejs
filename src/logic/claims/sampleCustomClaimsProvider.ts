@@ -1,9 +1,7 @@
-import {JWTPayload} from 'jose';
 import {SampleCustomClaims} from '../../logic/entities/sampleCustomClaims.js';
 import {BaseClaims} from '../../plumbing/claims/baseClaims.js';
 import {CustomClaims} from '../../plumbing/claims/customClaims.js';
 import {CustomClaimsProvider} from '../../plumbing/claims/customClaimsProvider.js';
-import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims.js';
 
 /*
  * A provider of domain specific claims
@@ -11,42 +9,21 @@ import {UserInfoClaims} from '../../plumbing/claims/userInfoClaims.js';
 export class SampleCustomClaimsProvider extends CustomClaimsProvider {
 
     /*
-     * When using the StandardAuthorizer, this is called at the time of token issuance
-     */
-    public async issue(subject: string, email: string): Promise<CustomClaims> {
-        return this._get(subject, email);
-    }
-
-    /*
-     * When using the StandardAuthorizer, this is called to read claims from the access token
-     */
-    public getFromPayload(payload: JWTPayload): CustomClaims {
-
-        const userId = payload['user_id'] as string;
-        const userRole = payload['user_role'] as string;
-        const userRegions = payload['user_regions'] as string[];
-        return new SampleCustomClaims(userId, userRole, userRegions);
-    }
-
-    /*
      * When using the ClaimsCachingAuthorizer, this is called to get extra claims when the token is first received
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async getFromLookup(
-        accessToken: string,
-        baseClaims: BaseClaims,
-        userInfo: UserInfoClaims): Promise<CustomClaims> {
+    public async getFromLookup(accessToken: string, baseClaims: BaseClaims): Promise<CustomClaims> {
 
-        return this._get(baseClaims.subject, userInfo.email);
+        return this._get(baseClaims.subject);
     }
 
     /*
      * Receive user attributes from identity data, and return user attributes from business data
      */
-    private async _get(subject: string, email: string): Promise<CustomClaims> {
+    private async _get(subject: string): Promise<CustomClaims> {
 
         // A real system would do a database lookup here
-        const isAdmin = email.indexOf('admin') !== -1;
+        const isAdmin = subject === '77a97e5b-b748-45e5-bb6f-658e85b2df91'
         if (isAdmin) {
 
             // For admin users we hard code this user id, assign a role of 'admin' and grant access to all regions

@@ -1,7 +1,6 @@
 import {JWTPayload} from 'jose';
 import {ErrorUtils} from '../errors/errorUtils.js';
 import {BaseClaims} from './baseClaims.js';
-import {UserInfoClaims} from './userInfoClaims.js';
 
 /*
  * A utility for gathering claims
@@ -17,17 +16,6 @@ export class ClaimsReader {
         const scopes = ClaimsReader._readClaim(payload, 'scope').split(' ');
         const expiry = parseInt(ClaimsReader._readClaim(payload, 'exp'), 10);
         return new BaseClaims(subject, scopes, expiry);
-    }
-
-    /*
-     * Return the user info claims
-     */
-    public static userInfoClaims(payload: any): UserInfoClaims {
-
-        const givenName =  ClaimsReader._readClaim(payload, 'given_name');
-        const familyName =  ClaimsReader._readClaim(payload, 'family_name');
-        const email =  ClaimsReader._readClaim(payload, 'email');
-        return new UserInfoClaims(givenName, familyName, email);
     }
 
     /*
