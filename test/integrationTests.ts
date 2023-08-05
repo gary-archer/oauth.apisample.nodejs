@@ -40,9 +40,77 @@ describe('OAuth API Tests', () => {
     });
 
     /*
-     * Test getting claims
+     * Test that a request without an access token is rejected
      */
-    it ('Get user claims returns a single region for the standard user', async () => {
+    it ('Call API returns 401 for missing JWT', async () => {
+    });
+
+    /*
+     * Test that an expired access token is rejected
+     */
+    it ('Call API returns 401 for an expired JWT', async () => {
+    });
+
+    /*
+     * Test that an access token with an invalid issuer is rejected
+     */
+    it ('Call API returns 401 for invalid issuer', async () => {
+    });
+
+    /*
+     * Test that an access token with an invalid audience is rejected
+     */
+    it ('Call API returns 401 for invalid audience', async () => {
+    });
+
+    /*
+     * Test that an access token with an invalid signature is rejected
+     */
+    it ('Call API returns 401 for invalid signature', async () => {
+
+        // Get an access token for the end user of this test
+        const maliciousJwk = await generateKeyPair('RS256');
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId, maliciousJwk);
+
+        // Call the API
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
+    });
+
+    /*
+     * Test that an access token with an invalid scope is rejected
+     */
+    it ('Call API returns 403 for invalid scope', async () => {
+    });
+
+    /*
+     * Test rehearsing a 500 error when there is an exception in the API
+     */
+    it ('Call API returns supportable 500 error for error rehearsal request', async () => {
+
+        // Get an access token for the end user of this test
+        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
+
+        // Call a valid API operation but pass a custom header to cause an API exception
+        const options = new ApiRequestOptions(accessToken);
+        options.rehearseException = true;
+        const response = await apiClient.getCompanyTransactions(options, 2);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 500, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'exception_simulation', 'Unexpected error code');
+    });
+
+
+
+    /*
+     * Test getting business user attributes for the standard user
+     */
+    it ('Get user info returns a single region for the standard user', async () => {
 
         // Get an access token for the end user of this test
         const accessToken = await authorizationServer.issueAccessToken(guestUserId);
@@ -57,9 +125,9 @@ describe('OAuth API Tests', () => {
     });
 
     /*
-     * Test getting claims for the admin user
+     * Test getting business user attributes for the admin user
      */
-    it ('Get user claims returns all regions for the admin user', async () => {
+    it ('Get user info returns all regions for the admin user', async () => {
 
         // Get an access token for the end user of this test
         const accessToken = await authorizationServer.issueAccessToken(guestAdminId);
@@ -74,7 +142,7 @@ describe('OAuth API Tests', () => {
     });
 
     /*
-     * Test getting companies
+     * Test getting companies for the standard user
      */
     it ('Get companies list returns 2 items for the standard user', async () => {
 
@@ -105,24 +173,6 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 200, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.length, 4, 'Unexpected companies list');
-    });
-
-    /*
-     * Test getting companies with a malicious JWT
-     */
-    it ('Get companies list with malicious JWT returns a 401 error', async () => {
-
-        // Get an access token for the end user of this test
-        const maliciousJwk = await generateKeyPair('RS256');
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId, maliciousJwk);
-
-        // Call the API
-        const options = new ApiRequestOptions(accessToken);
-        const response = await apiClient.getCompanyList(options);
-
-        // Assert results
-        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
-        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
     });
 
     /*
@@ -157,23 +207,5 @@ describe('OAuth API Tests', () => {
         // Assert results
         assert.strictEqual(response.statusCode, 404, 'Unexpected HTTP status code');
         assert.strictEqual(response.body.code, 'company_not_found', 'Unexpected error code');
-    });
-
-    /*
-     * Rehearse an API 500 error
-     */
-    it ('API exceptions return 500 with a supportable error response', async () => {
-
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
-
-        // Call a valid API operation but pass a custom header to cause an API exception
-        const options = new ApiRequestOptions(accessToken);
-        options.rehearseException = true;
-        const response = await apiClient.getCompanyTransactions(options, 2);
-
-        // Assert results
-        assert.strictEqual(response.statusCode, 500, 'Unexpected HTTP status code');
-        assert.strictEqual(response.body.code, 'exception_simulation', 'Unexpected error code');
     });
 });
