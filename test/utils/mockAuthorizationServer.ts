@@ -2,6 +2,7 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {Guid} from 'guid-typescript';
 import {generateKeyPair, exportJWK, KeyLike, SignJWT, GenerateKeyPairResult} from 'jose';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy.js';
+import {MockTokenOptions} from './mockTokenOptions.js';
 
 /*
  * A mock authorization server implemented with wiremock and a JOSE library
@@ -76,20 +77,20 @@ export class MockAuthorizationServer {
     /*
      * Issue an access token with the supplied user and other test options
      */
-    public async issueAccessToken(sub: string, jwk: GenerateKeyPairResult<KeyLike> | null = null): Promise<string> {
-
-        const now = Date.now();
+    public async issueAccessToken(
+        options: MockTokenOptions,
+        jwk: GenerateKeyPairResult<KeyLike> | null = null): Promise<string> {
 
         const jwkToUse = jwk || this._jwk!;
         return await new SignJWT( {
-            sub,
-            iss: 'testissuer.com',
-            aud: 'api.mycompany.com',
-            scope: 'openid profile email investments',
+            iss: options.issuer,
+            aud: options.audience,
+            scope: options.scope,
+            sub: options.subject,
+            manager_id: options.managerId,
         })
             .setProtectedHeader( { kid: this._keyId, alg: this._algorithm } )
-            .setIssuedAt(now - 30000)
-            .setExpirationTime(now + 30000)
+            .setExpirationTime(options.expiryTime)
             .sign(jwkToUse.privateKey);
     }
 

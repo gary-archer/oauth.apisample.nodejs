@@ -5,26 +5,21 @@ import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts.js';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
 import {MockAuthorizationServer} from './utils/mockAuthorizationServer.js';
+import {MockTokenOptions} from './utils/mockTokenOptions.js';
 
 /*
  * Test the API in isolation, without any dependencies on real access tokens
  */
 describe('OAuth API Tests', () => {
 
-    // The real subject claim values for my two online test users
-    const guestUserId  = 'a6b404b1-98af-41a2-8e7f-e4061dc0bf86';
-    const guestAdminId = '77a97e5b-b748-45e5-bb6f-658e85b2df91';
-
-    // A class to issue our own JWTs for testing
     const authorizationServer = new MockAuthorizationServer(false);
 
-    // Create the API client
     const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
     const sessionId = Guid.create().toString();
     const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, false);
 
     /*
-     * Run a mock authorization server during tests
+     * Start a mock authorization server during tests
      */
     before( async () => {
         
@@ -33,7 +28,7 @@ describe('OAuth API Tests', () => {
     });
 
     /*
-     * Teardown that runs when all tests have completed
+     * Free resources when all tests have completed
      */
     after( async () => {
         await authorizationServer.stop();
@@ -43,24 +38,74 @@ describe('OAuth API Tests', () => {
      * Test that a request without an access token is rejected
      */
     it ('Call API returns 401 for missing JWT', async () => {
+
+        // Call the API
+        const options = new ApiRequestOptions('');
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
     });
 
     /*
      * Test that an expired access token is rejected
      */
     it ('Call API returns 401 for an expired JWT', async () => {
+
+        // Get an access token for the end user of this test
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        jwtOptions.expiryTime = Date.now() / 1000 - (60 * 1000);
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
+
+        // Call the API
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
     });
 
     /*
      * Test that an access token with an invalid issuer is rejected
      */
     it ('Call API returns 401 for invalid issuer', async () => {
+
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        jwtOptions.issuer = 'https://otherissuer.com';
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
+
+        // Call the API
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
     });
 
     /*
      * Test that an access token with an invalid audience is rejected
      */
     it ('Call API returns 401 for invalid audience', async () => {
+
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        jwtOptions.audience = 'api.other.com';
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
+
+        // Call the API
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 401, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'invalid_token', 'Unexpected error code');
     });
 
     /*
@@ -68,9 +113,11 @@ describe('OAuth API Tests', () => {
      */
     it ('Call API returns 401 for invalid signature', async () => {
 
-        // Get an access token for the end user of this test
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
         const maliciousJwk = await generateKeyPair('RS256');
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId, maliciousJwk);
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions, maliciousJwk);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -85,6 +132,20 @@ describe('OAuth API Tests', () => {
      * Test that an access token with an invalid scope is rejected
      */
     it ('Call API returns 403 for invalid scope', async () => {
+
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        jwtOptions.scope = 'openid profile';
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
+
+        // Call the API
+        const options = new ApiRequestOptions(accessToken);
+        const response = await apiClient.getCompanyList(options);
+
+        // Assert results
+        assert.strictEqual(response.statusCode, 403, 'Unexpected HTTP status code');
+        assert.strictEqual(response.body.code, 'insufficient_scope', 'Unexpected error code');
     });
 
     /*
@@ -92,8 +153,10 @@ describe('OAuth API Tests', () => {
      */
     it ('Call API returns supportable 500 error for error rehearsal request', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call a valid API operation but pass a custom header to cause an API exception
         const options = new ApiRequestOptions(accessToken);
@@ -105,15 +168,15 @@ describe('OAuth API Tests', () => {
         assert.strictEqual(response.body.code, 'exception_simulation', 'Unexpected error code');
     });
 
-
-
     /*
      * Test getting business user attributes for the standard user
      */
     it ('Get user info returns a single region for the standard user', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -129,8 +192,10 @@ describe('OAuth API Tests', () => {
      */
     it ('Get user info returns all regions for the admin user', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestAdminId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useAdminUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -146,8 +211,10 @@ describe('OAuth API Tests', () => {
      */
     it ('Get companies list returns 2 items for the standard user', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -163,8 +230,10 @@ describe('OAuth API Tests', () => {
      */
     it ('Get companies list returns all items for the admin user', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestAdminId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useAdminUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -180,8 +249,10 @@ describe('OAuth API Tests', () => {
      */
     it ('Get transactions is allowed for companies that match the regions claim', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
@@ -197,8 +268,10 @@ describe('OAuth API Tests', () => {
      */
     it ('Get transactions returns 404 for companies that do not match the regions claim', async () => {
 
-        // Get an access token for the end user of this test
-        const accessToken = await authorizationServer.issueAccessToken(guestUserId);
+        // Set the access token values
+        const jwtOptions = new MockTokenOptions();
+        jwtOptions.useStandardUser();
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);

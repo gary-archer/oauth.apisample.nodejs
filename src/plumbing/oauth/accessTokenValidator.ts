@@ -37,33 +37,22 @@ export class AccessTokenValidator {
 
         return using(this._logEntry.createPerformanceBreakdown('tokenValidator'), async () => {
 
+            const options = {
+                algorithms: ['RS256'],
+                issuer: this._configuration.issuer,
+            } as JWTVerifyOptions;
+
+            // Allow for AWS Cognito, which does not include an audience claim in access tokens
+            if (this._configuration.audience) {
+                options.audience = this._configuration.audience;
+            }
+
+            // Validate the token and get its claims
+            let claims: JWTPayload;
             try {
 
-                const options = {
-                    algorithms: ['RS256'],
-                    issuer: this._configuration.issuer,
-                } as JWTVerifyOptions;
-
-                // Allow for AWS Cognito, which does not include an audience claim in access tokens
-                if (this._configuration.audience) {
-                    options.audience = this._configuration.audience;
-                }
-
-                // Validate the token and get its claims
                 const result = await jwtVerify(accessToken, this._jwksRetriever.remoteJWKSet, options);
-                const claims = result.payload;
-
-                // The sample API requires the same scope for all endpoints, and it is enforced here
-                const scopes = ClaimsReader.getStringClaim(claims, 'scope').split(' ');
-                if (scopes.indexOf('investments') === -1) {
-
-                    throw ErrorFactory.createClientError(
-                        403,
-                        BaseErrorCodes.insufficientScope,
-                        'The token does not contain sufficient scope for this API');
-                }
-
-                return claims;
+                claims = result.payload;
 
             } catch (e: any) {
 
@@ -80,6 +69,18 @@ export class AccessTokenValidator {
 
                 throw ErrorFactory.createClient401Error(details);
             }
+
+            // The sample API requires the same scope for all endpoints, and it is enforced here
+            const scopes = ClaimsReader.getStringClaim(claims, 'scope').split(' ');
+            if (scopes.indexOf('investments') === -1) {
+
+                throw ErrorFactory.createClientError(
+                    403,
+                    BaseErrorCodes.insufficientScope,
+                    'The token does not contain sufficient scope for this API');
+            }
+
+            return claims;
         });
     }
 }
