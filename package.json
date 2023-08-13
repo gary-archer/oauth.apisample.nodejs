@@ -1,0 +1,53 @@
+{
+  "name": "sampleapi",
+  "version": "3.0.0",
+  "description": "A Node.js version of the Final OAuth secured API",
+  "author": "Gary Archer",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "lint": "npx eslint . --ext .ts",
+    "start": "./start.sh",
+    "testsetup": "./test/scripts/testsetup.sh",
+    "test": "./test/scripts/test.sh",
+    "loadtest": "./test/scripts/loadtest.sh",
+    "buildRelease": "rm -rf dist && tsc --sourceMap false",
+    "startRelease": "node dist/host/startup/app.js"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "guid-typescript": "^1.0.9",
+    "https-proxy-agent": "^5.0.1",
+    "inversify": "^6.0.1",
+    "inversify-express-utils": "^6.4.3",
+    "jose": "^4.14.4",
+    "node-cache": "^5.1.2",
+    "reflect-metadata": "^0.1.13",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1",
+    "winston-transport": "^4.5.0"
+  },
+  "devDependencies": {
+    "@colors/colors": "^1.5.0",
+    "@types/express": "^4.17.17",
+    "@types/fs-extra": "^11.0.1",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.16.19",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.5",
+    "wiremock": "^2.35.0"
+  },
+  "overrides": {
+    "semver": "7.5.2"
+  }
+}
