@@ -45,9 +45,7 @@ export class ClaimsCache {
     public async setExtraUserClaims(accessTokenHash: string, claims: ExtraClaims, exp: number): Promise<void> {
 
         // Get the data in way that handles private property names
-        const dataAsJson = {
-            extra: claims.exportData(),
-        };
+        const dataAsJson = claims.exportData();
 
         // Use the exp field to work out the token expiry time
         const epochSeconds = Math.floor((new Date().getTime()) / 1000);
@@ -90,6 +88,6 @@ export class ClaimsCache {
 
         // Get the data in way that handles private property names
         const dataAsJson = JSON.parse(claimsText);
-        return this._extraClaimsProvider.deserializeFromCache(dataAsJson.extra);
+        return this._extraClaimsProvider.deserializeFromCache(dataAsJson);
     }
 }
