@@ -1,7 +1,7 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet} from 'inversify-express-utils';
+import {SampleExtraClaims} from '../../logic/claims/sampleExtraClaims.js';
 import {ClientUserInfo} from '../../logic/entities/clientUserInfo.js';
-import {SampleExtraClaims} from '../../logic/entities/sampleExtraClaims.js';
 import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 

@@ -3,10 +3,10 @@ import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ClientError} from '../../plumbing/errors/clientError.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {SampleExtraClaims} from '../claims/sampleExtraClaims.js';
 import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
 import {Company} from '../entities/company.js';
 import {CompanyTransactions} from '../entities/companyTransactions.js';
-import {SampleExtraClaims} from '../entities/sampleExtraClaims.js';
 import {ErrorCodes} from '../errors/errorCodes.js';
 import {CompanyRepository} from '../repositories/companyRepository.js';
 

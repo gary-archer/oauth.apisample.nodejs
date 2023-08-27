@@ -1,8 +1,8 @@
 import {JWTPayload} from 'jose';
-import {SampleExtraClaims} from '../../logic/entities/sampleExtraClaims.js';
 import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
 import {ExtraClaims} from '../../plumbing/claims/extraClaims.js';
 import {ExtraClaimsProvider} from '../../plumbing/claims/extraClaimsProvider.js';
+import {SampleExtraClaims} from './sampleExtraClaims.js';
 
 /*
  * Add extra claims that you cannot, or do not want to, manage in the authorization server
