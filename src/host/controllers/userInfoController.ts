@@ -26,7 +26,7 @@ export class UserInfoController extends BaseHttpController {
     public getUserInfo(): ClientUserInfo {
 
         return {
-            role: this._claims.role,
+            title: this._claims.title,
             regions: this._claims.regions,
         };
     }

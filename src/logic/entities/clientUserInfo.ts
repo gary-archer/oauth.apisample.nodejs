@@ -1,7 +1,7 @@
 /*
- * OAuth user info for returning to clients for display
+ * Return user attributes that are not stored in the authorization server that the UI needs
  */
 export interface ClientUserInfo {
-    role: string;
+    title: string;
     regions: string[];
 }

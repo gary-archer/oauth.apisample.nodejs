@@ -6,5 +6,6 @@ export const SAMPLETYPES = {
     CompanyController: Symbol.for('CompanyController'),
     CompanyService: Symbol.for('CompanyService'),
     CompanyRepository: Symbol.for('CompanyRepository'),
-    JsonFileReader: Symbol.for('JsonFileReader')
+    JsonFileReader: Symbol.for('JsonFileReader'),
+    UserRepository: Symbol.for('UserRepository'),
 };

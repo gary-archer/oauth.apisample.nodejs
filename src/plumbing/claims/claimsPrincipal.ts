@@ -21,6 +21,10 @@ export class ClaimsPrincipal {
         return ClaimsReader.getStringClaim(this._jwtClaims, 'sub');
     }
 
+    public get jwt(): JWTPayload {
+        return this._jwtClaims;
+    }
+
     public get extra(): ExtraClaims {
         return this._extraClaims;
     }

@@ -1,7 +1,14 @@
 import {JWTPayload} from 'jose';
+import {Container} from 'inversify';
+import {Request} from 'express';
+import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
 import {ExtraClaims} from '../../plumbing/claims/extraClaims.js';
 import {ExtraClaimsProvider} from '../../plumbing/claims/extraClaimsProvider.js';
+import {ChildContainerHelper} from '../../plumbing/dependencies/childContainerHelper.js';
+import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
+import {UserRepository} from '../repositories/userRepository.js';
+import {SampleClaimsPrincipal} from './sampleClaimsPrincipal.js';
 import {SampleExtraClaims} from './sampleExtraClaims.js';
 
 /*
@@ -9,27 +16,45 @@ import {SampleExtraClaims} from './sampleExtraClaims.js';
  */
 export class SampleExtraClaimsProvider extends ExtraClaimsProvider {
 
+    private readonly _container: Container;
+
+    public constructor(container: Container) {
+        super();
+        this._container = container;
+    }
+
     /*
      * Get additional claims from the API's own database
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async lookupBusinessClaims(accessToken: string, jwtClaims: JWTPayload): Promise<ExtraClaims> {
+    public async lookupExtraClaims(jwtClaims: JWTPayload, request: Request): Promise<ExtraClaims> {
 
-        // It is common to need to get a business user ID for the authenticated user
-        // In our example a manager user may be able to view information about investors
-        const managerId = this._getManagerId(jwtClaims);
+        // Get an object to look up user information
+        const perRequestContainer = ChildContainerHelper.resolve(request);
+        const userRepository = perRequestContainer.get<UserRepository>(SAMPLETYPES.UserRepository);
 
-        // A real API would use a database, but this API uses a mock implementation
-        if (managerId === '20116') {
+        // First, see which claims are included in access tokens
+        if (jwtClaims['manager_id']) {
 
-            // These claims are used for the guestadmin@mycompany.com user account
-            return new SampleExtraClaims(managerId, 'admin', ['Europe', 'USA', 'Asia']);
+            // The best model is to receive a useful user identity in access tokens, along with the user role
+            // This ensures a locked down token and also simpler code
+            const managerId = ClaimsReader.getStringClaim(jwtClaims, 'manager_id');
+            return userRepository.getClaimsForManagerId(managerId);
 
         } else {
 
-            // These claims are used for the guestuser@mycompany.com user account
-            return new SampleExtraClaims(managerId, 'user', ['USA']);
+            // With AWS Cognito, there is a lack of support for custom claims in access tokens at the time of writing
+            // So the API has to map the subject to its own user identity and look up all custom claims
+            const subject = ClaimsReader.getStringClaim(jwtClaims, 'sub');
+            return userRepository.getClaimsForSubject(subject);
         }
+    }
+
+    /*
+     * Create a claims principal that manages lookups across both token claims and extra claims
+     */
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    public createClaimsPrincipal(jwtClaims: JWTPayload, extraClaims: ExtraClaims, request: Request): ClaimsPrincipal {
+        return new SampleClaimsPrincipal(jwtClaims, extraClaims);
     }
 
     /*
@@ -37,39 +62,5 @@ export class SampleExtraClaimsProvider extends ExtraClaimsProvider {
      */
     public deserializeFromCache(data: any): ExtraClaims {
         return SampleExtraClaims.importData(data);
-    }
-
-    /*
-     * Get a business user ID that corresponds to the user in the token
-     */
-    private _getManagerId(jwtClaims: JWTPayload): string {
-
-        const managerId = jwtClaims['manager_id'];
-        if (managerId) {
-
-            // The preferred option is for the API to receive the business user identity in the JWT access token
-            return managerId as string;
-
-        } else {
-
-            // Otherwise the API must determine the value from the subject claim
-            const subject = ClaimsReader.getStringClaim(jwtClaims, 'sub');
-            return this._lookupManagerIdFromSubjectClaim(subject);
-        }
-    }
-
-    /*
-     * The API could store a mapping from the subject claim to the business user identity
-     */
-    private _lookupManagerIdFromSubjectClaim(subject: string): string {
-
-        // A real API would use a database, but this API uses a mock implementation
-        // This subject value is for the guestadmin@mycompany.com user account
-        const isAdmin = subject === '77a97e5b-b748-45e5-bb6f-658e85b2df91';
-        if (isAdmin) {
-            return '20116';
-        } else {
-            return '10345';
-        }
     }
 }

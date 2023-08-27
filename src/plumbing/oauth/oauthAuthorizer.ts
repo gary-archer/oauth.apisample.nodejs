@@ -47,16 +47,16 @@ export class OAuthAuthorizer {
         const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
         let extraClaims = await this._cache.getExtraUserClaims(accessTokenHash);
         if (extraClaims) {
-            return new ClaimsPrincipal(jwtClaims, extraClaims);
+            this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims, request);
         }
 
         // Look up extra claims not in the JWT access token when it is first received
-        extraClaims = await this._extraClaimsProvider.lookupBusinessClaims(accessToken, jwtClaims);
+        extraClaims = await this._extraClaimsProvider.lookupExtraClaims(jwtClaims, request);
 
         // Cache the extra claims for subsequent requests with the same access token
         await this._cache.setExtraUserClaims(accessTokenHash, extraClaims!, jwtClaims.exp!);
 
         // Return the final claims
-        return new ClaimsPrincipal(jwtClaims, extraClaims!);
+        return this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims, request);
     }
 }

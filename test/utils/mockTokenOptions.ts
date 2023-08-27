@@ -9,6 +9,8 @@ export class MockTokenOptions {
 
     public scope = 'openid profile investments';
 
+    public role = '';
+
     public expiryTime = Date.now() / 1000 + (15 * 60 * 1000);
 
     public subject = '';
@@ -21,7 +23,7 @@ export class MockTokenOptions {
     public useStandardUser(): void {
         this.subject = 'a6b404b1-98af-41a2-8e7f-e4061dc0bf86';
         this.managerId = '10345';
-
+        this.role = 'user';
     }
 
     /*
@@ -30,5 +32,6 @@ export class MockTokenOptions {
     public useAdminUser(): void {
         this.subject = '77a97e5b-b748-45e5-bb6f-658e85b2df91';
         this.managerId = '20116';
+        this.role = 'admin';
     }
 }

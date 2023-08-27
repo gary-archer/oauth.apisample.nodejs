@@ -3,6 +3,7 @@ import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ClientError} from '../../plumbing/errors/clientError.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {SampleClaimsPrincipal} from '../claims/sampleClaimsPrincipal.js';
 import {SampleExtraClaims} from '../claims/sampleExtraClaims.js';
 import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
 import {Company} from '../entities/company.js';
@@ -17,14 +18,14 @@ import {CompanyRepository} from '../repositories/companyRepository.js';
 export class CompanyService {
 
     private readonly _repository: CompanyRepository;
-    private readonly _claims: SampleExtraClaims;
+    private readonly _claims: SampleClaimsPrincipal;
 
     public constructor(
         @inject(SAMPLETYPES.CompanyRepository) repository: CompanyRepository,
         @inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
 
         this._repository = repository;
-        this._claims = claims.extra as SampleExtraClaims;
+        this._claims = claims as SampleClaimsPrincipal;
     }
 
     /*
@@ -61,13 +62,14 @@ export class CompanyService {
     private _isUserAuthorizedForCompany(company: Company): boolean {
 
         // First authorize based on the user role
-        const isAdmin = this._claims.role.toLowerCase().indexOf('admin') !== -1;
+        const isAdmin = this._claims.getRole().toLowerCase().indexOf('admin') !== -1;
         if (isAdmin) {
             return true;
         }
 
         // Next authorize based on a business rule that links the user to regional data
-        const found = this._claims.regions.find((c) => c === company.region);
+        const extraClaims = this._claims.extra as SampleExtraClaims;
+        const found = extraClaims.regions.find((c) => c === company.region);
         return !!found;
     }
 

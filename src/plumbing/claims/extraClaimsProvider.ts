@@ -1,5 +1,7 @@
+import {Request} from 'express';
 import {injectable} from 'inversify';
 import {JWTPayload} from 'jose';
+import {ClaimsPrincipal} from './claimsPrincipal.js';
 import {ExtraClaims} from './extraClaims.js';
 
 /*
@@ -9,11 +11,19 @@ import {ExtraClaims} from './extraClaims.js';
 export class ExtraClaimsProvider {
 
     /*
-     * Look up extra claims when details are not available in the cache, such as for a new access token
+     * Get additional claims from the API's own database
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async lookupBusinessClaims(accessToken: string, jwtClaims: JWTPayload): Promise<ExtraClaims> {
+    public async lookupExtraClaims(jwtClaims: JWTPayload, request: Request): Promise<ExtraClaims> {
         return new ExtraClaims();
+    }
+
+    /*
+     * Create a claims principal that manages lookups across both token claims and extra claims
+     */
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    public createClaimsPrincipal(jwtClaims: JWTPayload, extraClaims: ExtraClaims, request: Request): ClaimsPrincipal {
+        return new ClaimsPrincipal(jwtClaims, extraClaims);
     }
 
     /*
