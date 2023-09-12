@@ -99,5 +99,4 @@ npm run loadtest
 * Express is used to host the API over SSL
 * AWS Cognito is used as the default Authorization Server
 * The [JOSE Library](https://github.com/panva/jose) is used to manage in memory validation of JWTs
-* [Inversify](http://inversify.io) is used to manage dependencies in line with other development languages
 * The project includes API deployment resources for Docker and Kubernetes
