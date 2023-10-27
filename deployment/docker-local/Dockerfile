@@ -1,4 +1,4 @@
-FROM node:18.15.0-bullseye
+FROM node:20-bookworm
 
 # Configure trusted root certificate authorities
 COPY certs/authsamples-dev.ca.pem /usr/local/share/certificates/trusted.ca.crt

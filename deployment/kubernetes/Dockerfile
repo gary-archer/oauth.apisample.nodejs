@@ -1,4 +1,4 @@
-FROM node:18.15.0-bullseye
+FROM node:20-bookworm
 
 # Copy files into our docker image and install dependencies
 WORKDIR /usr/api
