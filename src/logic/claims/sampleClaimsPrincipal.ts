@@ -29,7 +29,7 @@ export class SampleClaimsPrincipal extends ClaimsPrincipal {
         if (this.jwt[CustomClaimNames.role]) {
             return ClaimsReader.getStringClaim(this.jwt, CustomClaimNames.role);
         } else {
-            return (this.extra as SampleExtraClaims).managerId || '';
+            return (this.extra as SampleExtraClaims).role || '';
         }
     }
 }
