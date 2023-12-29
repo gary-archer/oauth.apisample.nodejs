@@ -15,4 +15,4 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 #
 # Run the load test
 #
-node --loader ts-node/esm --no-warnings test/loadTest.ts
+npx tsx test/loadTest.ts
