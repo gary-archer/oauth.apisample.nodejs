@@ -19,7 +19,7 @@ export class MockAuthorizationServer {
 
         this._baseUrl = 'https://login.authsamples-dev.com:447/__admin/mappings';
         this._httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
-        this._algorithm = 'RS256';
+        this._algorithm = 'ES256';
         this._jwk = null;
         this._keyId = Guid.create().toString();
     }

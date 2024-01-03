@@ -7,6 +7,8 @@ export interface OAuthConfiguration {
 
     audience: string;
 
+    algorithm: string;
+    
     scope: string
 
     jwksEndpoint: string;
