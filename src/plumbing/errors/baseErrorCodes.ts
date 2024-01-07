@@ -7,8 +7,6 @@ export class BaseErrorCodes {
 
     public static readonly invalidToken = 'invalid_token';
 
-    public static readonly claimsFailure = 'claims_failure';
-
     public static readonly tokenSigningKeysDownloadError = 'jwks_download_failure';
 
     public static readonly insufficientScope = 'insufficient_scope';
