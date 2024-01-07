@@ -61,6 +61,7 @@ export class ErrorUtils {
 
     /*
      * The error thrown if we cannot find an expected claim during security handling
+    * This is the same underlying problem as a missing scope and typically caused by incorrect configuration
      */
     public static fromMissingClaim(claimName: string): ClientError {
 
