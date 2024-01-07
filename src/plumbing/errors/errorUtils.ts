@@ -65,10 +65,11 @@ export class ErrorUtils {
     public static fromMissingClaim(claimName: string): ClientError {
 
         return ErrorFactory.createClientErrorWithContext(
-            400,
-            BaseErrorCodes.claimsFailure,
-            'Authorization data not found',
-            `Missing claim in input: ${claimName}`);
+            403,
+            BaseErrorCodes.insufficientScope,
+            'The token does not contain sufficient scope for this API',
+            `An empty value was found for the expected claim '${claimName}'`
+        );
     }
 
     /*
