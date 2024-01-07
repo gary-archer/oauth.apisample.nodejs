@@ -68,7 +68,7 @@ export class ErrorUtils {
             403,
             BaseErrorCodes.insufficientScope,
             'The token does not contain sufficient scope for this API',
-            `An empty value was found for the expected claim '${claimName}'`
+            `Missing claim in input: '${claimName}'`
         );
     }
 
