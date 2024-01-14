@@ -5,7 +5,7 @@ import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {ErrorUtils} from '../errors/errorUtils.js';
 import {ServerError} from '../errors/serverError.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
-import {ResponseWriter} from '../utilities/responseWriter.js';
+import {ResponseErrorWriter} from '../utilities/responseErrorWriter.js';
 
 /*
  * The entry point for catching exceptions during API calls
@@ -44,7 +44,7 @@ export class UnhandledExceptionHandler {
         }
 
         // Write the client response
-        const writer = new ResponseWriter();
+        const writer = new ResponseErrorWriter();
         writer.writeErrorResponse(response, clientError);
     }
 
