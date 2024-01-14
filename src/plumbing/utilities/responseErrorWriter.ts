@@ -2,7 +2,7 @@ import {Response} from 'express';
 import {ClientError} from '../errors/clientError';
 
 /*
- * Return responses to clients
+ * Return secure error responses to clients
  */
 export class ResponseErrorWriter {
 
