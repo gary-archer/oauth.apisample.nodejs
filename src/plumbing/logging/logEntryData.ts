@@ -148,7 +148,7 @@ export class LogEntryData {
      */
     private _outputString(setter: (val: string) => void, value: string): void {
 
-        if (value.length > 0) {
+        if (value && value.length > 0) {
             setter(value);
         }
     }

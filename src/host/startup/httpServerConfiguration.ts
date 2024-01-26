@@ -39,7 +39,7 @@ export class HttpServerConfiguration {
         const base = new BaseCompositionRoot(this._container)
             .useApiBasePath('/investments/')
             .useOAuth(this._configuration.oauth)
-            .withExtraClaimsProvider(new SampleExtraClaimsProvider(this._container))
+            .withExtraClaimsProvider(new SampleExtraClaimsProvider())
             .withLogging(this._configuration.logging, this._loggerFactory)
             .withProxyConfiguration(this._configuration.api.useProxy, this._configuration.api.proxyUrl)
             .register();

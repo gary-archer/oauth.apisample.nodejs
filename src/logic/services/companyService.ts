@@ -3,7 +3,7 @@ import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ClientError} from '../../plumbing/errors/clientError.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
-import {SampleClaimsPrincipal} from '../claims/sampleClaimsPrincipal.js';
+import {CustomClaimNames} from '../claims/customClaimNames.js';
 import {SampleExtraClaims} from '../claims/sampleExtraClaims.js';
 import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
 import {Company} from '../entities/company.js';
@@ -18,14 +18,14 @@ import {CompanyRepository} from '../repositories/companyRepository.js';
 export class CompanyService {
 
     private readonly _repository: CompanyRepository;
-    private readonly _claims: SampleClaimsPrincipal;
+    private readonly _claims: ClaimsPrincipal;
 
     public constructor(
         @inject(SAMPLETYPES.CompanyRepository) repository: CompanyRepository,
         @inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
 
         this._repository = repository;
-        this._claims = claims as SampleClaimsPrincipal;
+        this._claims = claims;
     }
 
     /*
@@ -62,14 +62,13 @@ export class CompanyService {
     private _isUserAuthorizedForCompany(company: Company): boolean {
 
         // The admin role is granted access to all resources
-        const isAdmin = this._claims.getRole().toLowerCase() === 'admin';
-        if (isAdmin) {
+        const role = this._claims.getJwtClaim(CustomClaimNames.role).toLowerCase();
+        if (role === 'admin') {
             return true;
         }
 
         // Unknown roles are granted no access to resources
-        const isUser = this._claims.getRole().toLowerCase() === 'user';
-        if (!isUser) {
+        if (role !== 'user') {
             return false;
         }
 
