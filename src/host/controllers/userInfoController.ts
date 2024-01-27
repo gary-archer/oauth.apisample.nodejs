@@ -6,7 +6,8 @@ import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 
 /*
- * A controller class to return user info
+ * Return user info from the business data to the client
+ * These values are separate to the core identity data returned from the OAuth user info endpoint
  */
 @controller('/userinfo')
 export class UserInfoController extends BaseHttpController {
@@ -20,7 +21,7 @@ export class UserInfoController extends BaseHttpController {
     }
 
     /*
-     * Return user information not stored in the authorization server
+     * Return user attributes that are not stored in the authorization server that the UI needs
      */
     @httpGet('')
     public getUserInfo(): ClientUserInfo {
