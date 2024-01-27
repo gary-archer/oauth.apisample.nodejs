@@ -1,5 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
+import {ClaimsReader} from '../claims/claimsReader.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
@@ -31,7 +32,7 @@ export class AuthorizerMiddleware {
 
             // Run the authorizer then log identity details
             const claimsPrincipal = await authorizer.execute(request);
-            logEntry.setIdentity(claimsPrincipal.getJwtClaim('sub'));
+            logEntry.setIdentity(ClaimsReader.getStringClaim(claimsPrincipal.jwt, 'sub'));
 
             // Bind claims to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);
