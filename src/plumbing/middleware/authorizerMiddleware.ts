@@ -31,7 +31,7 @@ export class AuthorizerMiddleware {
 
             // Run the authorizer then log identity details
             const claimsPrincipal = await authorizer.execute(request);
-            logEntry.setIdentity(claimsPrincipal.subject);
+            logEntry.setIdentity(claimsPrincipal.getJwtClaim('sub'));
 
             // Bind claims to this requests's child container so that they are injectable into business logic
             perRequestContainer.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);
