@@ -1,25 +1,27 @@
 #!/bin/bash
 
-#######################################################
-# A script to run Wiremock in a child terminal
-# Ensure that Java is installed first as a prerequisite
-#######################################################
+########################################################
+# A script to run Wiremock in Docker in a child terminal
+########################################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
-# Run Wiremock over HTTPS in this terminal
-# On Linux ensure that you have first granted Java the permissions to listen on port 447:
-# - sudo setcap 'cap_net_bind_service=+ep' /usr/lib/jvm/zulu-17-amd64/bin/java
+# Run Wiremock over HTTPS using Docker
 #
-./node_modules/.bin/wiremock \
---root-dir test/integration \
---https-port 447 --disable-http \
---https-keystore './certs/authsamples-dev.ssl.p12' \
---keystore-type 'pkcs12' \
---keystore-password 'Password1' \
---key-manager-password 'Password1'
+docker run -it --rm \
+  --name wiremock \
+  -p 447:447 \
+  -v $(pwd)/certs/authsamples-dev.ssl.p12:/certs/authsamples-dev.ssl.p12 \
+  wiremock/wiremock:3.3.1 \
+  --root-dir test/integration \
+  --https-port 447 \
+  --disable-http \
+  --https-keystore '/certs/authsamples-dev.ssl.p12' \
+  --keystore-type 'pkcs12' \
+  --keystore-password 'Password1' \
+  --key-manager-password 'Password1'
 
 #
 # Prevent automatic terminal closure
