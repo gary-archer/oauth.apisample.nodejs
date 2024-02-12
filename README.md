@@ -55,7 +55,7 @@ Run the API with this command:
 ./start.sh
 ```
 
-### Configure DNS
+### Configure DNS and SSL
 
 Configure DNS by adding these domains to your hosts file:
 
@@ -68,6 +68,8 @@ Then call an endpoint over port 446:
 ```bash
 curl -k https://apilocal.authsamples-dev.com:446/investments/companies
 ```
+
+Then configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.
 
 ### Test the API
 
