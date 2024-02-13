@@ -1,4 +1,4 @@
-# Final OAuth Node.js API
+no# Final OAuth Node.js API
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/adc8714adb3446f3858f16e15c2118e0)](https://app.codacy.com/gh/gary-archer/oauth.apisample.nodejs?utm_source=github.com&utm_medium=referral&utm_content=gary-archer/oauth.apisample.nodejs&utm_campaign=Badge_Grade)
 
@@ -69,7 +69,7 @@ Then call an endpoint over port 446:
 curl -k https://apilocal.authsamples-dev.com:446/investments/companies
 ```
 
-Then configure [.NET SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup/#os-ssl-trust) for the root CA at `./certs/authsamples-dev.ca.pem`.
+Then configure [SSL trust](https://authguidance.com/2017/11/11/developer-ssl-setup) for the root CA at `./certs/authsamples-dev.ca.pem`.
 
 ### Test the API
 
