@@ -44,7 +44,7 @@ Follow the [Technical Support Queries](https://authguidance.com/2019/08/02/intel
 
 ### Prerequisites
 
-- Ensure that Node.js 18 or later is installed
+- Ensure that Node.js 20+ is installed
 - Integration tests run Wiremock in Docker, so ensure that Docker is installed
 
 ### Run the API
