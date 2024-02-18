@@ -11,7 +11,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 ./downloadcerts.sh
 if [ $? -ne 0 ]; then
-  exit
+  read -n 1
+  exit 1
 fi
 
 #
@@ -22,7 +23,7 @@ if [ ! -d 'node_modules' ]; then
   if [ $? -ne 0 ]; then
     echo 'Problem encountered building the API'
     read -n 1
-    exit
+    exit 1
   fi
 fi
 
@@ -32,7 +33,8 @@ fi
 npm run lint
 if [ $? -ne 0 ]; then
   echo 'Code quality checks failed'
-  exit
+  read -n 1
+  exit 1
 fi
 
 #
@@ -59,7 +61,7 @@ npx tsx src/host/startup/app.ts
 if [ $? -ne 0 ]; then
   echo 'Problem encountered starting the API'
   read -n 1
-  exit
+  exit 1
 fi
 
 #
