@@ -5,7 +5,6 @@
 #############################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-cd ../..
 
 #
 # Install dependencies if needed
@@ -25,7 +24,7 @@ fi
 export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 
 #
-# Ensure that log folders exist
+# Ensure that folders for log files exist
 #
 if [ ! -d '../oauth.logs' ]; then
   mkdir '../oauth.logs'
