@@ -8,14 +8,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
-# Download development SSL certificates if required
-#
-./downloadcerts.sh
-if [ $? -ne 0 ]; then
-  exit
-fi
-
-#
 # Copy down the test configuration, to point the API to Wiremock rather than AWS Cognito
 #
 cp deployment/environments/test/api.config.json ./api.config.json
@@ -37,17 +29,6 @@ case "$(uname -s)" in
     PLATFORM="LINUX"
 	;;
 esac
-
-#
-# Install dependencies if needed
-#
-if [ ! -d 'node_modules' ]; then
-  npm install
-fi
-if [ $? -ne 0 ]; then
-  echo 'Problem encountered building the API'
-  exit
-fi
 
 #
 # Run Wiremock and the API in child windows

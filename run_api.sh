@@ -1,10 +1,18 @@
 #!/bin/bash
 
-#############################################
-# A script to run the API in a child terminal
-#############################################
+##########################################
+# A shared script to build and run the API
+##########################################
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+
+#
+# Download development SSL certificates if required
+#
+./downloadcerts.sh
+if [ $? -ne 0 ]; then
+  exit
+fi
 
 #
 # Install dependencies if needed
@@ -16,6 +24,15 @@ if [ ! -d 'node_modules' ]; then
     read -n 1
     exit
   fi
+fi
+
+#
+# Enforce code quality checks
+#
+npm run lint
+if [ $? -ne 0 ]; then
+  echo 'Code quality checks failed'
+  exit
 fi
 
 #
@@ -34,7 +51,7 @@ if [ ! -d '../oauth.logs/api' ]; then
 fi
 
 #
-# Run the API in this terminal
+# Run the API
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
