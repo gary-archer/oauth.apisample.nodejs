@@ -10,7 +10,7 @@ cd ../..
 #
 # Run Wiremock over HTTPS using Docker
 #
-docker run -it --rm \
+docker run -i --rm \
   --name wiremock \
   -p 447:447 \
   -v $(pwd)/certs/authsamples-dev.ssl.p12:/certs/authsamples-dev.ssl.p12 \
