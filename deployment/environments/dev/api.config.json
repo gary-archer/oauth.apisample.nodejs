@@ -36,7 +36,6 @@
     "audience":                     "",
     "algorithm":                    "RS256",
     "scope":                        "https://api.authsamples.com/investments",
-    "jwksEndpoint1":                  "https://login.microsoftonline.com/7f071fbc-8bf2-4e61-bb48-dabd8e2f5b5a/discovery/v2.0/keys",
     "jwksEndpoint":                 "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_CuhLeqiE9/.well-known/jwks.json",
     "claimsCacheTimeToLiveMinutes": 15
   }
