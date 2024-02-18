@@ -1,9 +1,9 @@
 import {inject, injectable} from 'inversify';
-import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
-import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
-import {ClientError} from '../../plumbing/errors/clientError.js';
-import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {ClaimsPrincipal} from 'plumbing/claims/claimsPrincipal.js';
+import {ClaimsReader} from 'plumbing/claims/claimsReader.js';
+import {BASETYPES} from 'plumbing/dependencies/baseTypes.js';
+import {ClientError} from 'plumbing/errors/clientError.js';
+import {ErrorFactory} from 'plumbing/errors/errorFactory.js';
 import {CustomClaimNames} from '../claims/customClaimNames.js';
 import {SampleExtraClaims} from '../claims/sampleExtraClaims.js';
 import {SAMPLETYPES} from '../dependencies/sampleTypes.js';

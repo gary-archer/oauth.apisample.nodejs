@@ -1,9 +1,9 @@
 import {Container} from 'inversify';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
-import {CompanyRepository} from '../../logic/repositories/companyRepository.js';
-import {UserRepository} from '../../logic/repositories/userRepository.js';
-import {CompanyService} from '../../logic/services/companyService.js';
-import {JsonFileReader} from '../../logic/utilities/jsonFileReader.js';
+import {SAMPLETYPES} from 'logic/dependencies/sampleTypes.js';
+import {CompanyRepository} from 'logic/repositories/companyRepository.js';
+import {UserRepository} from 'logic/repositories/userRepository.js';
+import {CompanyService} from 'logic/services/companyService.js';
+import {JsonFileReader} from 'logic/utilities/jsonFileReader.js';
 import {CompanyController} from '../controllers/companyController.js';
 import {UserInfoController} from '../controllers/userInfoController.js';
 

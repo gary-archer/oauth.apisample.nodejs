@@ -1,5 +1,5 @@
-import {LoggingConfiguration} from '../../plumbing/configuration/loggingConfiguration.js';
-import {OAuthConfiguration} from '../../plumbing/configuration/oauthConfiguration.js';
+import {LoggingConfiguration} from 'plumbing/configuration/loggingConfiguration.js';
+import {OAuthConfiguration} from 'plumbing/configuration/oauthConfiguration.js';
 import {ApiConfiguration} from './apiConfiguration.js';
 
 /*

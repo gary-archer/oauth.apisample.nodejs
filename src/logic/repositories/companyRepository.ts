@@ -1,7 +1,7 @@
 import {inject, injectable} from 'inversify';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
-import {LogEntry} from '../../plumbing/logging/logEntry.js';
-import {using} from '../../plumbing/utilities/using.js';
+import {BASETYPES} from 'plumbing/dependencies/baseTypes.js';
+import {LogEntry} from 'plumbing/logging/logEntry.js';
+import {using} from 'plumbing/utilities/using.js';
 import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
 import {Company} from '../entities/company.js';
 import {CompanyTransactions} from '../entities/companyTransactions.js';

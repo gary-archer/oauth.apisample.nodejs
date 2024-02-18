@@ -1,11 +1,11 @@
 import {inject} from 'inversify';
 import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
-import {Company} from '../../logic/entities/company.js';
-import {CompanyTransactions} from '../../logic/entities/companyTransactions.js';
-import {ErrorCodes} from '../../logic/errors/errorCodes.js';
-import {CompanyService} from '../../logic/services/companyService.js';
-import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {SAMPLETYPES} from 'logic/dependencies/sampleTypes.js';
+import {Company} from 'logic/entities/company.js';
+import {CompanyTransactions} from 'logic/entities/companyTransactions.js';
+import {ErrorCodes} from 'logic/errors/errorCodes.js';
+import {CompanyService} from 'logic/services/companyService.js';
+import {ErrorFactory} from 'plumbing/errors/errorFactory.js';
 
 /*
  * Our API controller runs after claims handling has completed

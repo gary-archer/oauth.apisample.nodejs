@@ -1,4 +1,4 @@
-import {ExtraClaims} from '../../plumbing/claims/extraClaims.js';
+import {ExtraClaims} from 'plumbing/claims/extraClaims.js';
 
 /*
  * Represents finer grained permissions not issued to access tokens
