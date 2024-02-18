@@ -8,9 +8,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
+# Handle Windows specific command requirements
+#
+if [ "$(uname -s)" == 'MINGW64*)' ]; then
+  alias docker='winpty docker'
+fi
+
+#
 # Run Wiremock over HTTPS using Docker
 #
-docker run -i --rm \
+docker run -it --rm \
   --name wiremock \
   -p 447:447 \
   -v $(pwd)/certs/authsamples-dev.ssl.p12:/certs/authsamples-dev.ssl.p12 \
