@@ -45,7 +45,7 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 #
 # Ensure that the log folder exists
 #
-if [ ! -d '../logs' ]; then
+if [ ! -d './logs' ]; then
   mkdir './logs'
 fi
 
