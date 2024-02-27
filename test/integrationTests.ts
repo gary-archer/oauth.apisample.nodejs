@@ -1,7 +1,6 @@
 import assert from 'assert';
 import {Guid} from 'guid-typescript';
 import {generateKeyPair} from 'jose';
-import {ExtraCaCerts} from '../src/plumbing/utilities/extraCaCerts.js';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
 import {MockAuthorizationServer} from './utils/mockAuthorizationServer.js';
@@ -22,7 +21,6 @@ describe('OAuth API Tests', () => {
      * Start a mock authorization server during tests
      */
     before( async () => {
-        ExtraCaCerts.initialize();
         await authorizationServer.start();
     });
 
