@@ -8,9 +8,11 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cd ../..
 
 #
-# Tests will call the API over SSL, so trust the development root certificate
+# Default to our trusted CA file, or the user can add this CA to their own trust file
 #
-export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
+if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
+  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
+fi
 
 #
 # Run the suite of integration tests

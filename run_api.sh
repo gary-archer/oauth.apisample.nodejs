@@ -38,9 +38,11 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Set trusted root certificates used for testing
+# Default to our trusted CA file, or the user can add this CA to their own trust file
 #
-export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
+if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
+  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
+fi
 
 #
 # Ensure that the log folder exists
