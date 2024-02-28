@@ -11,11 +11,12 @@ import {MockTokenOptions} from './utils/mockTokenOptions.js';
  */
 describe('OAuth API Tests', () => {
 
-    const authorizationServer = new MockAuthorizationServer();
+    const useProxy = false;
+    const authorizationServer = new MockAuthorizationServer(useProxy);
 
     const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
     const sessionId = Guid.create().toString();
-    const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, false);
+    const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, useProxy);
 
     /*
      * Start a mock authorization server during tests

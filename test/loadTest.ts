@@ -19,10 +19,11 @@ export class LoadTest {
 
     public constructor() {
 
-        this._authorizationServer = new MockAuthorizationServer();
+        const useProxy = false;
+        this._authorizationServer = new MockAuthorizationServer(useProxy);
         const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
         this._sessionId = Guid.create().toString();
-        this._apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this._sessionId, false);
+        this._apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this._sessionId, useProxy);
         this._totalCount = 0;
         this._errorCount = 0;
     }
