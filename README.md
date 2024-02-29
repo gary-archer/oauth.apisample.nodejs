@@ -69,6 +69,10 @@ Then call an endpoint over port 446:
 curl -k https://apilocal.authsamples-dev.com:446/investments/companies
 ```
 
+By default, SSL trust is managed by setting a `NODE_EXTRA_CA_CERTS` environment variable.\
+This points to the development root CA downloaded to `./certs/authsamples-dev.ca.pem`.\
+If you have an existing trust file, you will need to the add this certificate to it.
+
 ### Test the API
 
 Stop the API, then re-run it with a test configuration:
