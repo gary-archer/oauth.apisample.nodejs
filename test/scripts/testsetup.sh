@@ -13,6 +13,22 @@ cd ../..
 cp deployment/environments/test/api.config.json ./api.config.json
 
 #
+# Download development SSL certificates if required
+#
+./downloadcerts.sh
+if [ $? -ne 0 ]; then
+  read -n 1
+  exit 1
+fi
+
+#
+# Default to our trusted CA file, or the user can add this CA to their own trust file
+#
+if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
+  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
+fi
+
+#
 # Get the platform
 #
 case "$(uname -s)" in

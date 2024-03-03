@@ -7,15 +7,6 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
-# Download development SSL certificates if required
-#
-./downloadcerts.sh
-if [ $? -ne 0 ]; then
-  read -n 1
-  exit 1
-fi
-
-#
 # Install dependencies if needed
 #
 if [ ! -d 'node_modules' ]; then
@@ -35,13 +26,6 @@ if [ $? -ne 0 ]; then
   echo 'Code quality checks failed'
   read -n 1
   exit 1
-fi
-
-#
-# Default to our trusted CA file, or the user can add this CA to their own trust file
-#
-if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
-  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
 fi
 
 #
