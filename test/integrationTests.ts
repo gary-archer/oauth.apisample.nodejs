@@ -14,7 +14,7 @@ describe('OAuth API Tests', () => {
     const useProxy = false;
     const authorizationServer = new MockAuthorizationServer(useProxy);
 
-    const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
+    const apiBaseUrl = 'https://api.authsamples-dev.com:446';
     const sessionId = Guid.create().toString();
     const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, useProxy);
 

@@ -21,7 +21,7 @@ export class LoadTest {
 
         const useProxy = false;
         this._authorizationServer = new MockAuthorizationServer(useProxy);
-        const apiBaseUrl = 'https://apilocal.authsamples-dev.com:446';
+        const apiBaseUrl = 'https://api.authsamples-dev.com:446';
         this._sessionId = Guid.create().toString();
         this._apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this._sessionId, useProxy);
         this._totalCount = 0;

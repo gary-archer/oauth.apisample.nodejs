@@ -60,13 +60,13 @@ Run the API with this command:
 Configure DNS by adding these domains to your hosts file:
 
 ```text
-127.0.0.1 localhost apilocal.authsamples-dev.com login.authsamples-dev.com
+127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
 ```
 
 Then call an endpoint over port 446:
 
 ```bash
-curl -k https://apilocal.authsamples-dev.com:446/investments/companies
+curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 By default, SSL trust is managed by setting a `NODE_EXTRA_CA_CERTS` environment variable.\
