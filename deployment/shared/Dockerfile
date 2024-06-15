@@ -1,4 +1,4 @@
-FROM node:20-bookworm
+FROM node:20-bookworm-slim
 
 # Copy files into our docker image and install dependencies
 WORKDIR /usr/api
