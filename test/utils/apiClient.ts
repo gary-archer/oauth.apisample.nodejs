@@ -66,9 +66,9 @@ export class ApiClient {
 
         const headers: any = {
             authorization: `Bearer ${requestOptions.accessToken}`,
-            'x-mycompany-api-client': this._clientName,
-            'x-mycompany-session-id': this._sessionId,
-            'x-mycompany-correlation-id': metrics.correlationId,
+            'x-authsamples-api-client': this._clientName,
+            'x-authsamples-session-id': this._sessionId,
+            'x-authsamples-correlation-id': metrics.correlationId,
         };
 
         const options = {
@@ -79,7 +79,7 @@ export class ApiClient {
         } as AxiosRequestConfig;
 
         if (requestOptions.rehearseException) {
-            headers['x-mycompany-test-exception'] = 'SampleApi';
+            headers['x-authsamples-test-exception'] = 'SampleApi';
         }
 
         try {
