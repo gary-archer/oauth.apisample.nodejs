@@ -13,7 +13,7 @@ import {BearerToken} from './bearerToken.js';
  * A class to create the claims principal at the start of every secured request
  */
 @injectable()
-export class OAuthAuthorizer {
+export class OAuthFilter {
 
     private readonly _cache: ClaimsCache;
     private readonly _accessTokenValidator: AccessTokenValidator;

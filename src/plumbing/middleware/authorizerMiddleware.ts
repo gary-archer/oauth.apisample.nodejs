@@ -5,7 +5,7 @@ import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
-import {OAuthAuthorizer} from '../oauth/oauthAuthorizer.js';
+import {OAuthFilter} from '../oauth/oauthFilter.js';
 
 /*
  * A middleware class as the entry point for OAuth authorization
@@ -27,11 +27,11 @@ export class AuthorizerMiddleware {
         try {
 
             // Get objects
-            const authorizer =  perRequestContainer.get<OAuthAuthorizer>(BASETYPES.OAuthAuthorizer);
+            const filter =  perRequestContainer.get<OAuthFilter>(BASETYPES.OAuthFilter);
             const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
 
             // Run the authorizer then log identity details
-            const claimsPrincipal = await authorizer.execute(request);
+            const claimsPrincipal = await filter.execute(request);
             logEntry.setIdentity(ClaimsReader.getStringClaim(claimsPrincipal.jwt, 'sub'));
 
             // Bind claims to this requests's child container so that they are injectable into business logic

@@ -16,7 +16,7 @@ import {LoggerMiddleware} from '../middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
 import {AccessTokenValidator} from '../oauth/accessTokenValidator.js';
 import {JwksRetriever} from '../oauth/jwksRetriever.js';
-import {OAuthAuthorizer} from '../oauth/oauthAuthorizer.js';
+import {OAuthFilter} from '../oauth/oauthFilter.js';
 import {HttpProxy} from '../utilities/httpProxy.js';
 
 /*
@@ -169,9 +169,9 @@ export class BaseCompositionRoot {
         this._container.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
             .to(AccessTokenValidator).inRequestScope();
 
-        // The authorizer deals with finalizing the claims principal
-        this._container.bind<OAuthAuthorizer>(BASETYPES.OAuthAuthorizer)
-            .to(OAuthAuthorizer).inRequestScope();
+        // The filter deals with finalizing the claims principal
+        this._container.bind<OAuthFilter>(BASETYPES.OAuthFilter)
+            .to(OAuthFilter).inRequestScope();
 
         // Also register a singleton to cache token signing public keys
         this._container.bind<JwksRetriever>(BASETYPES.JwksRetriever)

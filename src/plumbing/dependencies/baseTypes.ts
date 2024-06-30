@@ -11,7 +11,7 @@ export const BASETYPES = {
     LogEntry: Symbol.for('LogEntry'),
     LoggerFactory: Symbol.for('LoggerFactory'),
     LoggingConfiguration: Symbol.for('Configuration'),
-    OAuthAuthorizer: Symbol.for('OAuthAuthorizer'),
     OAuthConfiguration: Symbol.for('OAuthConfiguration'),
+    OAuthFilter: Symbol.for('OAuthFilter'),
     UnhandledExceptionHandler: Symbol.for('UnhandledExceptionHandler'),
 };
