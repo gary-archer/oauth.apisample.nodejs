@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "lint": "npx eslint . --ext .ts",
+    "lint": "npx eslint . --ignore-pattern dist",
     "start": "./start.sh",
     "testsetup": "./test/scripts/testsetup.sh",
     "test": "./test/scripts/test.sh",
@@ -34,15 +34,21 @@
   },
   "devDependencies": {
     "@colors/colors": "^1.6.0",
+    "@eslint/js": "^9.5.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.30",
-    "@typescript-eslint/eslint-plugin": "^7.3.1",
-    "@typescript-eslint/parser": "^7.3.1",
     "eslint": "^8.57.0",
     "mocha": "^10.3.0",
     "tsx": "^4.15.7",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^7.14.1"
+  },
+  "overrides": {
+    "eslint": {
+      "file-entry-cache": "8.x"
+    }
   }
 }

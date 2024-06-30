@@ -12,6 +12,7 @@ import {ExtraClaimsProvider} from './extraClaimsProvider.js';
 export class ClaimsCache {
 
     private readonly _cache: NodeCache;
+    private readonly _defaultTimeToLiveSeconds: number;
     private readonly _extraClaimsProvider: ExtraClaimsProvider;
     private readonly _traceLogger: Logger;
 
@@ -27,9 +28,9 @@ export class ClaimsCache {
         this._traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
-        const defaultExpirySeconds = timeToLiveMinutes * 60;
+        this._defaultTimeToLiveSeconds = timeToLiveMinutes * 60;
         this._cache = new NodeCache({
-            stdTTL: defaultExpirySeconds,
+            stdTTL: this._defaultTimeToLiveSeconds,
         });
 
         // If required add debug output here to verify expiry occurs when expected
@@ -42,7 +43,7 @@ export class ClaimsCache {
     /*
      * Add claims to the cache until the token's time to live
      */
-    public async setExtraUserClaims(accessTokenHash: string, claims: ExtraClaims, exp: number): Promise<void> {
+    public setExtraUserClaims(accessTokenHash: string, claims: ExtraClaims, exp: number): void {
 
         // Get the data in way that handles private property names
         const dataAsJson = claims.exportData();
@@ -57,25 +58,25 @@ export class ClaimsCache {
                 `Token to be cached will expire in ${secondsToCache} seconds (hash: ${accessTokenHash})`);
 
             // Do not exceed the maximum time we configured
-            if (secondsToCache > this._cache.options.stdTTL!) {
-                secondsToCache = this._cache.options.stdTTL!;
+            if (secondsToCache > this._defaultTimeToLiveSeconds) {
+                secondsToCache = this._defaultTimeToLiveSeconds;
             }
 
             // Cache the claims until the above time
             this._traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
             const claimsText = JSON.stringify(dataAsJson);
-            await this._cache.set(accessTokenHash, claimsText, secondsToCache);
+            this._cache.set(accessTokenHash, claimsText, secondsToCache);
         }
     }
 
     /*
      * Get claims from the cache or return null if not found
      */
-    public async getExtraUserClaims(accessTokenHash: string): Promise<ExtraClaims | null> {
+    public getExtraUserClaims(accessTokenHash: string): ExtraClaims | null {
 
         // Get the token hash and see if it exists in the cache
-        const claimsText = await this._cache.get<string>(accessTokenHash);
+        const claimsText = this._cache.get<string>(accessTokenHash);
         if (!claimsText) {
 
             // If this is a new token and we need to do claims processing

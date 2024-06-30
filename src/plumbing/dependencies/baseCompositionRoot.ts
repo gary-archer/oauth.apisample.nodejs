@@ -22,6 +22,7 @@ import {HttpProxy} from '../utilities/httpProxy.js';
 /*
  * A class to create and register common cross cutting concerns
  */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class BaseCompositionRoot {
 
     private readonly _container: Container;
@@ -112,7 +113,7 @@ export class BaseCompositionRoot {
 
         // The second middleware manages authorization
         this._authorizerMiddleware = new AuthorizerMiddleware();
-        expressApp.use(`${this._apiBasePath}*`, this._authorizerMiddleware!.authorize);
+        expressApp.use(`${this._apiBasePath}*`, this._authorizerMiddleware.authorize);
 
         // The third middleware supports non functional testing via headers
         const handler = new CustomHeaderMiddleware(this._loggingConfiguration!.apiName);

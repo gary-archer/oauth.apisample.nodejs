@@ -45,7 +45,7 @@ export class OAuthFilter {
 
         // If cached results already exist for this token then return them immediately
         const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
-        let extraClaims = await this._cache.getExtraUserClaims(accessTokenHash);
+        let extraClaims = this._cache.getExtraUserClaims(accessTokenHash);
         if (extraClaims) {
             this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims, request);
         }
@@ -54,7 +54,7 @@ export class OAuthFilter {
         extraClaims = await this._extraClaimsProvider.lookupExtraClaims(jwtClaims, request);
 
         // Cache the extra claims for subsequent requests with the same access token
-        await this._cache.setExtraUserClaims(accessTokenHash, extraClaims!, jwtClaims.exp!);
+        this._cache.setExtraUserClaims(accessTokenHash, extraClaims, jwtClaims.exp || 0);
 
         // Return the final claims
         return this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims, request);
