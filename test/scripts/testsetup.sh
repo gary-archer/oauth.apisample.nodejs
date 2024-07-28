@@ -25,7 +25,7 @@ fi
 # Default to our trusted CA file, or the user can add this CA to their own trust file
 #
 if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
-  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.pem'
+  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.crt'
 fi
 
 #

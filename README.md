@@ -70,7 +70,7 @@ curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 By default, SSL trust is managed by setting a `NODE_EXTRA_CA_CERTS` environment variable.\
-This points to the development root CA downloaded to `./certs/authsamples-dev.ca.pem`.\
+This points to the development root CA downloaded to `./certs/authsamples-dev.ca.crt`.\
 If you have an existing trust file, you will need to the add this certificate to it.
 
 ### Test the API
