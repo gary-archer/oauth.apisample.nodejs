@@ -4,8 +4,6 @@
 
 [![Known Vulnerabilities](https://snyk.io/test/github/gary-archer/oauth.apisample.nodejs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/gary-archer/oauth.apisample.nodejs?targetFile=package.json)
 
-## Behaviour
-
 The final OAuth secured Node.js API code sample, which returns mock `investments` data:
 
 - The API takes finer control over claims-based authorization to enable security with good manageability.
@@ -27,8 +25,8 @@ For productive test-driven development, the API instead mocks the authorization 
 
 ### API is Load Testable
 
-A basic load test uses promises to fire 5 parallel requests at a time at the API.\
-This ensures no concurrency problems, and tests use error rehearsal to ensure useful client responses and logs:
+A basic load test fires batches of concurrent requests at the API.\
+This enables reliability testing and error rehearsal to ensure useful client responses and API logs:
 
 ![Load Test](./images/loadtest.png)
 
@@ -51,7 +49,7 @@ Then run the API with this command:
 
 ### Configure DNS and SSL
 
-Configure DNS by adding these domains to your hosts file:
+Add these domains to your hosts file to configure DNS:
 
 ```text
 127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
@@ -64,8 +62,7 @@ curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 By default, SSL trust is managed by setting a `NODE_EXTRA_CA_CERTS` environment variable.\
-This points to the development root CA downloaded to `./certs/authsamples-dev.ca.crt`.\
-If you have an existing trust file, you will need to the add this certificate to it.
+Alternatively you can configure [Node.js SSL trust](https://apisandclients.com/posts/developer-ssl-setup#trusting-a-root-certificate-in-nodejs-apis) for the root CA at `./certs/authsamples-dev.ca.crt`.
 
 ### Test the API
 
