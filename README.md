@@ -26,7 +26,7 @@ For productive test-driven development, the API instead mocks the authorization 
 ### API is Load Testable
 
 A basic load test fires batches of concurrent requests at the API.\
-This enables reliability testing and error rehearsal to ensure useful client responses and API logs:
+This further verifies reliability and the correctness of API logs.
 
 ![Load Test](./images/loadtest.png)
 
@@ -93,5 +93,5 @@ npm run loadtest
 
 * Express is the HTTP server that hosts the API endpoints.
 * AWS Cognito is the API's default authorization server.
-* The [jose](https://github.com/panva/jose) library manages in memory validation of JWTs.
+* The [jose](https://github.com/panva/jose) library manages in-memory JWT validation.
 * The project includes API deployment resources for Docker and Kubernetes.
