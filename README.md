@@ -11,21 +11,21 @@ The final OAuth secured Node.js API code sample, which returns mock `investments
 - The API takes finer control over claims-based authorization to enable security with good manageability.
 - The API uses structured logging and log aggregation, for the best supportability.
 
-### API integrates with UI Clients
+### API Serves Frontend Clients
 
 The API can run as part of an OAuth end-to-end setup, to serve my blog's UI code samples.\
 Running the API in this manner forces it to be consumer-focused to its clients:
 
 ![SPA and API](./images/spa-and-api.png)
 
-### API can be Productively Tested
+### API Security is Testable
 
 The API's clients are UIs, which get user-level access tokens by running an OpenID Connect code flow.\
 For productive test-driven development, the API instead mocks the authorization server:
 
 ![Test Driven Development](./images/tests.png)
 
-### API can be Load Tested
+### API is Load Testable
 
 A basic load test uses promises to fire 5 parallel requests at a time at the API.\
 This ensures no concurrency problems, and tests use error rehearsal to ensure useful client responses and logs:
@@ -38,16 +38,12 @@ You can aggregate API logs to Elasticsearch and run [Technical Support Queries](
 
 ![Support Queries](./images/support-queries.png)
 
-## Commands
-
-### Prerequisites
+## How to Run the API
 
 - Install Node.js 20+.
 - Also install Docker to run integration tests that use Wiremock.
 
-### Run the API
-
-Run the API with this command:
+Then run the API with this command:
 
 ```bash
 ./start.sh
