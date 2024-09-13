@@ -79,7 +79,7 @@ export class ApiClient {
         } as AxiosRequestConfig;
 
         if (requestOptions.rehearseException) {
-            headers['x-authsamples-test-exception'] = 'SampleApi';
+            headers['x-authsamples-test-exception'] = 'FinalApi';
         }
 
         try {
