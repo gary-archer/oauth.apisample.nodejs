@@ -45,9 +45,9 @@ export class LogEntryImpl implements LogEntry {
         this._data.path = request.originalUrl;
 
         // Our callers can supply a custom header so that we can keep track of who is calling each API
-        const clientApplicationName = request.header('x-authsamples-api-client');
-        if (clientApplicationName) {
-            this._data.clientApplicationName = clientApplicationName;
+        const clientName = request.header('x-authsamples-api-client');
+        if (clientName) {
+            this._data.clientName = clientName;
         }
 
         // Use the correlation id from request headers or create one
