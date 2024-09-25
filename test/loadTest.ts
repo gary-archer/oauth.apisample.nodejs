@@ -259,7 +259,5 @@ export class LoadTest {
 /*
  * Run the load test
  */
-(async () => {
-    const loadTest = new LoadTest();
-    await loadTest.execute();
-})();
+const loadTest = new LoadTest();
+await loadTest.execute();
