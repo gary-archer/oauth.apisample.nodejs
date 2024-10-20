@@ -72,11 +72,13 @@ export class HttpServerConfiguration {
         // Next ask the routing-controller library to create the API's routes from annotations
         useContainer(new InversifyAdapter(this._container));
         useExpressServer(this._expressApp, {
+            defaultErrorHandler: false,
             routePrefix: apiBasePath,
             controllers: [CompanyController, UserInfoController],
         });
 
         // Configure Express error middleware once routes have been created
+        // this._expressApp.use(allRoutes, exceptionHandler.notFound);
         this._expressApp.use(allRoutes, exceptionHandler.execute);
     }
 
