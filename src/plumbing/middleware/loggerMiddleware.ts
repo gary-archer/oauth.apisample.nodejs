@@ -4,7 +4,6 @@ import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
 import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl.js';
-import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
 
 /*
  * A class to log API requests as JSON objects so that we get structured logging output
@@ -12,7 +11,6 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
 export class LoggerMiddleware {
 
     private readonly _loggerFactory: LoggerFactoryImpl;
-    private _routeMetadataHandler!: RouteMetadataHandler;
 
     /*
      * Create the global logger at startup, which is responsible for receiving data
@@ -20,13 +18,6 @@ export class LoggerMiddleware {
     public constructor(loggerFactory: LoggerFactory) {
         this._loggerFactory = loggerFactory as LoggerFactoryImpl;
         this._setupCallbacks();
-    }
-
-    /*
-     * Set metadata details needed to log certain fields
-     */
-    public setRouteMetadataHandler(routeMetadataHandler: RouteMetadataHandler): void {
-        this._routeMetadataHandler = routeMetadataHandler;
     }
 
     /*
@@ -43,7 +34,6 @@ export class LoggerMiddleware {
 
         // Start the log entry for this API request
         logEntry.start(request);
-        logEntry.processRoutes(request, this._routeMetadataHandler);
 
         // Write the log entry when the finish event fires
         response.on('finish', () => {

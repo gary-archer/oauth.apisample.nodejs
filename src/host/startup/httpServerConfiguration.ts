@@ -2,7 +2,6 @@ import express from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {InversifyExpressServer} from 'inversify-express-utils';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
@@ -31,7 +30,6 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Use common code and give it any data it needs
         const base = new BaseCompositionRoot(this._container)
             .useApiBasePath('/investments/')
             .useOAuth(this._configuration.oauth)
@@ -42,29 +40,13 @@ export class HttpServerConfiguration {
 
         // Register the API's own dependencies
         CompositionRoot.registerDependencies(this._container);
-
-        // Configure Inversify Express, which will register @controller attributes and set up controller autowiring
-        new InversifyExpressServer(this._container, null, {rootPath: '/investments/'}, this._expressApp)
-            .setConfig(() => {
-
-                // Parse JSON into the request body when required
-                this._expressApp.use(express.json());
-
-                // The demo API does not implement request caching
-                this._expressApp.set('etag', false);
+        // The demo API does not implement request caching
+                // this._expressApp.set('etag', false);
 
                 // We must configure Express cross cutting concerns during this callback
-                base.configureMiddleware(this._expressApp);
-            })
-            .setErrorConfig(() => {
-
-                // Inversify Express requires us to add the middleware for exception handling here
-                base.configureExceptionHandler(this._expressApp);
-            })
-            .build();
-
-        // Finalise once routes are avaiilable, which enables us to log path based fields later
-        base.finalise();
+                // base.configureMiddleware(this._expressApp);
+                // base.configureExceptionHandler(this._expressApp);
+                // base.finalise();
     }
 
     /*

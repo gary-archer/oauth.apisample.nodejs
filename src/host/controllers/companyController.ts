@@ -1,5 +1,5 @@
 import {inject} from 'inversify';
-import {BaseHttpController, controller, httpGet, requestParam} from 'inversify-express-utils';
+import {Controller, Get, Param} from 'routing-controllers';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {Company} from '../../logic/entities/company.js';
 import {CompanyTransactions} from '../../logic/entities/companyTransactions.js';
@@ -10,21 +10,19 @@ import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
 /*
  * Our API controller runs after claims handling has completed
  */
-@controller('/companies')
-export class CompanyController extends BaseHttpController {
+@Controller('/companies')
+export class CompanyController {
 
     private readonly _service: CompanyService;
 
     public constructor(@inject(SAMPLETYPES.CompanyService) service: CompanyService) {
-
-        super();
         this._service = service;
     }
 
     /*
      * Return a list of companies
      */
-    @httpGet('')
+    @Get('')
     public async getCompanyList(): Promise<Company[]> {
         return this._service.getCompanyList();
     }
@@ -32,8 +30,8 @@ export class CompanyController extends BaseHttpController {
     /*
      * Return a composite object containing company transactions
      */
-    @httpGet('/:id/transactions')
-    public async getCompanyTransactions(@requestParam('id') id: string): Promise<CompanyTransactions> {
+    @Get('/:id/transactions')
+    public async getCompanyTransactions(@Param('id') id: string): Promise<CompanyTransactions> {
 
         // Parse the ID and throw a 400 error if it is invalid
         const companyId = parseInt(id, 10);
