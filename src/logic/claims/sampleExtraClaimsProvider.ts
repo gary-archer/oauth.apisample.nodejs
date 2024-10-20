@@ -32,7 +32,6 @@ export class SampleExtraClaimsProvider extends ExtraClaimsProvider {
     /*
      * Create a claims principal containing both token claims and extra claims
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
     public createClaimsPrincipal(jwtClaims: JWTPayload, extraClaims: ExtraClaims): ClaimsPrincipal {
         return new ClaimsPrincipal(jwtClaims, extraClaims);
     }

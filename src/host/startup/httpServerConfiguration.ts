@@ -2,11 +2,12 @@ import express from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {useContainer, useExpressServer} from 'routing-controllers';
+import {getMetadataArgsStorage, useContainer, useExpressServer} from 'routing-controllers';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
 import {InversifyAdapter} from '../../plumbing/dependencies/inversifyAdapter.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
+import {RouteMetadataHandler} from '../../plumbing/logging/routeMetadataHandler.js';
 import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
@@ -45,11 +46,11 @@ export class HttpServerConfiguration {
 
         // Create Express middleware
         const childContainerMiddleware = new ChildContainerMiddleware(this._container);
-        const loggerMiddleware = new LoggerMiddleware(this._loggerFactory!);
+        const loggerMiddleware = new LoggerMiddleware(this._loggerFactory);
         const authorizerMiddleware = new AuthorizerMiddleware();
-        const customHeaderMiddleware = new CustomHeaderMiddleware(this._configuration.logging!.apiName);
+        const customHeaderMiddleware = new CustomHeaderMiddleware(this._configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this._configuration.logging);
-        
+
         // Register base dependencies
         new BaseCompositionRoot(this._container)
             .useOAuth(this._configuration.oauth)
@@ -68,7 +69,7 @@ export class HttpServerConfiguration {
         this._expressApp.use(allRoutes, loggerMiddleware.execute);
         this._expressApp.use(allRoutes, authorizerMiddleware.execute);
         this._expressApp.use(allRoutes, customHeaderMiddleware.execute);
-        
+
         // Next ask the routing-controller library to create the API's routes from annotations
         useContainer(new InversifyAdapter(this._container));
         useExpressServer(this._expressApp, {
@@ -77,8 +78,11 @@ export class HttpServerConfiguration {
             controllers: [CompanyController, UserInfoController],
         });
 
+        // Also give the logger middleware access to metadata about routing controllers
+        const routeMetadataHandler = new RouteMetadataHandler(apiBasePath, getMetadataArgsStorage());
+        loggerMiddleware.setRouteMetadataHandler(routeMetadataHandler);
+
         // Configure Express error middleware once routes have been created
-        // this._expressApp.use(allRoutes, exceptionHandler.notFound);
         this._expressApp.use(allRoutes, exceptionHandler.execute);
     }
 

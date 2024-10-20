@@ -21,12 +21,12 @@ fi
 #
 # Enforce code quality checks
 #
-#npm run lint
-#if [ $? -ne 0 ]; then
-#  echo 'Code quality checks failed'
-#  read -n 1
-#  exit 1
-#fi
+npm run lint
+if [ $? -ne 0 ]; then
+  echo 'Code quality checks failed'
+  read -n 1
+  exit 1
+fi
 
 #
 # Ensure that the log folder exists

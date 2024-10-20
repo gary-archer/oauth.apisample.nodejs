@@ -7,7 +7,7 @@ import {Container} from 'inversify';
 export class ChildContainerMiddleware {
 
     private readonly _container: Container;
-    
+
     public constructor(container: Container) {
         this._container = container;
         this._setupCallbacks();

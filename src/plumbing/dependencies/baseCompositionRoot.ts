@@ -1,4 +1,3 @@
-import {Application} from 'express';
 import {Container} from 'inversify';
 import {ClaimsCache} from '../claims/claimsCache.js';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
