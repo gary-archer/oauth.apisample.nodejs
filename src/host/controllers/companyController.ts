@@ -1,4 +1,4 @@
-import {inject} from 'inversify';
+import {inject, injectable} from 'inversify';
 import {Controller, Get, Param} from 'routing-controllers';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {Company} from '../../logic/entities/company.js';
@@ -10,6 +10,7 @@ import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
 /*
  * Our API controller runs after claims handling has completed
  */
+@injectable()
 @Controller('/companies')
 export class CompanyController {
 
@@ -17,6 +18,7 @@ export class CompanyController {
 
     public constructor(@inject(SAMPLETYPES.CompanyService) service: CompanyService) {
         this._service = service;
+        this._setupCallbacks();
     }
 
     /*
@@ -45,5 +47,13 @@ export class CompanyController {
 
         // Next authorize access based on claims
         return this._service.getCompanyTransactions(companyId);
+    }
+
+    /*
+     * Plumbing to ensure the this parameter is available
+     */
+    private _setupCallbacks(): void {
+        this.getCompanyList = this.getCompanyList.bind(this);
+        this.getCompanyTransactions = this.getCompanyTransactions.bind(this);
     }
 }

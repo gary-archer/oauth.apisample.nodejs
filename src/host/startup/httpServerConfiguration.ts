@@ -2,9 +2,10 @@ import express from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {useExpressServer} from 'routing-controllers';
+import {useContainer, useExpressServer} from 'routing-controllers';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
+import {InversifyAdapter} from '../../plumbing/dependencies/inversifyAdapter.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
 import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
@@ -48,7 +49,6 @@ export class HttpServerConfiguration {
         const authorizerMiddleware = new AuthorizerMiddleware();
         const customHeaderMiddleware = new CustomHeaderMiddleware(this._configuration.logging!.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this._configuration.logging);
-        this._expressApp.set('etag', false);
         
         // Register base dependencies
         new BaseCompositionRoot(this._container)
@@ -62,14 +62,17 @@ export class HttpServerConfiguration {
         // Register the API's own dependencies
         CompositionRoot.registerDependencies(this._container);
 
-        // Configure cross cutting cthis._expressApp.set('etag', false);
+        // Configure cross cutting concerns
+        this._expressApp.set('etag', false);
         this._expressApp.use(allRoutes, childContainerMiddleware.execute);
         this._expressApp.use(allRoutes, loggerMiddleware.execute);
         this._expressApp.use(allRoutes, authorizerMiddleware.execute);
         this._expressApp.use(allRoutes, customHeaderMiddleware.execute);
         
         // Next ask the routing-controller library to create the API's routes from annotations
+        useContainer(new InversifyAdapter(this._container));
         useExpressServer(this._expressApp, {
+            routePrefix: apiBasePath,
             controllers: [CompanyController, UserInfoController],
         });
 
