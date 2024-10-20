@@ -8,7 +8,7 @@ import {ServerError} from '../errors/serverError.js';
 import {LogEntry} from './logEntry.js';
 import {LogEntryData} from './logEntryData.js';
 import {PerformanceBreakdown} from './performanceBreakdown.js';
-import {RouteMetadataHandler} from './routeMetadataHandler.js';
+import {RouteMetadata} from './routeMetadata.js';
 
 /*
  * The full implementation class is private to the framework and excluded from the index.ts file
@@ -37,7 +37,7 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Start collecting data before calling the API's business logic
      */
-    public start(request: Request): void {
+    public start(request: Request, routeMetadata: RouteMetadata | null): void {
 
         // Read request details
         this._data.performance.start();
@@ -59,6 +59,12 @@ export class LogEntryImpl implements LogEntry {
         if (sessionId) {
             this._data.sessionId = sessionId;
         }
+
+        // Record route metadata if available
+        if (routeMetadata) {
+            this._data.operationName = routeMetadata.operationName;
+            this._data.resourceId = routeMetadata.resourceIds.join('/');
+        }
     }
 
     /*
@@ -73,23 +79,6 @@ export class LogEntryImpl implements LogEntry {
      */
     public setOperationName(name: string): void {
         this._data.operationName = name;
-    }
-
-    /*
-     * Extract the operations name and resource id values from metadata
-     */
-    public processRoutes(request: Request, routeMetadataHandler: RouteMetadataHandler): void {
-
-        // Calculate the operation name from request.route
-        const metadata = routeMetadataHandler.getOperationRouteInfo(request);
-        if (metadata) {
-
-            // Record the operation name
-            this._data.operationName = metadata.operationName;
-
-            // Also log URL path segments for resource ids
-            this._data.resourceId = metadata.resourceIds.join('/');
-        }
     }
 
     /*

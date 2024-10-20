@@ -1,8 +1,8 @@
 import {NextFunction, Request, Response} from 'express';
+import {Container} from 'inversify';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ClaimsReader} from '../claims/claimsReader.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
-import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
 import {OAuthFilter} from '../oauth/oauthFilter.js';
@@ -19,23 +19,23 @@ export class AuthorizerMiddleware {
     /*
      * The entry point for implementing authorization
      */
-    public async authorize(request: Request, response: Response, next: NextFunction): Promise<void> {
+    public async execute(request: Request, response: Response, next: NextFunction): Promise<void> {
 
         // Get the container for this request
-        const perRequestContainer = ChildContainerHelper.resolve(request);
+        const container = response.locals.container as Container;
 
         try {
 
             // Get objects
-            const filter =  perRequestContainer.get<OAuthFilter>(BASETYPES.OAuthFilter);
-            const logEntry = perRequestContainer.get<LogEntryImpl>(BASETYPES.LogEntry);
+            const filter =  container.get<OAuthFilter>(BASETYPES.OAuthFilter);
+            const logEntry = container.get<LogEntryImpl>(BASETYPES.LogEntry);
 
             // Run the authorizer then log identity details
-            const claimsPrincipal = await filter.execute(request);
+            const claimsPrincipal = await filter.execute(request, response);
             logEntry.setIdentity(ClaimsReader.getStringClaim(claimsPrincipal.jwt, 'sub'));
 
             // Bind claims to this requests's child container so that they are injectable into business logic
-            perRequestContainer.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);
+            container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);
 
             // On success, move on to the controller logic
             next();
@@ -43,9 +43,9 @@ export class AuthorizerMiddleware {
         } catch (e) {
 
             // Handle authorization exceptions
-            const exceptionHandler = perRequestContainer.get<UnhandledExceptionHandler>(
+            const exceptionHandler = container.get<UnhandledExceptionHandler>(
                 BASETYPES.UnhandledExceptionHandler);
-            exceptionHandler.handleException(e, request, response, next);
+            exceptionHandler.execute(e, request, response, next);
         }
     }
 
@@ -53,6 +53,6 @@ export class AuthorizerMiddleware {
      * Plumbing to ensure the this parameter is available
      */
     private _setupCallbacks(): void {
-        this.authorize = this.authorize.bind(this);
+        this.execute = this.execute.bind(this);
     }
 }

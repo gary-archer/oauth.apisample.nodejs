@@ -1,3 +1,5 @@
+import {ClientError} from './clientError.js';
+
 /*
  * An abstraction for server exception behaviour
  */
@@ -19,5 +21,5 @@ export abstract class ServerError extends Error {
     public abstract toLogFormat(apiName: string): any;
 
     // Return the client error for the server error
-    public abstract toClientError(apiName: string): any;
+    public abstract toClientError(apiName: string): ClientError;
 }

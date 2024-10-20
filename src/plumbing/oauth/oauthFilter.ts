@@ -1,5 +1,5 @@
 import {createHash} from 'crypto';
-import {Request} from 'express';
+import {Request, Response} from 'express';
 import {inject, injectable} from 'inversify';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ClaimsCache} from '../claims/claimsCache.js';
@@ -32,7 +32,7 @@ export class OAuthFilter {
     /*
      * Validate the OAuth access token and then look up other claims
      */
-    public async execute(request: Request): Promise<ClaimsPrincipal> {
+    public async execute(request: Request, response: Response): Promise<ClaimsPrincipal> {
 
         // First read the access token
         const accessToken = BearerToken.read(request);
@@ -47,16 +47,16 @@ export class OAuthFilter {
         const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
         let extraClaims = this._cache.getExtraUserClaims(accessTokenHash);
         if (extraClaims) {
-            this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims, request);
+            this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims);
         }
 
         // Look up extra claims not in the JWT access token when it is first received
-        extraClaims = await this._extraClaimsProvider.lookupExtraClaims(jwtClaims, request);
+        extraClaims = await this._extraClaimsProvider.lookupExtraClaims(jwtClaims, response);
 
         // Cache the extra claims for subsequent requests with the same access token
         this._cache.setExtraUserClaims(accessTokenHash, extraClaims, jwtClaims.exp || 0);
 
         // Return the final claims
-        return this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims, request);
+        return this._extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims);
     }
 }

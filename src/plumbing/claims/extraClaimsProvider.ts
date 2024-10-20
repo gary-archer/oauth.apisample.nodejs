@@ -1,4 +1,4 @@
-import {Request} from 'express';
+import {Response} from 'express';
 import {injectable} from 'inversify';
 import {JWTPayload} from 'jose';
 import {ClaimsPrincipal} from './claimsPrincipal.js';
@@ -14,15 +14,14 @@ export class ExtraClaimsProvider {
      * Get additional claims from the API's own database
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async lookupExtraClaims(jwtClaims: JWTPayload, request: Request): Promise<ExtraClaims> {
+    public async lookupExtraClaims(jwtClaims: JWTPayload, response: Response): Promise<ExtraClaims> {
         return new ExtraClaims();
     }
 
     /*
      * Create a claims principal that manages lookups across both token claims and extra claims
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public createClaimsPrincipal(jwtClaims: JWTPayload, extraClaims: ExtraClaims, request: Request): ClaimsPrincipal {
+    public createClaimsPrincipal(jwtClaims: JWTPayload, extraClaims: ExtraClaims): ClaimsPrincipal {
         return new ClaimsPrincipal(jwtClaims, extraClaims);
     }
 

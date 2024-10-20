@@ -2,11 +2,20 @@ import express from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {InversifyExpressServer} from 'inversify-express-utils';
+import {getMetadataArgsStorage, useContainer, useExpressServer} from 'routing-controllers';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
+import {InversifyAdapter} from '../../plumbing/dependencies/inversifyAdapter.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
+import {RouteMetadataHandler} from '../../plumbing/logging/routeMetadataHandler.js';
+import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
+import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
+import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
+import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
+import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
 import {Configuration} from '../configuration/configuration.js';
+import {CompanyController} from '../controllers/companyController.js';
+import {UserInfoController} from '../controllers/userInfoController.js';
 import {CompositionRoot} from '../dependencies/compositionRoot.js';
 
 /*
@@ -27,44 +36,54 @@ export class HttpServerConfiguration {
     }
 
     /*
-     * Configure behaviour before starting the server
+     * Configure Express HTTP server behavior and wire up dependencies
      */
     public async configure(): Promise<void> {
 
-        // Use common code and give it any data it needs
-        const base = new BaseCompositionRoot(this._container)
-            .useApiBasePath('/investments/')
+        // Initialize routes
+        const apiBasePath = '/investments';
+        const allRoutes = `${apiBasePath}*_`;
+
+        // Create Express middleware
+        const childContainerMiddleware = new ChildContainerMiddleware(this._container);
+        const loggerMiddleware = new LoggerMiddleware(this._loggerFactory);
+        const authorizerMiddleware = new AuthorizerMiddleware();
+        const customHeaderMiddleware = new CustomHeaderMiddleware(this._configuration.logging.apiName);
+        const exceptionHandler = new UnhandledExceptionHandler(this._configuration.logging);
+
+        // Register base dependencies
+        new BaseCompositionRoot(this._container)
             .useOAuth(this._configuration.oauth)
             .withExtraClaimsProvider(new SampleExtraClaimsProvider())
             .withLogging(this._configuration.logging, this._loggerFactory)
+            .withExceptionHandler(exceptionHandler)
             .withProxyConfiguration(this._configuration.api.useProxy, this._configuration.api.proxyUrl)
             .register();
 
         // Register the API's own dependencies
         CompositionRoot.registerDependencies(this._container);
 
-        // Configure Inversify Express, which will register @controller attributes and set up controller autowiring
-        new InversifyExpressServer(this._container, null, {rootPath: '/investments/'}, this._expressApp)
-            .setConfig(() => {
+        // Configure cross cutting concerns
+        this._expressApp.set('etag', false);
+        this._expressApp.use(allRoutes, childContainerMiddleware.execute);
+        this._expressApp.use(allRoutes, loggerMiddleware.execute);
+        this._expressApp.use(allRoutes, authorizerMiddleware.execute);
+        this._expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
-                // Parse JSON into the request body when required
-                this._expressApp.use(express.json());
+        // Next ask the routing-controller library to create the API's routes from annotations
+        useContainer(new InversifyAdapter(this._container));
+        useExpressServer(this._expressApp, {
+            defaultErrorHandler: false,
+            routePrefix: apiBasePath,
+            controllers: [CompanyController, UserInfoController],
+        });
 
-                // The demo API does not implement request caching
-                this._expressApp.set('etag', false);
+        // Also give the logger middleware access to metadata about routing controllers
+        const routeMetadataHandler = new RouteMetadataHandler(apiBasePath, getMetadataArgsStorage());
+        loggerMiddleware.setRouteMetadataHandler(routeMetadataHandler);
 
-                // We must configure Express cross cutting concerns during this callback
-                base.configureMiddleware(this._expressApp);
-            })
-            .setErrorConfig(() => {
-
-                // Inversify Express requires us to add the middleware for exception handling here
-                base.configureExceptionHandler(this._expressApp);
-            })
-            .build();
-
-        // Finalise once routes are avaiilable, which enables us to log path based fields later
-        base.finalise();
+        // Configure Express error middleware once routes have been created
+        this._expressApp.use(allRoutes, exceptionHandler.execute);
     }
 
     /*

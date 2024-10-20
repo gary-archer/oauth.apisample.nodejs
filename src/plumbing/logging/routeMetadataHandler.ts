@@ -1,77 +1,60 @@
 import {Request} from 'express';
-import {interfaces} from 'inversify-express-utils';
 import {RouteMetadata} from './routeMetadata.js';
+import {MetadataArgsStorage} from 'routing-controllers';
+import {ActionMetadataArgs } from 'routing-controllers/types/metadata/args/ActionMetadataArgs.js';
 
 /*
- * A helper class to use Inversify Express Utils metadata at runtime to capture important logging fields
- * This is difficult since Express request data is not always available in middleware classes
+ * A helper class to use Routing Controllers metadata at runtime to capture important logging fields
  */
 export class RouteMetadataHandler {
 
     private readonly _basePath: string;
-    private readonly _metadata: {
-        controllerMetadata: interfaces.ControllerMetadata;
-        methodMetadata: interfaces.ControllerMethodMetadata[];
-        parameterMetadata: interfaces.ControllerParameterMetadata;
-        }[];
+    private readonly _metadata: MetadataArgsStorage;
 
-    public constructor(basePath: string, metadata: {
-        controllerMetadata: interfaces.ControllerMetadata;
-        methodMetadata: interfaces.ControllerMethodMetadata[];
-        parameterMetadata: interfaces.ControllerParameterMetadata;
-        }[]) {
-
-        this._basePath = this._trimTrailingForwardSlash(basePath);
+    public constructor(basePath: string, metadata: MetadataArgsStorage) {
+        this._basePath = basePath;
         this._metadata = metadata;
     }
 
     /*
-     * Calculate the operation name and resource ids from path segments
-     * For 'api/companies/2/transactions' we derive the operation name of 'getCompanyTransactions'
-     * For 'api/companies/2/transactions' we find 'api/companies/:id/transactions' and get resource ids of 2
+     * Calculate route metadata to log for the current request
      */
     public getOperationRouteInfo(request: Request): RouteMetadata | null {
 
-        let result: RouteMetadata | null = null;
-
-        // Get the route, which will be a value such as 'api/companies/2/transactions' without the query string
+        // Get the request path, such as '/investments/companies/2/transactions' without the query string
         const requestPath = this._getRequestPath(request);
         if (requestPath) {
 
-            // Process each controller and stop on the first find
-            this._metadata.some((controller) => {
+            for (const controller of this._metadata.controllers) {
 
-                // Process each controller operation and stop on the first find
-                const found = controller.methodMetadata.some((operation) => {
+                for (const action of this._metadata.actions) {
 
-                    // Get the full path, which will be a value such as 'api/companies/:id/transactions'
-                    const controllerPath = controller.controllerMetadata.path;
-                    const operationPath = this._getControllerOperationPath(controllerPath, operation.path);
+                    if (controller.target === action.target) {
 
-                    // Return data if it is a matching route
-                    const routeInfo = this._getMatchingRouteInfo(
-                        requestPath,
-                        request.method,
-                        operationPath,
-                        operation);
+                        // Get the operation path, such as 'investments/companies/:id/transactions'
+                        const operationPath = this._basePath + controller.route + action.route;
 
-                    if (routeInfo) {
-                        result = routeInfo;
-                        return true;
+                        // Return a match if found
+                        const routeInfo = this._getMatchingRouteInfo(
+                            requestPath,
+                            request.method,
+                            operationPath,
+                            action);
+
+                        if (routeInfo) {
+                            return routeInfo;
+                        }
                     }
-                });
-
-                if (found) {
-                    return true;
                 }
-            });
+            }
         }
 
-        return result;
+        // Otherwise indicate not found
+        return null;
     }
 
     /*
-     * Use the full request path, such as '/investments/companies/2/transactions', which is available in all middleware
+     * Use the full request path, such as '/investments/companies/2/transactions'
      */
     private _getRequestPath(request: Request): string {
 
@@ -79,8 +62,8 @@ export class RouteMetadataHandler {
         let path = this._removeQuery(request.originalUrl, '?');
         path = this._removeQuery(path, '#');
 
-        // Then trim the result
-        return this._trimTrailingForwardSlash(path.toLowerCase());
+        // Then trim trailing slashes from the result
+        return path.toLowerCase().replace(/\/+$/, '');
     }
 
     /*
@@ -97,41 +80,16 @@ export class RouteMetadataHandler {
     }
 
     /*
-     * Deal with concatenation while handling forward slashes
-     */
-    private _getControllerOperationPath(controllerPath: string, operationPath: string) {
-
-        // Get a value such as '/companies'
-        const trimmedControllerPath = this._trimTrailingForwardSlash(controllerPath.toLowerCase());
-
-        // Get a value such as ':id/transactions'
-        const trimmedOperationPath =
-            this._trimTrailingForwardSlash(this._trimLeadingForwardSlash(operationPath.toLowerCase()));
-
-        // Concatenate parts and return the full path, such as '/companies/:id/transactions'
-        let path = '';
-        if (trimmedControllerPath.length > 0) {
-            path += trimmedControllerPath;
-        }
-        if (trimmedOperationPath.length > 0) {
-            path += '/' + trimmedOperationPath;
-        }
-
-        // Return a value such as '/investments/companies/:id/transactions'
-        return this._basePath + path;
-    }
-
-    /*
      * Check for a match on method and path, such as 'GET /investments/companies/2/transactions'
      */
     private _getMatchingRouteInfo(
         requestPath: string,
         requestMethod: string,
         operationPath: string,
-        operationMetadata: interfaces.ControllerMethodMetadata): RouteMetadata | null {
+        action: ActionMetadataArgs): RouteMetadata | null {
 
-        // Check that the HTTP verb matches that configured against the operation
-        if (operationMetadata.method.toLowerCase() !== requestMethod.toLowerCase()) {
+        // Check that the HTTP method matches that configured against the operation
+        if (action.type.toLowerCase() !== requestMethod.toLowerCase()) {
             return null;
         }
 
@@ -163,16 +121,8 @@ export class RouteMetadataHandler {
 
         // Return the operation name and the REST template parameters, which will be logged
         return {
-            operationName: operationMetadata.key,
+            operationName: action.method,
             resourceIds,
         };
-    }
-
-    private _trimTrailingForwardSlash(input: string): string {
-        return input.replace(/\/+$/, '');
-    }
-
-    private _trimLeadingForwardSlash(input: string): string {
-        return input.replace(/^\/+/, '');
     }
 }

@@ -1,6 +1,4 @@
-import {Application} from 'express';
 import {Container} from 'inversify';
-import {getRawMetadata} from 'inversify-express-utils';
 import {ClaimsCache} from '../claims/claimsCache.js';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ExtraClaimsProvider} from '../claims/extraClaimsProvider.js';
@@ -9,10 +7,6 @@ import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
-import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
-import {AuthorizerMiddleware} from '../middleware/authorizerMiddleware.js';
-import {CustomHeaderMiddleware} from '../middleware/customHeaderMiddleware.js';
-import {LoggerMiddleware} from '../middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
 import {AccessTokenValidator} from '../oauth/accessTokenValidator.js';
 import {JwksRetriever} from '../oauth/jwksRetriever.js';
@@ -26,31 +20,15 @@ import {HttpProxy} from '../utilities/httpProxy.js';
 export class BaseCompositionRoot {
 
     private readonly _container: Container;
-    private _apiBasePath?: string;
     private _oauthConfiguration?: OAuthConfiguration;
     private _extraClaimsProvider?: ExtraClaimsProvider;
     private _loggingConfiguration?: LoggingConfiguration;
     private _loggerFactory?: LoggerFactory;
-    private _authorizerMiddleware?: AuthorizerMiddleware;
-    private _loggerMiddleware?: LoggerMiddleware;
     private _exceptionHandler?: UnhandledExceptionHandler;
     private _httpProxy?: HttpProxy;
 
     public constructor(container: Container) {
         this._container = container;
-    }
-
-    /*
-     * Set the API base path
-     */
-    public useApiBasePath(apiBasePath: string): BaseCompositionRoot {
-
-        this._apiBasePath = apiBasePath.toLowerCase();
-        if (!this._apiBasePath.endsWith('/')) {
-            this._apiBasePath += '/';
-        }
-
-        return this;
     }
 
     /*
@@ -82,6 +60,15 @@ export class BaseCompositionRoot {
     }
 
     /*
+     * Receive the unhandled exception handler
+     */
+    public withExceptionHandler(exceptionHandler: UnhandledExceptionHandler): BaseCompositionRoot {
+
+        this._exceptionHandler = exceptionHandler;
+        return this;
+    }
+
+    /*
      * Apply HTTP proxy details for outgoing OAuth calls if configured
      */
     public withProxyConfiguration(useProxy: boolean, proxyUrl: string): BaseCompositionRoot {
@@ -95,46 +82,10 @@ export class BaseCompositionRoot {
      */
     public register(): BaseCompositionRoot {
 
-        this._exceptionHandler = new UnhandledExceptionHandler(this._loggingConfiguration!);
         this._registerBaseDependencies();
         this._registerOAuthDependencies();
         this._registerClaimsDependencies();
         return this;
-    }
-
-    /*
-     * Set up cross cutting concerns as Express middleware
-     */
-    public configureMiddleware(expressApp: Application): void {
-
-        // The first middleware starts structured logging of API requests
-        this._loggerMiddleware = new LoggerMiddleware(this._loggerFactory!);
-        expressApp.use(`${this._apiBasePath}*`, this._loggerMiddleware.logRequest);
-
-        // The second middleware manages authorization
-        this._authorizerMiddleware = new AuthorizerMiddleware();
-        expressApp.use(`${this._apiBasePath}*`, this._authorizerMiddleware.authorize);
-
-        // The third middleware supports non functional testing via headers
-        const handler = new CustomHeaderMiddleware(this._loggingConfiguration!.apiName);
-        expressApp.use(`${this._apiBasePath}*`, handler.processHeaders);
-    }
-
-    /*
-     * With Inversify Express the exception middleware must be configured after other middleware
-     */
-    public configureExceptionHandler(expressApp: Application): BaseCompositionRoot {
-        expressApp.use(`${this._apiBasePath}*`, this._exceptionHandler!.handleException);
-        return this;
-    }
-
-    /*
-     * Once Inversify routes have been configured we can call getRawMetadata to get route information
-     * This enables our logging to calculate key logging fields throughout the whole middleware pipeline
-     */
-    public finalise(): void {
-        const routeMetadataHandler = new RouteMetadataHandler(this._apiBasePath!, getRawMetadata(this._container));
-        this._loggerMiddleware!.setRouteMetadataHandler(routeMetadataHandler);
     }
 
     /*

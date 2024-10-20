@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
+import {Container} from 'inversify';
 import {BASETYPES} from '../dependencies/baseTypes.js';
-import {ChildContainerHelper} from '../dependencies/childContainerHelper.js';
 import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
 import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl.js';
@@ -14,16 +14,13 @@ export class LoggerMiddleware {
     private readonly _loggerFactory: LoggerFactoryImpl;
     private _routeMetadataHandler!: RouteMetadataHandler;
 
-    /*
-     * Create the global logger at startup, which is responsible for receiving data
-     */
     public constructor(loggerFactory: LoggerFactory) {
         this._loggerFactory = loggerFactory as LoggerFactoryImpl;
         this._setupCallbacks();
     }
 
     /*
-     * Set metadata details needed to log certain fields
+     * Set metadata details needed to log particular request fields
      */
     public setRouteMetadataHandler(routeMetadataHandler: RouteMetadataHandler): void {
         this._routeMetadataHandler = routeMetadataHandler;
@@ -32,18 +29,18 @@ export class LoggerMiddleware {
     /*
      * Log one API request
      */
-    public logRequest(request: Request, response: Response, next: NextFunction): void {
+    public execute(request: Request, response: Response, next: NextFunction): void {
 
         // Create the log entry for this API request
         const logEntry = this._loggerFactory.createLogEntry();
 
         // Register it against this request's child container so that it can be injected into other places
-        const container = ChildContainerHelper.resolve(request);
+        const container = response.locals.container as Container;
         container.bind<LogEntry>(BASETYPES.LogEntry).toConstantValue(logEntry);
 
         // Start the log entry for this API request
-        logEntry.start(request);
-        logEntry.processRoutes(request, this._routeMetadataHandler);
+        const routeMetadata = this._routeMetadataHandler.getOperationRouteInfo(request);
+        logEntry.start(request, routeMetadata);
 
         // Write the log entry when the finish event fires
         response.on('finish', () => {
@@ -58,6 +55,6 @@ export class LoggerMiddleware {
      * Plumbing to ensure the this parameter is available
      */
     private _setupCallbacks(): void {
-        this.logRequest = this.logRequest.bind(this);
+        this.execute = this.execute.bind(this);
     }
 }
