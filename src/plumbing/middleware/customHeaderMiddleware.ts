@@ -18,7 +18,7 @@ export class CustomHeaderMiddleware {
      * Enable testers to select an API to break as part of non functional testing
      * This can be especially useful when there are many APIs and they call each other
      */
-    public processHeaders(request: Request, response: Response, next: NextFunction): void {
+    public execute(request: Request, response: Response, next: NextFunction): void {
 
         const apiToBreak = request.header('x-authsamples-test-exception');
         if (apiToBreak) {
@@ -37,6 +37,6 @@ export class CustomHeaderMiddleware {
      * Plumbing to ensure the this parameter is available
      */
     private _setupCallbacks(): void {
-        this.processHeaders = this.processHeaders.bind(this);
+        this.execute = this.execute.bind(this);
     }
 }
