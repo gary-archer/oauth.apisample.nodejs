@@ -32,7 +32,7 @@ This further verifies reliability and the correctness of API logs.
 
 ### API is Supportable
 
-You can aggregate API logs to Elasticsearch and run [Technical Support Queries](https://apisandclients.com/posts/api-technical-support-analysis).
+You can aggregate API logs to Elasticsearch and run [Technical Support Queries](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/api-technical-support-analysis).
 
 ![Support Queries](./images/support-queries.png)
 
@@ -62,7 +62,8 @@ curl -k https://api.authsamples-dev.com:446/investments/companies
 ```
 
 By default, SSL trust is managed by setting a `NODE_EXTRA_CA_CERTS` environment variable.\
-Alternatively you can configure [Node.js SSL trust](https://apisandclients.com/posts/developer-ssl-setup#trusting-a-root-certificate-in-nodejs-apis) for the root CA at `./certs/authsamples-dev.ca.crt`.
+Alternatively you can configure [Node.js SSL trust](
+https://github.com/gary-archer/oauth.blog/tree/master/public/posts/developer-ssl-setup.mdx#trusting-a-root-certificate-in-nodejs-apis) for the root CA at `./certs/authsamples-dev.ca.crt`.
 
 ### Test the API
 
@@ -81,9 +82,9 @@ npm run loadtest
 
 ## Further Details
 
-* See the [API Journey - Server Side](https://apisandclients.com/posts/api-journey-server-side) for further information on the API's behaviour.
-* See the [Overview Page](https://apisandclients.com/posts/api-architecture-node) for further details on how to run the API.
-* See the [Code Overview](https://apisandclients.com/posts/final-nodeapi-coding-key-points) for some implementation details.
+* See the [API Journey - Server Side](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/api-journey-server-side.mdx) for further information on the API's behaviour.
+* See the [Overview Page](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/api-architecture-node.mdx) for further details on how to run the API.
+* See the [Code Overview](https://github.com/gary-archer/oauth.blog/tree/master/public/posts/final-nodeapi-coding-key-points.mdx) for some implementation details.
 
 ## Programming Languages
 
