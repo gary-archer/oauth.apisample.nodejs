@@ -22,7 +22,7 @@ export class RouteMetadataHandler {
     public getOperationRouteInfo(request: Request): RouteMetadata | null {
 
         // Get the request path, such as '/investments/companies/2/transactions' without the query string
-        const requestPath = this._getRequestPath(request);
+        const requestPath = (request.baseUrl + request.path).replace(/\/+$/, '');
         if (requestPath) {
 
             for (const controller of this._metadata.controllers) {
@@ -51,32 +51,6 @@ export class RouteMetadataHandler {
 
         // Otherwise indicate not found
         return null;
-    }
-
-    /*
-     * Use the full request path, such as '/investments/companies/2/transactions'
-     */
-    private _getRequestPath(request: Request): string {
-
-        // Remove query parts of the request path
-        let path = this._removeQuery(request.originalUrl, '?');
-        path = this._removeQuery(path, '#');
-
-        // Then trim trailing slashes from the result
-        return path.toLowerCase().replace(/\/+$/, '');
-    }
-
-    /*
-     * Remove the query part of the request path before processing
-     */
-    private _removeQuery(path: string, separator: string): string {
-
-        const queryPos = path.indexOf(separator);
-        if (queryPos !== -1) {
-            return path.substring(0, queryPos);
-        }
-
-        return path;
     }
 
     /*
