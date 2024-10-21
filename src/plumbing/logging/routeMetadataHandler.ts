@@ -35,7 +35,7 @@ export class RouteMetadataHandler {
                         const operationPath = this._basePath + controller.route + action.route;
 
                         // Return a match if found
-                        const routeInfo = this._getMatchingRouteInfo(
+                        const routeInfo = this.getMatchingRouteInfo(
                             requestPath,
                             request.method,
                             operationPath,
@@ -56,7 +56,7 @@ export class RouteMetadataHandler {
     /*
      * Check for a match on method and path, such as 'GET /investments/companies/2/transactions'
      */
-    private _getMatchingRouteInfo(
+    private getMatchingRouteInfo(
         requestPath: string,
         requestMethod: string,
         operationPath: string,

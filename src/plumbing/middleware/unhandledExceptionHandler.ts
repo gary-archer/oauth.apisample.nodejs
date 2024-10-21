@@ -17,7 +17,7 @@ export class UnhandledExceptionHandler {
     public constructor(configuration: LoggingConfiguration) {
 
         this._configuration = configuration;
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     /*
@@ -25,13 +25,6 @@ export class UnhandledExceptionHandler {
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
     public execute(exception: any, request: Request, response: Response, next: NextFunction): void {
-        this._handleError(exception, response);
-    }
-
-    /*
-     * Do the work of handling the error
-     */
-    private _handleError(exception: any, response: Response): void {
 
         // Get the log entry for this API request
         const container = response.locals.container as Container;
@@ -61,7 +54,7 @@ export class UnhandledExceptionHandler {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.execute = this.execute.bind(this);
     }
 }

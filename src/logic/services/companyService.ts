@@ -38,7 +38,7 @@ export class CompanyService {
         const companies = await this._repository.getCompanyList();
 
         // We will then filter on only authorized companies
-        return companies.filter((c) => this._isUserAuthorizedForCompany(c));
+        return companies.filter((c) => this.isUserAuthorizedForCompany(c));
     }
 
     /*
@@ -50,8 +50,8 @@ export class CompanyService {
         const data = await this._repository.getCompanyTransactions(companyId);
 
         // If the user is unauthorized or data was not found then return 404
-        if (!data || !this._isUserAuthorizedForCompany(data.company)) {
-            throw this._unauthorizedError(companyId);
+        if (!data || !this.isUserAuthorizedForCompany(data.company)) {
+            throw this.unauthorizedError(companyId);
         }
 
         return data;
@@ -60,7 +60,7 @@ export class CompanyService {
     /*
      * A simple example of applying domain specific claims
      */
-    private _isUserAuthorizedForCompany(company: Company): boolean {
+    private isUserAuthorizedForCompany(company: Company): boolean {
 
         // The admin role is granted access to all resources
         const role = ClaimsReader.getStringClaim(this._claims.jwt, CustomClaimNames.role).toLowerCase();
@@ -83,7 +83,7 @@ export class CompanyService {
      * Return a 404 error if the user is not authorized
      * Requests for both unauthorized and non existent data are treated the same
      */
-    private _unauthorizedError(companyId: number): ClientError {
+    private unauthorizedError(companyId: number): ClientError {
 
         throw ErrorFactory.createClientError(
             404,

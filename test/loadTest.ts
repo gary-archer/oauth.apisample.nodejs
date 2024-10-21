@@ -40,7 +40,7 @@ export class LoadTest {
         // Get some access tokens to send to the API
         const startMessage = `Load test session ${this._sessionId} starting at ${new Date().toISOString()}\n`;
         console.log(color.blue(startMessage));
-        const accessTokens = await this._getAccessTokens();
+        const accessTokens = await this.getAccessTokens();
 
         // Show a startup table header
         const startTime = process.hrtime();
@@ -57,7 +57,7 @@ export class LoadTest {
         console.log(color.yellow(header));
 
         // Next execute the main body of requests
-        await this._sendLoadTestRequests(accessTokens);
+        await this.sendLoadTestRequests(accessTokens);
 
         // Report a summary of results
         const endTime = process.hrtime(startTime);
@@ -73,7 +73,7 @@ export class LoadTest {
     /*
      * Do some initial work to get multiple access tokens
      */
-    private async _getAccessTokens(): Promise<string[]> {
+    private async getAccessTokens(): Promise<string[]> {
 
         const accessTokens: string[] = [];
         for (let index = 0; index < 5; index++) {
@@ -91,7 +91,7 @@ export class LoadTest {
     /*
      * Run the main body of API requests, including some invalid requests that trigger errors
      */
-    private async _sendLoadTestRequests(accessTokens: string[]): Promise<void> {
+    private async sendLoadTestRequests(accessTokens: string[]): Promise<void> {
 
         // Next produce some requests that will run in parallel
         const requests: (() => Promise<ApiResponse>)[] = [];
@@ -106,35 +106,35 @@ export class LoadTest {
             // Create some promises for various API endpoints
             if (index % 5 === 0) {
 
-                requests.push(this._createUserInfoRequest(accessToken));
+                requests.push(this.createUserInfoRequest(accessToken));
 
             } else if (index % 5 === 1) {
 
-                requests.push(this._createTransactionsRequest(accessToken, 2));
+                requests.push(this.createTransactionsRequest(accessToken, 2));
 
             } else if (index % 5 === 2) {
 
                 // On request 71 try to access unauthorized data for company 3, to create a 404 error
                 const companyId = (index === 72) ? 3 : 2;
-                requests.push(this._createTransactionsRequest(accessToken, companyId));
+                requests.push(this.createTransactionsRequest(accessToken, companyId));
 
             } else {
 
-                requests.push(this._createCompaniesRequest(accessToken));
+                requests.push(this.createCompaniesRequest(accessToken));
             }
         }
 
         // Fire the API requests in batches
-        await this._executeApiRequests(requests);
+        await this.executeApiRequests(requests);
     }
 
     /*
      * Create a user info request callback
      */
-    private _createUserInfoRequest(accessToken: string): () => Promise<ApiResponse> {
+    private createUserInfoRequest(accessToken: string): () => Promise<ApiResponse> {
 
         const options = new ApiRequestOptions(accessToken);
-        this._initializeApiRequest(options);
+        this.initializeApiRequest(options);
 
         return () => this._apiClient.getUserInfoClaims(options);
     }
@@ -142,10 +142,10 @@ export class LoadTest {
     /*
      * Create a get companies request callback
      */
-    private _createCompaniesRequest(accessToken: string): () => Promise<ApiResponse> {
+    private createCompaniesRequest(accessToken: string): () => Promise<ApiResponse> {
 
         const options = new ApiRequestOptions(accessToken);
-        this._initializeApiRequest(options);
+        this.initializeApiRequest(options);
 
         return () => this._apiClient.getCompanyList(options);
     }
@@ -153,10 +153,10 @@ export class LoadTest {
     /*
      * Create a get transactions request callback
      */
-    private _createTransactionsRequest(accessToken: string, companyId: number): () => Promise<ApiResponse> {
+    private createTransactionsRequest(accessToken: string, companyId: number): () => Promise<ApiResponse> {
 
         const options = new ApiRequestOptions(accessToken);
-        this._initializeApiRequest(options);
+        this.initializeApiRequest(options);
 
         return () => this._apiClient.getCompanyTransactions(options, companyId);
     }
@@ -164,7 +164,7 @@ export class LoadTest {
     /*
      * Set any special logic before sending an API request
      */
-    private _initializeApiRequest(options: ApiRequestOptions): void {
+    private initializeApiRequest(options: ApiRequestOptions): void {
 
         // On request 85 we'll simulate a 500 error via a custom header
         this._totalCount++;
@@ -177,7 +177,7 @@ export class LoadTest {
      * Issue API requests in batches of 5, to avoid excessive queueing on a development computer
      * By default there is a limit of 5 concurrent outgoing requests to a single host
      */
-    private async _executeApiRequests(requests: (() => Promise<ApiResponse>)[]): Promise<void> {
+    private async executeApiRequests(requests: (() => Promise<ApiResponse>)[]): Promise<void> {
 
         // Set counters
         const total = requests.length;
@@ -191,7 +191,7 @@ export class LoadTest {
             const requestBatch = requests.slice(current, Math.min(current + batchSize, total));
 
             // Execute them to create promises
-            const batchPromises = requestBatch.map((r) => this._executeApiRequest(r));
+            const batchPromises = requestBatch.map((r) => this.executeApiRequest(r));
 
             // Wait for the batch to complete
             await Promise.all(batchPromises);
@@ -202,7 +202,7 @@ export class LoadTest {
     /*
      * Start execution and return a success promise regardless of whether the API call succeeded
      */
-    private _executeApiRequest(callback: () => Promise<ApiResponse>): Promise<ApiResponse> {
+    private executeApiRequest(callback: () => Promise<ApiResponse>): Promise<ApiResponse> {
 
         return new Promise<ApiResponse>((resolve) => {
 
@@ -212,12 +212,12 @@ export class LoadTest {
                 if (response.statusCode >= 200 && response.statusCode <= 299) {
 
                     // Report successful requests
-                    console.log(color.green(this._formatMetrics(response)));
+                    console.log(color.green(this.formatMetrics(response)));
 
                 } else {
 
                     // Report failed requests, some of which are expected
-                    console.log(color.red(this._formatMetrics(response)));
+                    console.log(color.red(this.formatMetrics(response)));
                     this._errorCount++;
                 }
 
@@ -230,7 +230,7 @@ export class LoadTest {
     /*
      * Get metrics as a table row
      */
-    private _formatMetrics(response: ApiResponse): string {
+    private formatMetrics(response: ApiResponse): string {
 
         let errorCode = '';
         let errorId   = '';

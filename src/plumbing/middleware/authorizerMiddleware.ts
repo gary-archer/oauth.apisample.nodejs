@@ -13,7 +13,7 @@ import {OAuthFilter} from '../oauth/oauthFilter.js';
 export class AuthorizerMiddleware {
 
     public constructor() {
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     /*
@@ -52,7 +52,7 @@ export class AuthorizerMiddleware {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.execute = this.execute.bind(this);
     }
 }

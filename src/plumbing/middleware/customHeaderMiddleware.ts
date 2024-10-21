@@ -11,7 +11,7 @@ export class CustomHeaderMiddleware {
 
     public constructor(apiName: string) {
         this._apiName = apiName.toLowerCase();
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     /*
@@ -36,7 +36,7 @@ export class CustomHeaderMiddleware {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.execute = this.execute.bind(this);
     }
 }

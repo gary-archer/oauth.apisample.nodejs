@@ -132,19 +132,11 @@ export class LogEntryImpl implements LogEntry {
      */
     public write(): void {
 
-        this._writeDataItem(this._data);
-    }
-
-    /*
-     * Write a single data item
-     */
-    private _writeDataItem(item: LogEntryData): void {
-
         // Get the object to log
-        const logData = item.toLogFormat();
+        const logData = this._data.toLogFormat();
 
         // Output it
-        if (item.errorData) {
+        if (this._data.errorData) {
             this._logger.error(logData);
         } else {
             this._logger.info(logData);

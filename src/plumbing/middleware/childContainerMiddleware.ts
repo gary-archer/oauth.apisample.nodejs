@@ -10,7 +10,7 @@ export class ChildContainerMiddleware {
 
     public constructor(container: Container) {
         this._container = container;
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     public execute(request: Request, response: Response, next: NextFunction): void {
@@ -26,7 +26,7 @@ export class ChildContainerMiddleware {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.execute = this.execute.bind(this);
     }
 }

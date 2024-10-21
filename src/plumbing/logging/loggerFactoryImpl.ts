@@ -49,11 +49,11 @@ export class LoggerFactoryImpl implements LoggerFactory {
 
         // Create the production logger
         const productionLogConfig = configuration.production;
-        this._createProductionLogger(productionLogConfig.level, productionLogConfig.transports);
+        this.createProductionLogger(productionLogConfig.level, productionLogConfig.transports);
 
         // Create development loggers
         const developmentLogConfig = configuration.development;
-        this._createDevelopmentLoggers(developmentLogConfig);
+        this.createDevelopmentLoggers(developmentLogConfig);
     }
 
     /*
@@ -63,7 +63,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
 
         // Create a default production logger if configuration is not loaded yet
         if (!winston.loggers.has(PRODUCTION_LOGGER_NAME)) {
-            this._createProductionLogger('info', [{type: 'console'}]);
+            this.createProductionLogger('info', [{type: 'console'}]);
         }
 
         // Get the error into a loggable format
@@ -72,7 +72,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
         // Create a log entry and set error details
         const logEntry = new LogEntryImpl(
             this._apiName,
-            this._getProductionLogger(),
+            this.getProductionLogger(),
             this._performanceThresholdMilliseconds);
 
         logEntry.setOperationName('startup');
@@ -98,14 +98,14 @@ export class LoggerFactoryImpl implements LoggerFactory {
      */
     public createLogEntry(): LogEntryImpl {
 
-        return new LogEntryImpl(this._apiName, this._getProductionLogger(), this._performanceThresholdMilliseconds);
+        return new LogEntryImpl(this._apiName, this.getProductionLogger(), this._performanceThresholdMilliseconds);
     }
 
     /*
      * There is a single production logger which writes a structured and queryable log entry for each API request
      * It should be configured to be always on in all environments
      */
-    private _createProductionLogger(level: string, transportsConfig: any[]): void {
+    private createProductionLogger(level: string, transportsConfig: any[]): void {
 
         const transports = [];
 
@@ -135,7 +135,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
         // Create the file transport, which is used for log shipping from a developer PC
         const fileTransportConfig = transportsConfig.find((a: any) => a.type === 'file');
         if (fileTransportConfig) {
-            const fileTransport = this._createFileTransport(fileTransportConfig);
+            const fileTransport = this.createFileTransport(fileTransportConfig);
             if (fileTransport) {
                 fileTransport.format = bareJsonFormatter;
                 transports.push(fileTransport);
@@ -153,7 +153,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
     /*
      * Return the production logger, which logs every request as a JSON object
      */
-    private _getProductionLogger(): winston.Logger {
+    private getProductionLogger(): winston.Logger {
         return winston.loggers.get(PRODUCTION_LOGGER_NAME);
     }
 
@@ -161,10 +161,10 @@ export class LoggerFactoryImpl implements LoggerFactory {
      * Development loggers run only on a developer PC and should be used sparingly
      * The output is not useful in production since it has insufficient context and is not queryable
      */
-    private _createDevelopmentLoggers(developmentLogConfig: any): void {
+    private createDevelopmentLoggers(developmentLogConfig: any): void {
 
         // Create the root logger
-        this._createDevelopmentLogger(ROOT_DEVELOPMENT_LOGGER_NAME, developmentLogConfig.level);
+        this.createDevelopmentLogger(ROOT_DEVELOPMENT_LOGGER_NAME, developmentLogConfig.level);
 
         // Add extra loggers per class if configured
         if (developmentLogConfig.overrideLevels) {
@@ -172,7 +172,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
                 if (name) {
 
                     const level = developmentLogConfig.overrideLevels[name];
-                    this._createDevelopmentLogger(name, level);
+                    this.createDevelopmentLogger(name, level);
                 }
             }
         }
@@ -182,14 +182,14 @@ export class LoggerFactoryImpl implements LoggerFactory {
      * Create a single development logger
      * Development loggers intentionally only support a console logger
      */
-    private _createDevelopmentLogger(name: string, level: string): void {
+    private createDevelopmentLogger(name: string, level: string): void {
 
         const transports = [];
         transports.push(new winston.transports.Console());
 
         const options = {
             transports,
-            format: this._createDevelopmentFormatter(name),
+            format: this.createDevelopmentFormatter(name),
             level,
         } as LoggerOptions;
 
@@ -199,7 +199,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
     /*
      * A utility method to create the file transport consistently
      */
-    private _createFileTransport(transportConfig: any): Transport {
+    private createFileTransport(transportConfig: any): Transport {
 
         const options = {
             filename: `${transportConfig.filePrefix}-%DATE%.log`,
@@ -215,7 +215,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
     /*
      * Create the formatter for development text output in a parameterised manner
      */
-    private _createDevelopmentFormatter(loggerName: string): any {
+    private createDevelopmentFormatter(loggerName: string): any {
 
         return winston.format.combine(
             winston.format.colorize(),

@@ -17,7 +17,7 @@ export class UserInfoController {
 
     public constructor(@inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
         this._claims = claims.extra as SampleExtraClaims;
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     /*
@@ -35,7 +35,7 @@ export class UserInfoController {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.getUserInfo = this.getUserInfo.bind(this);
     }
 }

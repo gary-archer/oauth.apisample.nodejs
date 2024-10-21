@@ -18,7 +18,7 @@ export class CompanyController {
 
     public constructor(@inject(SAMPLETYPES.CompanyService) service: CompanyService) {
         this._service = service;
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     /*
@@ -52,7 +52,7 @@ export class CompanyController {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.getCompanyList = this.getCompanyList.bind(this);
         this.getCompanyTransactions = this.getCompanyTransactions.bind(this);
     }

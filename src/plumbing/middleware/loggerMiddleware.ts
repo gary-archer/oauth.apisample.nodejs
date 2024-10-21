@@ -16,7 +16,7 @@ export class LoggerMiddleware {
 
     public constructor(loggerFactory: LoggerFactory) {
         this._loggerFactory = loggerFactory as LoggerFactoryImpl;
-        this._setupCallbacks();
+        this.setupCallbacks();
     }
 
     /*
@@ -54,7 +54,7 @@ export class LoggerMiddleware {
     /*
      * Plumbing to ensure the this parameter is available
      */
-    private _setupCallbacks(): void {
+    private setupCallbacks(): void {
         this.execute = this.execute.bind(this);
     }
 }

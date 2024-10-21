@@ -82,16 +82,16 @@ export class BaseCompositionRoot {
      */
     public register(): BaseCompositionRoot {
 
-        this._registerBaseDependencies();
-        this._registerOAuthDependencies();
-        this._registerClaimsDependencies();
+        this.registerBaseDependencies();
+        this.registerOAuthDependencies();
+        this.registerClaimsDependencies();
         return this;
     }
 
     /*
      * Register dependencies for logging and error handling
      */
-    private _registerBaseDependencies(): void {
+    private registerBaseDependencies(): void {
 
         // Singletons
         this._container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
@@ -111,7 +111,7 @@ export class BaseCompositionRoot {
     /*
      * Register OAuth depencencies
      */
-    private _registerOAuthDependencies(): void {
+    private registerOAuthDependencies(): void {
 
         // Make the configuration injectable
         this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
@@ -133,7 +133,7 @@ export class BaseCompositionRoot {
     /*
      * Register claims related depencencies
      */
-    private _registerClaimsDependencies(): void {
+    private registerClaimsDependencies(): void {
 
         // Register the singleton cache
         const claimsCache = new ClaimsCache(
