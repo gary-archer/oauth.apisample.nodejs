@@ -9,18 +9,18 @@ import {MockTokenOptions} from './mockTokenOptions.js';
  */
 export class MockAuthorizationServer {
 
-    private readonly _baseUrl: string;
-    private readonly _httpProxy: HttpProxy;
-    private readonly _algorithm: string;
-    private _jwk!: GenerateKeyPairResult<KeyLike>;
-    private _keyId: string;
+    private readonly baseUrl: string;
+    private readonly httpProxy: HttpProxy;
+    private readonly algorithm: string;
+    private jwk!: GenerateKeyPairResult<KeyLike>;
+    private keyId: string;
 
     public constructor(useProxy: boolean) {
 
-        this._baseUrl = 'https://login.authsamples-dev.com:447/__admin/mappings';
-        this._httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
-        this._algorithm = 'ES256';
-        this._keyId = Guid.create().toString();
+        this.baseUrl = 'https://login.authsamples-dev.com:447/__admin/mappings';
+        this.httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
+        this.algorithm = 'ES256';
+        this.keyId = Guid.create().toString();
     }
 
     /*
@@ -29,12 +29,12 @@ export class MockAuthorizationServer {
     public async start(): Promise<void> {
 
         // Generate a JSON Web Key for our token issuing
-        this._jwk = await generateKeyPair(this._algorithm);
+        this.jwk = await generateKeyPair(this.algorithm);
 
         // Get the JSON Web Key Set containing the public key
-        const jwk = await exportJWK(this._jwk.publicKey);
-        jwk.kid = this._keyId;
-        jwk.alg = this._algorithm;
+        const jwk = await exportJWK(this.jwk.publicKey);
+        jwk.kid = this.keyId;
+        jwk.alg = this.algorithm;
         const keys = {
             keys: [
                 jwk,
@@ -44,7 +44,7 @@ export class MockAuthorizationServer {
 
         // Publish the public keys at a Wiremock JWKS URI
         const stubbedResponse = {
-            id: this._keyId,
+            id: this.keyId,
             priority: 1,
             request: {
                 method: 'GET',
@@ -63,7 +63,7 @@ export class MockAuthorizationServer {
      * Free resources at the end of the test run
      */
     public async stop(): Promise<void> {
-        await this._unregister(this._keyId);
+        await this._unregister(this.keyId);
     }
 
     /*
@@ -73,7 +73,7 @@ export class MockAuthorizationServer {
         options: MockTokenOptions,
         jwk: GenerateKeyPairResult<KeyLike> | null = null): Promise<string> {
 
-        const jwkToUse = jwk || this._jwk;
+        const jwkToUse = jwk || this.jwk;
         return await new SignJWT( {
             iss: options.issuer,
             aud: options.audience,
@@ -82,7 +82,7 @@ export class MockAuthorizationServer {
             manager_id: options.managerId,
             role: options.role,
         })
-            .setProtectedHeader( { kid: this._keyId, alg: this._algorithm } )
+            .setProtectedHeader( { kid: this.keyId, alg: this.algorithm } )
             .setExpirationTime(options.expiryTime)
             .sign(jwkToUse.privateKey);
     }
@@ -93,13 +93,13 @@ export class MockAuthorizationServer {
     private async _register(stubbedResponse: any): Promise<void> {
 
         const options = {
-            url: this._baseUrl,
+            url: this.baseUrl,
             method: 'POST',
             data: stubbedResponse,
             headers: {
                 'content-type': 'application/json',
             },
-            httpsAgent: this._httpProxy.agent,
+            httpsAgent: this.httpProxy.agent,
         } as AxiosRequestConfig;
 
         const response = await axios(options);
@@ -114,9 +114,9 @@ export class MockAuthorizationServer {
     private async _unregister(id: string): Promise<void> {
 
         const options = {
-            url: `${this._baseUrl}/${id}`,
+            url: `${this.baseUrl}/${id}`,
             method: 'DELETE',
-            httpsAgent: this._httpProxy.agent,
+            httpsAgent: this.httpProxy.agent,
         } as AxiosRequestConfig;
 
         const response = await axios(options);

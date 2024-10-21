@@ -17,8 +17,8 @@ const PRODUCTION_LOGGER_NAME = 'production';
  */
 export class LoggerFactoryImpl implements LoggerFactory {
 
-    private _apiName: string;
-    private _performanceThresholdMilliseconds: number;
+    private apiName: string;
+    private performanceThresholdMilliseconds: number;
 
     /*
      * We create the logger factory before reading configuration, since we need to log problems loading configuration
@@ -26,8 +26,8 @@ export class LoggerFactoryImpl implements LoggerFactory {
     public constructor() {
 
         // Initialise logging fields
-        this._apiName = '';
-        this._performanceThresholdMilliseconds = 1000;
+        this.apiName = '';
+        this.performanceThresholdMilliseconds = 1000;
 
         // Initialise console colours
         winston.addColors({
@@ -44,8 +44,8 @@ export class LoggerFactoryImpl implements LoggerFactory {
     public configure(configuration: LoggingConfiguration): void {
 
         // Initialise behaviour
-        this._apiName = configuration.apiName;
-        this._performanceThresholdMilliseconds = configuration.production.performanceThresholdMilliseconds;
+        this.apiName = configuration.apiName;
+        this.performanceThresholdMilliseconds = configuration.production.performanceThresholdMilliseconds;
 
         // Create the production logger
         const productionLogConfig = configuration.production;
@@ -71,9 +71,9 @@ export class LoggerFactoryImpl implements LoggerFactory {
 
         // Create a log entry and set error details
         const logEntry = new LogEntryImpl(
-            this._apiName,
+            this.apiName,
             this.getProductionLogger(),
-            this._performanceThresholdMilliseconds);
+            this.performanceThresholdMilliseconds);
 
         logEntry.setOperationName('startup');
         logEntry.setServerError(error);
@@ -98,7 +98,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
      */
     public createLogEntry(): LogEntryImpl {
 
-        return new LogEntryImpl(this._apiName, this.getProductionLogger(), this._performanceThresholdMilliseconds);
+        return new LogEntryImpl(this.apiName, this.getProductionLogger(), this.performanceThresholdMilliseconds);
     }
 
     /*

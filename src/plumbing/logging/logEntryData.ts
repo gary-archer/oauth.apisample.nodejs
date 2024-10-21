@@ -101,7 +101,7 @@ export class LogEntryData {
      * Set fields at the end of a log entry
      */
     public finalise(): void {
-        this.millisecondsTaken = this.performance.millisecondsTaken;
+        this.millisecondsTaken = this.performance.getMillisecondsTaken();
     }
 
     /*
@@ -124,7 +124,7 @@ export class LogEntryData {
         this.outputNumber((x) => output.statusCode = x, this.statusCode);
         this.outputString((x) => output.errorCode = x, this.errorCode);
         this.outputNumber((x) => output.errorId = x, this.errorId);
-        this.outputNumber((x) => output.millisecondsTaken = x, this.performance.millisecondsTaken, true);
+        this.outputNumber((x) => output.millisecondsTaken = x, this.performance.getMillisecondsTaken(), true);
         this.outputString((x) => output.correlationId = x, this.correlationId);
         this.outputString((x) => output.sessionId = x, this.sessionId);
 
@@ -167,7 +167,7 @@ export class LogEntryData {
      */
     private outputPerformance(output: any): void {
 
-        if (this.performance.millisecondsTaken >= this.performanceThresholdMilliseconds) {
+        if (this.performance.getMillisecondsTaken() >= this.performanceThresholdMilliseconds) {
             output.performance = this.performance.data;
         }
     }

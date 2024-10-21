@@ -13,15 +13,15 @@ import {JsonFileReader} from '../utilities/jsonFileReader.js';
 @injectable()
 export class CompanyRepository {
 
-    private readonly _jsonReader: JsonFileReader;
-    private readonly _logEntry: LogEntry;
+    private readonly jsonReader: JsonFileReader;
+    private readonly logEntry: LogEntry;
 
     public constructor(
         @inject(SAMPLETYPES.JsonFileReader) jsonReader: JsonFileReader,
         @inject(BASETYPES.LogEntry) logEntry: LogEntry) {
 
-        this._jsonReader = jsonReader;
-        this._logEntry = logEntry;
+        this.jsonReader = jsonReader;
+        this.logEntry = logEntry;
         this.setupCallbacks();
     }
 
@@ -30,9 +30,9 @@ export class CompanyRepository {
      */
     public async getCompanyList(): Promise<Company[]> {
 
-        return using(this._logEntry.createPerformanceBreakdown('selectCompanyListData'), async () => {
+        return using(this.logEntry.createPerformanceBreakdown('selectCompanyListData'), async () => {
 
-            return this._jsonReader.readData<Company[]>('data/companyList.json');
+            return this.jsonReader.readData<Company[]>('data/companyList.json');
         });
     }
 
@@ -41,16 +41,16 @@ export class CompanyRepository {
      */
     public async getCompanyTransactions(companyId: number): Promise<CompanyTransactions | null> {
 
-        return using(this._logEntry.createPerformanceBreakdown('selectCompanyTransactionsData'), async () => {
+        return using(this.logEntry.createPerformanceBreakdown('selectCompanyTransactionsData'), async () => {
 
             // Read companies and find that supplied
-            const companyList = await this._jsonReader.readData<Company[]>('data/companyList.json');
+            const companyList = await this.jsonReader.readData<Company[]>('data/companyList.json');
             const foundCompany = companyList.find((c) => c.id === companyId);
             if (foundCompany) {
 
                 // Next read transactions from the database
                 const companyTransactions =
-                    await this._jsonReader.readData<CompanyTransactions[]>('data/companyTransactions.json');
+                    await this.jsonReader.readData<CompanyTransactions[]>('data/companyTransactions.json');
 
                 // Then join the data
                 const foundTransactions = companyTransactions.find((ct) => ct.id === companyId);

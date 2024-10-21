@@ -11,11 +11,11 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
  */
 export class LoggerMiddleware {
 
-    private readonly _loggerFactory: LoggerFactoryImpl;
-    private _routeMetadataHandler!: RouteMetadataHandler;
+    private readonly loggerFactory: LoggerFactoryImpl;
+    private routeMetadataHandler!: RouteMetadataHandler;
 
     public constructor(loggerFactory: LoggerFactory) {
-        this._loggerFactory = loggerFactory as LoggerFactoryImpl;
+        this.loggerFactory = loggerFactory as LoggerFactoryImpl;
         this.setupCallbacks();
     }
 
@@ -23,7 +23,7 @@ export class LoggerMiddleware {
      * Set metadata details needed to log particular request fields
      */
     public setRouteMetadataHandler(routeMetadataHandler: RouteMetadataHandler): void {
-        this._routeMetadataHandler = routeMetadataHandler;
+        this.routeMetadataHandler = routeMetadataHandler;
     }
 
     /*
@@ -32,14 +32,14 @@ export class LoggerMiddleware {
     public execute(request: Request, response: Response, next: NextFunction): void {
 
         // Create the log entry for this API request
-        const logEntry = this._loggerFactory.createLogEntry();
+        const logEntry = this.loggerFactory.createLogEntry();
 
         // Register it against this request's child container so that it can be injected into other places
         const container = response.locals.container as Container;
         container.bind<LogEntry>(BASETYPES.LogEntry).toConstantValue(logEntry);
 
         // Start the log entry for this API request
-        const routeMetadata = this._routeMetadataHandler.getOperationRouteInfo(request);
+        const routeMetadata = this.routeMetadataHandler.getOperationRouteInfo(request);
         logEntry.start(request, routeMetadata);
 
         // Write the log entry when the finish event fires

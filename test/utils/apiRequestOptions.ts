@@ -3,43 +3,43 @@
  */
 export class ApiRequestOptions {
 
-    private readonly _accessToken: string;
-    private _httpMethod: string;
-    private _apiPath: string;
-    private _rehearseException: boolean;
+    private readonly accessToken: string;
+    private httpMethod: string;
+    private apiPath: string;
+    private rehearseException: boolean;
 
     public constructor(accessToken: string) {
-        this._accessToken = accessToken;
-        this._httpMethod = '';
-        this._apiPath = '';
-        this._rehearseException = false;
+        this.accessToken = accessToken;
+        this.httpMethod = '';
+        this.apiPath = '';
+        this.rehearseException = false;
     }
 
-    public get accessToken(): string {
-        return this._accessToken;
+    public getAccessToken(): string {
+        return this.accessToken;
     }
 
-    public set httpMethod(value: string) {
-        this._httpMethod = value;
+    public setHttpMethod(value: string): void {
+        this.httpMethod = value;
     }
 
-    public get httpMethod(): string {
-        return this._httpMethod;
+    public getHttpMethod(): string {
+        return this.httpMethod;
     }
 
-    public set apiPath(value: string) {
-        this._apiPath = value;
+    public setApiPath(value: string): void {
+        this.apiPath = value;
     }
 
-    public get apiPath(): string {
-        return this._apiPath;
+    public getApiPath(): string {
+        return this.apiPath;
     }
 
-    public set rehearseException(value: boolean) {
-        this._rehearseException = value;
+    public setRehearseException(value: boolean): void {
+        this.rehearseException = value;
     }
 
-    public get rehearseException(): boolean {
-        return this._rehearseException;
+    public getRehearseException(): boolean {
+        return this.rehearseException;
     }
 }

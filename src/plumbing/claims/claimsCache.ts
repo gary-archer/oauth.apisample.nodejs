@@ -11,10 +11,10 @@ import {ExtraClaimsProvider} from './extraClaimsProvider.js';
 @injectable()
 export class ClaimsCache {
 
-    private readonly _cache: NodeCache;
-    private readonly _defaultTimeToLiveSeconds: number;
-    private readonly _extraClaimsProvider: ExtraClaimsProvider;
-    private readonly _traceLogger: Logger;
+    private readonly cache: NodeCache;
+    private readonly defaultTimeToLiveSeconds: number;
+    private readonly extraClaimsProvider: ExtraClaimsProvider;
+    private readonly traceLogger: Logger;
 
     /*
      * Create the cache at application startup
@@ -24,19 +24,19 @@ export class ClaimsCache {
         extraClaimsProvider: ExtraClaimsProvider,
         loggerFactory: LoggerFactory) {
 
-        this._extraClaimsProvider = extraClaimsProvider;
-        this._traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
+        this.extraClaimsProvider = extraClaimsProvider;
+        this.traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
-        this._defaultTimeToLiveSeconds = timeToLiveMinutes * 60;
-        this._cache = new NodeCache({
-            stdTTL: this._defaultTimeToLiveSeconds,
+        this.defaultTimeToLiveSeconds = timeToLiveMinutes * 60;
+        this.cache = new NodeCache({
+            stdTTL: this.defaultTimeToLiveSeconds,
         });
 
         // If required add debug output here to verify expiry occurs when expected
         /* eslint-disable @typescript-eslint/no-unused-vars */
-        this._cache.on('expired', (key: string, value: any) => {
-            this._traceLogger.debug(`Expired token has been removed from the cache (hash: ${key})`);
+        this.cache.on('expired', (key: string, value: any) => {
+            this.traceLogger.debug(`Expired token has been removed from the cache (hash: ${key})`);
         });
     }
 
@@ -54,19 +54,19 @@ export class ClaimsCache {
         if (secondsToCache > 0) {
 
             // Output debug info
-            this._traceLogger.debug(
+            this.traceLogger.debug(
                 `Token to be cached will expire in ${secondsToCache} seconds (hash: ${accessTokenHash})`);
 
             // Do not exceed the maximum time we configured
-            if (secondsToCache > this._defaultTimeToLiveSeconds) {
-                secondsToCache = this._defaultTimeToLiveSeconds;
+            if (secondsToCache > this.defaultTimeToLiveSeconds) {
+                secondsToCache = this.defaultTimeToLiveSeconds;
             }
 
             // Cache the claims until the above time
-            this._traceLogger.debug(
+            this.traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
             const claimsText = JSON.stringify(dataAsJson);
-            this._cache.set(accessTokenHash, claimsText, secondsToCache);
+            this.cache.set(accessTokenHash, claimsText, secondsToCache);
         }
     }
 
@@ -76,19 +76,19 @@ export class ClaimsCache {
     public getExtraUserClaims(accessTokenHash: string): ExtraClaims | null {
 
         // Get the token hash and see if it exists in the cache
-        const claimsText = this._cache.get<string>(accessTokenHash);
+        const claimsText = this.cache.get<string>(accessTokenHash);
         if (!claimsText) {
 
             // If this is a new token and we need to do claims processing
-            this._traceLogger.debug(`New token will be added to claims cache (hash: ${accessTokenHash})`);
+            this.traceLogger.debug(`New token will be added to claims cache (hash: ${accessTokenHash})`);
             return null;
         }
 
         // Otherwise return cached claims
-        this._traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
+        this.traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
 
         // Get the data in way that handles private property names
         const dataAsJson = JSON.parse(claimsText);
-        return this._extraClaimsProvider.deserializeFromCache(dataAsJson);
+        return this.extraClaimsProvider.deserializeFromCache(dataAsJson);
     }
 }

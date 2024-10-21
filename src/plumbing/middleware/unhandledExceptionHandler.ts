@@ -12,11 +12,11 @@ import {LogEntryImpl} from '../logging/logEntryImpl.js';
  */
 export class UnhandledExceptionHandler {
 
-    private readonly _configuration: LoggingConfiguration;
+    private readonly configuration: LoggingConfiguration;
 
     public constructor(configuration: LoggingConfiguration) {
 
-        this._configuration = configuration;
+        this.configuration = configuration;
         this.setupCallbacks();
     }
 
@@ -38,7 +38,7 @@ export class UnhandledExceptionHandler {
         if (error instanceof ServerError) {
 
             logEntry.setServerError(error);
-            clientError = error.toClientError(this._configuration.apiName);
+            clientError = error.toClientError(this.configuration.apiName);
 
         } else {
 

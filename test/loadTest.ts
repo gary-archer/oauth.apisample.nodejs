@@ -11,21 +11,21 @@ import {MockTokenOptions} from './utils/mockTokenOptions.js';
  */
 export class LoadTest {
 
-    private readonly _authorizationServer: MockAuthorizationServer;
-    private readonly _apiClient: ApiClient;
-    private readonly _sessionId: string;
-    private _totalCount: number;
-    private _errorCount: number;
+    private readonly authorizationServer: MockAuthorizationServer;
+    private readonly apiClient: ApiClient;
+    private readonly sessionId: string;
+    private totalCount: number;
+    private errorCount: number;
 
     public constructor() {
 
         const useProxy = false;
-        this._authorizationServer = new MockAuthorizationServer(useProxy);
+        this.authorizationServer = new MockAuthorizationServer(useProxy);
         const apiBaseUrl = 'https://api.authsamples-dev.com:446';
-        this._sessionId = Guid.create().toString();
-        this._apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this._sessionId, useProxy);
-        this._totalCount = 0;
-        this._errorCount = 0;
+        this.sessionId = Guid.create().toString();
+        this.apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this.sessionId, useProxy);
+        this.totalCount = 0;
+        this.errorCount = 0;
     }
 
     /*
@@ -35,10 +35,10 @@ export class LoadTest {
     public async execute(): Promise<void> {
 
         // First prepare the system
-        await this._authorizationServer.start();
+        await this.authorizationServer.start();
 
         // Get some access tokens to send to the API
-        const startMessage = `Load test session ${this._sessionId} starting at ${new Date().toISOString()}\n`;
+        const startMessage = `Load test session ${this.sessionId} starting at ${new Date().toISOString()}\n`;
         console.log(color.blue(startMessage));
         const accessTokens = await this.getAccessTokens();
 
@@ -62,12 +62,12 @@ export class LoadTest {
         // Report a summary of results
         const endTime = process.hrtime(startTime);
         const millisecondsTaken = Math.floor((endTime[0] * 1000000000 + endTime[1]) / 1000000);
-        const endMessage = `Load test session ${this._sessionId} completed in ${millisecondsTaken} milliseconds`;
-        const errorStats = `${this._errorCount} errors from ${this._totalCount} requests`;
+        const endMessage = `Load test session ${this.sessionId} completed in ${millisecondsTaken} milliseconds`;
+        const errorStats = `${this.errorCount} errors from ${this.totalCount} requests`;
         console.log(color.blue(`\n${endMessage}: (${errorStats})`));
 
         // Clean up before exiting
-        await this._authorizationServer.stop();
+        await this.authorizationServer.stop();
     }
 
     /*
@@ -80,7 +80,7 @@ export class LoadTest {
 
             const jwtOptions = new MockTokenOptions();
             jwtOptions.useStandardUser();
-            const accessToken = await this._authorizationServer.issueAccessToken(jwtOptions);
+            const accessToken = await this.authorizationServer.issueAccessToken(jwtOptions);
             accessTokens.push(accessToken);
         }
 
@@ -136,7 +136,7 @@ export class LoadTest {
         const options = new ApiRequestOptions(accessToken);
         this.initializeApiRequest(options);
 
-        return () => this._apiClient.getUserInfoClaims(options);
+        return () => this.apiClient.getUserInfoClaims(options);
     }
 
     /*
@@ -147,7 +147,7 @@ export class LoadTest {
         const options = new ApiRequestOptions(accessToken);
         this.initializeApiRequest(options);
 
-        return () => this._apiClient.getCompanyList(options);
+        return () => this.apiClient.getCompanyList(options);
     }
 
     /*
@@ -158,7 +158,7 @@ export class LoadTest {
         const options = new ApiRequestOptions(accessToken);
         this.initializeApiRequest(options);
 
-        return () => this._apiClient.getCompanyTransactions(options, companyId);
+        return () => this.apiClient.getCompanyTransactions(options, companyId);
     }
 
     /*
@@ -167,9 +167,9 @@ export class LoadTest {
     private initializeApiRequest(options: ApiRequestOptions): void {
 
         // On request 85 we'll simulate a 500 error via a custom header
-        this._totalCount++;
-        if (this._totalCount === 85) {
-            options.rehearseException = true;
+        this.totalCount++;
+        if (this.totalCount === 85) {
+            options.setRehearseException(true);
         }
     }
 
@@ -218,7 +218,7 @@ export class LoadTest {
 
                     // Report failed requests, some of which are expected
                     console.log(color.red(this.formatMetrics(response)));
-                    this._errorCount++;
+                    this.errorCount++;
                 }
 
                 // Resolve the promise

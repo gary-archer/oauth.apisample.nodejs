@@ -16,8 +16,8 @@ import {RouteMetadata} from './routeMetadata.js';
 @injectable()
 export class LogEntryImpl implements LogEntry {
 
-    private readonly _logger: Logger;
-    private readonly _data: LogEntryData;
+    private readonly logger: Logger;
+    private readonly data: LogEntryData;
 
     /*
      * A log entry is created once per API request
@@ -25,13 +25,13 @@ export class LogEntryImpl implements LogEntry {
     public constructor(apiName: string, logger: Logger, performanceThresholdMilliseconds: number) {
 
         // Record the logger details
-        this._logger = logger;
+        this.logger = logger;
 
         // Initialise data
-        this._data = new LogEntryData();
-        this._data.apiName = apiName;
-        this._data.hostName = os.hostname();
-        this._data.performanceThresholdMilliseconds = performanceThresholdMilliseconds;
+        this.data = new LogEntryData();
+        this.data.apiName = apiName;
+        this.data.hostName = os.hostname();
+        this.data.performanceThresholdMilliseconds = performanceThresholdMilliseconds;
     }
 
     /*
@@ -40,30 +40,30 @@ export class LogEntryImpl implements LogEntry {
     public start(request: Request, routeMetadata: RouteMetadata | null): void {
 
         // Read request details
-        this._data.performance.start();
-        this._data.method = request.method;
-        this._data.path = request.originalUrl;
+        this.data.performance.start();
+        this.data.method = request.method;
+        this.data.path = request.originalUrl;
 
         // Our callers can supply a custom header so that we can keep track of who is calling each API
         const clientName = request.header('x-authsamples-api-client');
         if (clientName) {
-            this._data.clientName = clientName;
+            this.data.clientName = clientName;
         }
 
         // Use the correlation id from request headers or create one
         const correlationId = request.header('x-authsamples-correlation-id');
-        this._data.correlationId = correlationId ? correlationId : Guid.create().toString();
+        this.data.correlationId = correlationId ? correlationId : Guid.create().toString();
 
         // Log an optional session id if supplied
         const sessionId = request.header('x-authsamples-session-id');
         if (sessionId) {
-            this._data.sessionId = sessionId;
+            this.data.sessionId = sessionId;
         }
 
         // Record route metadata if available
         if (routeMetadata) {
-            this._data.operationName = routeMetadata.operationName;
-            this._data.resourceId = routeMetadata.resourceIds.join('/');
+            this.data.operationName = routeMetadata.operationName;
+            this.data.resourceId = routeMetadata.resourceIds.join('/');
         }
     }
 
@@ -71,45 +71,45 @@ export class LogEntryImpl implements LogEntry {
      * Add identity details for secured requests
      */
     public setIdentity(subject: string): void {
-        this._data.userId = subject;
+        this.data.userId = subject;
     }
 
     /*
      * An internal method for setting the operation name
      */
     public setOperationName(name: string): void {
-        this._data.operationName = name;
+        this.data.operationName = name;
     }
 
     /*
      * Create a child performance breakdown when requested
      */
     public createPerformanceBreakdown(name: string): PerformanceBreakdown {
-        return this._data.performance.createChild(name);
+        return this.data.performance.createChild(name);
     }
 
     /*
      * Add error details after they have been processed by the exception handler, including denormalised fields
      */
     public setServerError(error: ServerError): void {
-        this._data.errorData = error.toLogFormat(this._data.apiName);
-        this._data.errorCode = error.getErrorCode();
-        this._data.errorId = error.getInstanceId();
+        this.data.errorData = error.toLogFormat(this.data.apiName);
+        this.data.errorCode = error.getErrorCode();
+        this.data.errorId = error.getInstanceId();
     }
 
     /*
      * Add error details after they have been processed by the exception handler, including denormalised fields
      */
     public setClientError(error: ClientError): void {
-        this._data.errorData = error.toLogFormat();
-        this._data.errorCode = error.getErrorCode();
+        this.data.errorData = error.toLogFormat();
+        this.data.errorCode = error.getErrorCode();
     }
 
     /*
      * Enable free text to be added to production logs, though this should be avoided in most cases
      */
     public addInfo(info: any): void {
-        this._data.infoData.push(info);
+        this.data.infoData.push(info);
     }
 
     /*
@@ -118,13 +118,13 @@ export class LogEntryImpl implements LogEntry {
     public end(response: Response): void {
 
         // Finish performance measurements
-        this._data.performance.dispose();
+        this.data.performance.dispose();
 
         // Record response details
-        this._data.statusCode = response.statusCode;
+        this.data.statusCode = response.statusCode;
 
         // Finalise this log entry
-        this._data.finalise();
+        this.data.finalise();
     }
 
     /*
@@ -133,13 +133,13 @@ export class LogEntryImpl implements LogEntry {
     public write(): void {
 
         // Get the object to log
-        const logData = this._data.toLogFormat();
+        const logData = this.data.toLogFormat();
 
         // Output it
-        if (this._data.errorData) {
-            this._logger.error(logData);
+        if (this.data.errorData) {
+            this.logger.error(logData);
         } else {
-            this._logger.info(logData);
+            this.logger.info(logData);
         }
     }
 }

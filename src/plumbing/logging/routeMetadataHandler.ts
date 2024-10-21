@@ -8,12 +8,12 @@ import {ActionMetadataArgs } from 'routing-controllers/types/metadata/args/Actio
  */
 export class RouteMetadataHandler {
 
-    private readonly _basePath: string;
-    private readonly _metadata: MetadataArgsStorage;
+    private readonly basePath: string;
+    private readonly metadata: MetadataArgsStorage;
 
     public constructor(basePath: string, metadata: MetadataArgsStorage) {
-        this._basePath = basePath;
-        this._metadata = metadata;
+        this.basePath = basePath;
+        this.metadata = metadata;
     }
 
     /*
@@ -25,14 +25,14 @@ export class RouteMetadataHandler {
         const requestPath = (request.baseUrl + request.path).replace(/\/+$/, '');
         if (requestPath) {
 
-            for (const controller of this._metadata.controllers) {
+            for (const controller of this.metadata.controllers) {
 
-                for (const action of this._metadata.actions) {
+                for (const action of this.metadata.actions) {
 
                     if (controller.target === action.target) {
 
                         // Get the operation path, such as 'investments/companies/:id/transactions'
-                        const operationPath = this._basePath + controller.route + action.route;
+                        const operationPath = this.basePath + controller.route + action.route;
 
                         // Return a match if found
                         const routeInfo = this.getMatchingRouteInfo(

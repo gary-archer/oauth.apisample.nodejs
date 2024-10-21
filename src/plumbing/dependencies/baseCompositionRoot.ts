@@ -19,23 +19,23 @@ import {HttpProxy} from '../utilities/httpProxy.js';
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class BaseCompositionRoot {
 
-    private readonly _container: Container;
-    private _oauthConfiguration?: OAuthConfiguration;
-    private _extraClaimsProvider?: ExtraClaimsProvider;
-    private _loggingConfiguration?: LoggingConfiguration;
-    private _loggerFactory?: LoggerFactory;
-    private _exceptionHandler?: UnhandledExceptionHandler;
-    private _httpProxy?: HttpProxy;
+    private readonly container: Container;
+    private oauthConfiguration?: OAuthConfiguration;
+    private extraClaimsProvider?: ExtraClaimsProvider;
+    private loggingConfiguration?: LoggingConfiguration;
+    private loggerFactory?: LoggerFactory;
+    private exceptionHandler?: UnhandledExceptionHandler;
+    private httpProxy?: HttpProxy;
 
     public constructor(container: Container) {
-        this._container = container;
+        this.container = container;
     }
 
     /*
      * Indicate that we're using OAuth and receive the configuration
      */
     public useOAuth(oauthConfiguration: OAuthConfiguration): BaseCompositionRoot {
-        this._oauthConfiguration = oauthConfiguration;
+        this.oauthConfiguration = oauthConfiguration;
         return this;
     }
 
@@ -43,7 +43,7 @@ export class BaseCompositionRoot {
      * An object to provide extra claims when a new token is processed
      */
     public withExtraClaimsProvider(extraClaimsProvider: ExtraClaimsProvider): BaseCompositionRoot {
-        this._extraClaimsProvider = extraClaimsProvider;
+        this.extraClaimsProvider = extraClaimsProvider;
         return this;
     }
 
@@ -54,8 +54,8 @@ export class BaseCompositionRoot {
         loggingConfiguration: LoggingConfiguration,
         loggerFactory: LoggerFactory): BaseCompositionRoot {
 
-        this._loggingConfiguration = loggingConfiguration;
-        this._loggerFactory = loggerFactory;
+        this.loggingConfiguration = loggingConfiguration;
+        this.loggerFactory = loggerFactory;
         return this;
     }
 
@@ -64,7 +64,7 @@ export class BaseCompositionRoot {
      */
     public withExceptionHandler(exceptionHandler: UnhandledExceptionHandler): BaseCompositionRoot {
 
-        this._exceptionHandler = exceptionHandler;
+        this.exceptionHandler = exceptionHandler;
         return this;
     }
 
@@ -73,7 +73,7 @@ export class BaseCompositionRoot {
      */
     public withProxyConfiguration(useProxy: boolean, proxyUrl: string): BaseCompositionRoot {
 
-        this._httpProxy = new HttpProxy(useProxy, proxyUrl);
+        this.httpProxy = new HttpProxy(useProxy, proxyUrl);
         return this;
     }
 
@@ -94,17 +94,17 @@ export class BaseCompositionRoot {
     private registerBaseDependencies(): void {
 
         // Singletons
-        this._container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
-            .toConstantValue(this._exceptionHandler!);
-        this._container.bind<LoggerFactory>(BASETYPES.LoggerFactory)
-            .toConstantValue(this._loggerFactory!);
-        this._container.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
-            .toConstantValue(this._loggingConfiguration!);
-        this._container.bind<HttpProxy>(BASETYPES.HttpProxy)
-            .toConstantValue(this._httpProxy!);
+        this.container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
+            .toConstantValue(this.exceptionHandler!);
+        this.container.bind<LoggerFactory>(BASETYPES.LoggerFactory)
+            .toConstantValue(this.loggerFactory!);
+        this.container.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
+            .toConstantValue(this.loggingConfiguration!);
+        this.container.bind<HttpProxy>(BASETYPES.HttpProxy)
+            .toConstantValue(this.httpProxy!);
 
         // Register a per request dummy value that is overridden by the logger middleware later
-        this._container.bind<LogEntry>(BASETYPES.LogEntry)
+        this.container.bind<LogEntry>(BASETYPES.LogEntry)
             .toConstantValue({} as any);
     }
 
@@ -114,20 +114,20 @@ export class BaseCompositionRoot {
     private registerOAuthDependencies(): void {
 
         // Make the configuration injectable
-        this._container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
-            .toConstantValue(this._oauthConfiguration!);
+        this.container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
+            .toConstantValue(this.oauthConfiguration!);
 
         // A class to validate JWT access tokens
-        this._container.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
+        this.container.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
             .to(AccessTokenValidator).inRequestScope();
 
         // The filter deals with finalizing the claims principal
-        this._container.bind<OAuthFilter>(BASETYPES.OAuthFilter)
+        this.container.bind<OAuthFilter>(BASETYPES.OAuthFilter)
             .to(OAuthFilter).inRequestScope();
 
         // Also register a singleton to cache token signing public keys
-        this._container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
-            .toConstantValue(new JwksRetriever(this._oauthConfiguration!, this._httpProxy!));
+        this.container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
+            .toConstantValue(new JwksRetriever(this.oauthConfiguration!, this.httpProxy!));
     }
 
     /*
@@ -137,18 +137,18 @@ export class BaseCompositionRoot {
 
         // Register the singleton cache
         const claimsCache = new ClaimsCache(
-            this._oauthConfiguration!.claimsCacheTimeToLiveMinutes,
-            this._extraClaimsProvider!,
-            this._loggerFactory!);
-        this._container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
+            this.oauthConfiguration!.claimsCacheTimeToLiveMinutes,
+            this.extraClaimsProvider!,
+            this.loggerFactory!);
+        this.container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
             .toConstantValue(claimsCache);
 
         // Register the extra claims provider
-        this._container.bind<ExtraClaimsProvider>(BASETYPES.ExtraClaimsProvider)
-            .toConstantValue(this._extraClaimsProvider!);
+        this.container.bind<ExtraClaimsProvider>(BASETYPES.ExtraClaimsProvider)
+            .toConstantValue(this.extraClaimsProvider!);
 
         // Register dummy per request claims that are overridden later by the authorizer middleware
-        this._container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal)
+        this.container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal)
             .toConstantValue({} as any);
     }
 }

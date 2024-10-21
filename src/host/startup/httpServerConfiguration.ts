@@ -23,16 +23,16 @@ import {CompositionRoot} from '../dependencies/compositionRoot.js';
  */
 export class HttpServerConfiguration {
 
-    private readonly _configuration: Configuration;
-    private readonly _container: Container;
-    private readonly _loggerFactory: LoggerFactory;
-    private readonly _expressApp: express.Application;
+    private readonly configuration: Configuration;
+    private readonly container: Container;
+    private readonly loggerFactory: LoggerFactory;
+    private readonly expressApp: express.Application;
 
     public constructor(configuration: Configuration, container: Container, loggerFactory: LoggerFactory) {
-        this._configuration = configuration;
-        this._container = container;
-        this._loggerFactory = loggerFactory;
-        this._expressApp = express();
+        this.configuration = configuration;
+        this.container = container;
+        this.loggerFactory = loggerFactory;
+        this.expressApp = express();
     }
 
     /*
@@ -45,34 +45,34 @@ export class HttpServerConfiguration {
         const allRoutes = `${apiBasePath}*_`;
 
         // Create Express middleware
-        const childContainerMiddleware = new ChildContainerMiddleware(this._container);
-        const loggerMiddleware = new LoggerMiddleware(this._loggerFactory);
+        const childContainerMiddleware = new ChildContainerMiddleware(this.container);
+        const loggerMiddleware = new LoggerMiddleware(this.loggerFactory);
         const authorizerMiddleware = new AuthorizerMiddleware();
-        const customHeaderMiddleware = new CustomHeaderMiddleware(this._configuration.logging.apiName);
-        const exceptionHandler = new UnhandledExceptionHandler(this._configuration.logging);
+        const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
+        const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging);
 
         // Register base dependencies
-        new BaseCompositionRoot(this._container)
-            .useOAuth(this._configuration.oauth)
+        new BaseCompositionRoot(this.container)
+            .useOAuth(this.configuration.oauth)
             .withExtraClaimsProvider(new SampleExtraClaimsProvider())
-            .withLogging(this._configuration.logging, this._loggerFactory)
+            .withLogging(this.configuration.logging, this.loggerFactory)
             .withExceptionHandler(exceptionHandler)
-            .withProxyConfiguration(this._configuration.api.useProxy, this._configuration.api.proxyUrl)
+            .withProxyConfiguration(this.configuration.api.useProxy, this.configuration.api.proxyUrl)
             .register();
 
         // Register the API's own dependencies
-        CompositionRoot.registerDependencies(this._container);
+        CompositionRoot.registerDependencies(this.container);
 
         // Configure cross cutting concerns
-        this._expressApp.set('etag', false);
-        this._expressApp.use(allRoutes, childContainerMiddleware.execute);
-        this._expressApp.use(allRoutes, loggerMiddleware.execute);
-        this._expressApp.use(allRoutes, authorizerMiddleware.execute);
-        this._expressApp.use(allRoutes, customHeaderMiddleware.execute);
+        this.expressApp.set('etag', false);
+        this.expressApp.use(allRoutes, childContainerMiddleware.execute);
+        this.expressApp.use(allRoutes, loggerMiddleware.execute);
+        this.expressApp.use(allRoutes, authorizerMiddleware.execute);
+        this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
         // Next ask the routing-controller library to create the API's routes from annotations
-        useContainer(new InversifyAdapter(this._container));
-        useExpressServer(this._expressApp, {
+        useContainer(new InversifyAdapter(this.container));
+        useExpressServer(this.expressApp, {
             defaultErrorHandler: false,
             routePrefix: apiBasePath,
             controllers: [CompanyController, UserInfoController],
@@ -83,7 +83,7 @@ export class HttpServerConfiguration {
         loggerMiddleware.setRouteMetadataHandler(routeMetadataHandler);
 
         // Configure Express error middleware once routes have been created
-        this._expressApp.use(allRoutes, exceptionHandler.execute);
+        this.expressApp.use(allRoutes, exceptionHandler.execute);
     }
 
     /*
@@ -91,18 +91,18 @@ export class HttpServerConfiguration {
      */
     public async start(): Promise<void> {
 
-        const port = this._configuration.api.port;
-        if (this._configuration.api.sslCertificateFileName && this._configuration.api.sslCertificatePassword) {
+        const port = this.configuration.api.port;
+        if (this.configuration.api.sslCertificateFileName && this.configuration.api.sslCertificatePassword) {
 
             // Load certificate details
-            const pfxFile = await fs.readFile(this._configuration.api.sslCertificateFileName);
+            const pfxFile = await fs.readFile(this.configuration.api.sslCertificateFileName);
             const serverOptions = {
                 pfx: pfxFile,
-                passphrase: this._configuration.api.sslCertificatePassword,
+                passphrase: this.configuration.api.sslCertificatePassword,
             };
 
             // Start listening over HTTPS
-            const httpsServer = https.createServer(serverOptions, this._expressApp);
+            const httpsServer = https.createServer(serverOptions, this.expressApp);
             httpsServer.listen(port, () => {
                 console.log(`API is listening on HTTPS port ${port}`);
             });
@@ -110,7 +110,7 @@ export class HttpServerConfiguration {
         } else {
 
             // Otherwise listen over HTTP
-            this._expressApp.listen(port, () => {
+            this.expressApp.listen(port, () => {
                 console.log(`API is listening on HTTP port ${port}`);
             });
         }

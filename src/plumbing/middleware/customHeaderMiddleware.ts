@@ -7,10 +7,10 @@ import {ErrorFactory} from '../errors/errorFactory.js';
  */
 export class CustomHeaderMiddleware {
 
-    private readonly _apiName: string;
+    private readonly apiName: string;
 
     public constructor(apiName: string) {
-        this._apiName = apiName.toLowerCase();
+        this.apiName = apiName.toLowerCase();
         this.setupCallbacks();
     }
 
@@ -22,7 +22,7 @@ export class CustomHeaderMiddleware {
 
         const apiToBreak = request.header('x-authsamples-test-exception');
         if (apiToBreak) {
-            if (apiToBreak.toLowerCase() === this._apiName.toLowerCase()) {
+            if (apiToBreak.toLowerCase() === this.apiName.toLowerCase()) {
 
                 throw ErrorFactory.createServerError(
                     BaseErrorCodes.exceptionSimulation,

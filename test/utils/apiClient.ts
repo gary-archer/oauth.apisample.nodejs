@@ -10,22 +10,22 @@ import {ApiResponseMetrics} from './apiResponseMetrics.js';
  */
 export class ApiClient {
 
-    private readonly _baseUrl: string;
-    private readonly _clientName: string;
-    private readonly _sessionId: string;
-    private readonly _httpProxy: HttpProxy;
+    private readonly baseUrl: string;
+    private readonly clientName: string;
+    private readonly sessionId: string;
+    private readonly httpProxy: HttpProxy;
 
     public constructor(baseUrl: string, clientName: string, sessionId: string, useProxy: boolean) {
-        this._baseUrl = baseUrl;
-        this._clientName = clientName;
-        this._sessionId = sessionId;
-        this._httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
+        this.baseUrl = baseUrl;
+        this.clientName = clientName;
+        this.sessionId = sessionId;
+        this.httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
     }
 
     public async getUserInfoClaims(options: ApiRequestOptions): Promise<ApiResponse> {
 
-        options.httpMethod = 'GET';
-        options.apiPath = '/investments/userinfo';
+        options.setHttpMethod('GET');
+        options.setApiPath('/investments/userinfo');
 
         const metrics = {
             operation: 'getUserInfoClaims',
@@ -36,8 +36,8 @@ export class ApiClient {
 
     public async getCompanyList(options: ApiRequestOptions): Promise<ApiResponse> {
 
-        options.httpMethod = 'GET';
-        options.apiPath = '/investments/companies';
+        options.setHttpMethod('GET');
+        options.setApiPath('/investments/companies');
 
         const metrics = {
             operation: 'getCompanyList',
@@ -48,8 +48,8 @@ export class ApiClient {
 
     public async getCompanyTransactions(options: ApiRequestOptions, companyId: number): Promise<ApiResponse> {
 
-        options.httpMethod = 'GET';
-        options.apiPath = `/investments/companies/${companyId}/transactions`;
+        options.setHttpMethod('GET');
+        options.setApiPath(`/investments/companies/${companyId}/transactions`);
 
         const metrics = {
             operation: 'getCompanyTransactions',
@@ -65,20 +65,20 @@ export class ApiClient {
         const hrtimeStart = process.hrtime();
 
         const headers: any = {
-            authorization: `Bearer ${requestOptions.accessToken}`,
-            'x-authsamples-api-client': this._clientName,
-            'x-authsamples-session-id': this._sessionId,
+            authorization: `Bearer ${requestOptions.getAccessToken()}`,
+            'x-authsamples-api-client': this.clientName,
+            'x-authsamples-session-id': this.sessionId,
             'x-authsamples-correlation-id': metrics.correlationId,
         };
 
         const options = {
-            url: this._baseUrl + requestOptions.apiPath,
-            method: requestOptions.httpMethod,
+            url: this.baseUrl + requestOptions.getApiPath(),
+            method: requestOptions.getHttpMethod(),
             headers,
-            httpsAgent: this._httpProxy.agent,
+            httpsAgent: this.httpProxy.getAgent(),
         } as AxiosRequestConfig;
 
-        if (requestOptions.rehearseException) {
+        if (requestOptions.getRehearseException()) {
             headers['x-authsamples-test-exception'] = 'FinalApi';
         }
 

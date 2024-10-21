@@ -18,15 +18,15 @@ import {CompanyRepository} from '../repositories/companyRepository.js';
 @injectable()
 export class CompanyService {
 
-    private readonly _repository: CompanyRepository;
-    private readonly _claims: ClaimsPrincipal;
+    private readonly repository: CompanyRepository;
+    private readonly claims: ClaimsPrincipal;
 
     public constructor(
         @inject(SAMPLETYPES.CompanyRepository) repository: CompanyRepository,
         @inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
 
-        this._repository = repository;
-        this._claims = claims;
+        this.repository = repository;
+        this.claims = claims;
     }
 
     /*
@@ -35,7 +35,7 @@ export class CompanyService {
     public async getCompanyList(): Promise<Company[]> {
 
         // Use a micro services approach of getting all data
-        const companies = await this._repository.getCompanyList();
+        const companies = await this.repository.getCompanyList();
 
         // We will then filter on only authorized companies
         return companies.filter((c) => this.isUserAuthorizedForCompany(c));
@@ -47,7 +47,7 @@ export class CompanyService {
     public async getCompanyTransactions(companyId: number): Promise<CompanyTransactions> {
 
         // Use a micro services approach of getting all data
-        const data = await this._repository.getCompanyTransactions(companyId);
+        const data = await this.repository.getCompanyTransactions(companyId);
 
         // If the user is unauthorized or data was not found then return 404
         if (!data || !this.isUserAuthorizedForCompany(data.company)) {
@@ -63,7 +63,7 @@ export class CompanyService {
     private isUserAuthorizedForCompany(company: Company): boolean {
 
         // The admin role is granted access to all resources
-        const role = ClaimsReader.getStringClaim(this._claims.jwt, CustomClaimNames.role).toLowerCase();
+        const role = ClaimsReader.getStringClaim(this.claims.getJwt(), CustomClaimNames.role).toLowerCase();
         if (role === 'admin') {
             return true;
         }
@@ -74,8 +74,8 @@ export class CompanyService {
         }
 
         // For the user role, authorize based on a business rule that links the user to regional data
-        const extraClaims = this._claims.extra as SampleExtraClaims;
-        const found = extraClaims.regions.find((c) => c === company.region);
+        const extraClaims = this.claims.getExtra() as SampleExtraClaims;
+        const found = extraClaims.getRegions().find((c) => c === company.region);
         return !!found;
     }
 

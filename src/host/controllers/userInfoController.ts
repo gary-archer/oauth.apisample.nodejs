@@ -13,10 +13,10 @@ import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 @Controller('/userinfo')
 export class UserInfoController {
 
-    private readonly _claims: SampleExtraClaims;
+    private readonly claims: SampleExtraClaims;
 
     public constructor(@inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
-        this._claims = claims.extra as SampleExtraClaims;
+        this.claims = claims.getExtra() as SampleExtraClaims;
         this.setupCallbacks();
     }
 
@@ -27,8 +27,8 @@ export class UserInfoController {
     public getUserInfo(): ClientUserInfo {
 
         return {
-            title: this._claims.title,
-            regions: this._claims.regions,
+            title: this.claims.getTitle(),
+            regions: this.claims.getRegions(),
         };
     }
 

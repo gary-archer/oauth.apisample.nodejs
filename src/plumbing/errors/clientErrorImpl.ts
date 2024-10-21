@@ -6,54 +6,54 @@ import {ClientError} from './clientError.js';
 export class ClientErrorImpl extends ClientError {
 
     // Fields in all client errors
-    private readonly _statusCode: number;
-    private readonly _errorCode: string;
-    private _logContext: any;
+    private readonly statusCode: number;
+    private readonly errorCode: string;
+    private logContext: any;
 
     // Extra fields for 500 errors
-    private _area: string;
-    private _id: number;
-    private _utcTime: string;
+    private area: string;
+    private id: number;
+    private utcTime: string;
 
     public constructor(statusCode: number, errorCode: string, message: string) {
 
         // Set common fields
         super(message);
-        this._statusCode = statusCode;
-        this._errorCode = errorCode;
-        this._logContext = null;
+        this.statusCode = statusCode;
+        this.errorCode = errorCode;
+        this.logContext = null;
 
         // Initialise 5xx fields
-        this._area = '';
-        this._id = 0;
-        this._utcTime = '';
+        this.area = '';
+        this.id = 0;
+        this.utcTime = '';
 
         // Ensure that instanceof works
         Object.setPrototypeOf(this, new.target.prototype);
     }
 
     public getStatusCode(): number {
-        return this._statusCode;
+        return this.statusCode;
     }
 
     public getErrorCode(): string {
-        return this._errorCode;
+        return this.errorCode;
     }
 
     /*
      * A 4xx error can be thrown with additional data that is logged for support purposes
      */
-    public set logContext(value: any) {
-        this._logContext = value;
+    public setLogContext(value: any): void {
+        this.logContext = value;
     }
 
     /*
      * Set extra fields to return to the caller for 500 errors
      */
     public setExceptionDetails(area: string, id: number, utcTime: string): void {
-        this._area = area;
-        this._id = id;
-        this._utcTime = utcTime;
+        this.area = area;
+        this.id = id;
+        this.utcTime = utcTime;
     }
 
     /*
@@ -62,14 +62,14 @@ export class ClientErrorImpl extends ClientError {
     public toResponseFormat(): any {
 
         const body: any = {
-            code: this._errorCode,
+            code: this.errorCode,
             message: this.message,
         };
 
-        if (this._id > 0 && this._area.length > 0 && this._utcTime.length > 0) {
-            body.id = this._id;
-            body.area = this._area;
-            body.utcTime = this._utcTime;
+        if (this.id > 0 && this.area.length > 0 && this.utcTime.length > 0) {
+            body.id = this.id;
+            body.area = this.area;
+            body.utcTime = this.utcTime;
         }
 
         return body;
@@ -81,12 +81,12 @@ export class ClientErrorImpl extends ClientError {
     public toLogFormat(): any {
 
         const data: any = {
-            statusCode: this._statusCode,
+            statusCode: this.statusCode,
             clientError: this.toResponseFormat(),
         };
 
-        if (this._logContext) {
-            data.context = this._logContext;
+        if (this.logContext) {
+            data.context = this.logContext;
         }
 
         return data;

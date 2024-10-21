@@ -10,7 +10,7 @@ import {HttpProxy} from '../utilities/httpProxy.js';
 @injectable()
 export class JwksRetriever {
 
-    private readonly _remoteJWKSet: JWTVerifyGetKey;
+    private readonly remoteJWKSet: JWTVerifyGetKey;
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
@@ -18,7 +18,7 @@ export class JwksRetriever {
 
         // View requests via an HTTP proxy if required
         const jwksOptions = {
-            agent: httpProxy.agent,
+            agent: httpProxy.getAgent(),
         } as RemoteJWKSetOptions;
 
         // Integration tests use a value of zero to ensure multiple test runs without unfound JWK errors
@@ -27,10 +27,10 @@ export class JwksRetriever {
         }
 
         // Create this object only once
-        this._remoteJWKSet = createRemoteJWKSet(new URL(configuration.jwksEndpoint), jwksOptions);
+        this.remoteJWKSet = createRemoteJWKSet(new URL(configuration.jwksEndpoint), jwksOptions);
     }
 
-    public get remoteJWKSet(): JWTVerifyGetKey {
-        return this._remoteJWKSet;
+    public get getRemoteJWKSet(): JWTVerifyGetKey {
+        return this.remoteJWKSet;
     }
 }

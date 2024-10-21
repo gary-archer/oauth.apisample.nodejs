@@ -158,7 +158,7 @@ describe('OAuth API Tests', () => {
 
         // Call a valid API operation but pass a custom header to cause an API exception
         const options = new ApiRequestOptions(accessToken);
-        options.rehearseException = true;
+        options.setRehearseException(true);
         const response = await apiClient.getCompanyTransactions(options, 2);
 
         // Assert results

@@ -14,10 +14,10 @@ import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
 @Controller('/companies')
 export class CompanyController {
 
-    private readonly _service: CompanyService;
+    private readonly service: CompanyService;
 
     public constructor(@inject(SAMPLETYPES.CompanyService) service: CompanyService) {
-        this._service = service;
+        this.service = service;
         this.setupCallbacks();
     }
 
@@ -26,7 +26,7 @@ export class CompanyController {
      */
     @Get('')
     public async getCompanyList(): Promise<Company[]> {
-        return this._service.getCompanyList();
+        return this.service.getCompanyList();
     }
 
     /*
@@ -46,7 +46,7 @@ export class CompanyController {
         }
 
         // Next authorize access based on claims
-        return this._service.getCompanyTransactions(companyId);
+        return this.service.getCompanyTransactions(companyId);
     }
 
     /*

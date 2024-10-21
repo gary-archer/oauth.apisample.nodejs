@@ -33,7 +33,7 @@ export class ErrorFactory {
         logContext: any): ClientError {
 
         const error = new ClientErrorImpl(statusCode, errorCode, userMessage);
-        error.logContext = logContext;
+        error.setLogContext(logContext);
         return error;
     }
 
@@ -46,7 +46,7 @@ export class ErrorFactory {
             401,
             BaseErrorCodes.invalidToken,
             'Missing, invalid or expired access token');
-        error.logContext = reason;
+        error.setLogContext(reason);
         return error;
     }
 }
