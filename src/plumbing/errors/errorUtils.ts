@@ -40,7 +40,7 @@ export class ErrorUtils {
             errorCode || defaultErrorCode,
             message || defaultMessage,
             exception.stack);
-        error.setDetails(ErrorUtils._getExceptionDetailsMessage(exception));
+        error.setDetails(ErrorUtils.getExceptionDetailsMessage(exception));
         return error;
     }
 
@@ -54,7 +54,7 @@ export class ErrorUtils {
             'Problem downloading token signing keys',
             responseError.stack);
 
-        const details = ErrorUtils._getExceptionDetailsMessage(responseError);
+        const details = ErrorUtils.getExceptionDetailsMessage(responseError);
         error.setDetails(`${details}, URL: ${url}`);
         return error;
     }
@@ -101,7 +101,7 @@ export class ErrorUtils {
     /*
      * Get the message from an exception and avoid returning [object Object]
      */
-    private static _getExceptionDetailsMessage(e: any): string {
+    private static getExceptionDetailsMessage(e: any): string {
 
         if (e.message) {
             return e.message;

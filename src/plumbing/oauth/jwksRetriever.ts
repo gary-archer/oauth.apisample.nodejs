@@ -30,7 +30,7 @@ export class JwksRetriever {
         this.remoteJWKSet = createRemoteJWKSet(new URL(configuration.jwksEndpoint), jwksOptions);
     }
 
-    public get getRemoteJWKSet(): JWTVerifyGetKey {
+    public getRemoteJWKSet(): JWTVerifyGetKey {
         return this.remoteJWKSet;
     }
 }

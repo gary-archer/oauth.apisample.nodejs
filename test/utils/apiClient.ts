@@ -31,7 +31,7 @@ export class ApiClient {
             operation: 'getUserInfoClaims',
         } as ApiResponseMetrics;
 
-        return this._callApi(options, metrics);
+        return this.callApi(options, metrics);
     }
 
     public async getCompanyList(options: ApiRequestOptions): Promise<ApiResponse> {
@@ -43,7 +43,7 @@ export class ApiClient {
             operation: 'getCompanyList',
         } as ApiResponseMetrics;
 
-        return this._callApi(options, metrics);
+        return this.callApi(options, metrics);
     }
 
     public async getCompanyTransactions(options: ApiRequestOptions, companyId: number): Promise<ApiResponse> {
@@ -55,10 +55,10 @@ export class ApiClient {
             operation: 'getCompanyTransactions',
         } as ApiResponseMetrics;
 
-        return this._callApi(options, metrics);
+        return this.callApi(options, metrics);
     }
 
-    private async _callApi(requestOptions: ApiRequestOptions, metrics: ApiResponseMetrics): Promise<ApiResponse> {
+    private async callApi(requestOptions: ApiRequestOptions, metrics: ApiResponseMetrics): Promise<ApiResponse> {
 
         metrics.startTime = new Date();
         metrics.correlationId = Guid.create().toString();

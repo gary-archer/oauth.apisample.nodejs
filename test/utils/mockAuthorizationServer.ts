@@ -56,14 +56,14 @@ export class MockAuthorizationServer {
             },
         };
 
-        await this._register(stubbedResponse);
+        await this.register(stubbedResponse);
     }
 
     /*
      * Free resources at the end of the test run
      */
     public async stop(): Promise<void> {
-        await this._unregister(this.keyId);
+        await this.unregister(this.keyId);
     }
 
     /*
@@ -90,7 +90,7 @@ export class MockAuthorizationServer {
     /*
      * Add a stubbed response to Wiremock via its Admin API
      */
-    private async _register(stubbedResponse: any): Promise<void> {
+    private async register(stubbedResponse: any): Promise<void> {
 
         const options = {
             url: this.baseUrl,
@@ -99,7 +99,7 @@ export class MockAuthorizationServer {
             headers: {
                 'content-type': 'application/json',
             },
-            httpsAgent: this.httpProxy.agent,
+            httpsAgent: this.httpProxy.getAgent(),
         } as AxiosRequestConfig;
 
         const response = await axios(options);
@@ -111,12 +111,12 @@ export class MockAuthorizationServer {
     /*
      * Delete a stubbed response from Wiremock via its Admin API
      */
-    private async _unregister(id: string): Promise<void> {
+    private async unregister(id: string): Promise<void> {
 
         const options = {
             url: `${this.baseUrl}/${id}`,
             method: 'DELETE',
-            httpsAgent: this.httpProxy.agent,
+            httpsAgent: this.httpProxy.getAgent(),
         } as AxiosRequestConfig;
 
         const response = await axios(options);

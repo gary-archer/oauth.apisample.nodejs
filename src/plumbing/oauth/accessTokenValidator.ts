@@ -51,7 +51,7 @@ export class AccessTokenValidator {
             let claims: JWTPayload;
             try {
 
-                const result = await jwtVerify(accessToken, this.jwksRetriever.getRemoteJWKSet, options);
+                const result = await jwtVerify(accessToken, this.jwksRetriever.getRemoteJWKSet(), options);
                 claims = result.payload;
 
             } catch (e: any) {
