@@ -23,8 +23,8 @@
     "fs-extra": "^11.2.0",
     "guid-typescript": "^1.0.9",
     "https-proxy-agent": "^7.0.5",
-    "inversify": "6.0.1",
-    "jose": "^5.9.4",
+    "inversify": "^6.1.4",
+    "jose": "^5.9.6",
     "node-cache": "^5.1.2",
     "reflect-metadata": "^0.2.1",
     "routing-controllers": "^0.10.4",
@@ -34,15 +34,15 @@
   },
   "devDependencies": {
     "@colors/colors": "^1.6.0",
-    "@eslint/js": "^9.13.0",
+    "@eslint/js": "^9.15.0",
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/mocha": "^10.0.6",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20.16.13",
-    "eslint": "^9.13.0",
-    "mocha": "^10.7.3",
-    "tsx": "^4.19.1",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.10.0"
+    "eslint": "^9.15.0",
+    "mocha": "^10.8.2",
+    "tsx": "^4.19.2",
+    "typescript": "5.6.3",
+    "typescript-eslint": "^8.15.0"
   }
 }
