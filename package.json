@@ -40,9 +40,12 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.16.13",
     "eslint": "^9.15.0",
-    "mocha": "^10.8.2",
+    "mocha": "^11.0.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
+  },
+  "overrides": {
+    "cookie": "1.0.2"
   }
 }
