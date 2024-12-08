@@ -40,7 +40,7 @@ fi
 #
 # Build the docker image
 #
-docker build -f deployment/shared/Dockerfile -t finalnodejsapi:latest .
+docker build -t finalnodejsapi:latest .
 if [ $? -ne 0 ]; then
   echo 'Problem encountered building the API docker image'
   exit
