@@ -36,7 +36,34 @@ You can aggregate API logs to Elasticsearch and run [Technical Support Queries](
 
 ![Support Queries](./images/support-queries.png)
 
-## How to Run the API
+## Local Development Quick Start
+
+To run the code sample locally you must configure some infrastructure before you run the code.
+
+### Configure DNS and SSL
+
+Configure custom development domains by adding these DNS entries to your hosts file:
+
+```bash
+127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
+```
+
+Install OpenSSL if required, then create a folder in which to create development certificates for the SPA:
+
+```bash
+export SECRETS_FOLDER='~/secrets'
+mkdir ~/secrets
+./certs/create.sh
+```
+
+If required, configure [Node.js SSL trust](
+https://github.com/gary-archer/oauth.blog/tree/master/public/posts/developer-ssl-setup.mdx#trusting-a-root-certificate-in-nodejs-apis) for the root CA at the following location:
+
+```text
+./certs/authsamples-dev.ca.crt
+```
+
+### Run the Code
 
 - Install Node.js 20+.
 - Also install Docker to run integration tests that use Wiremock.
@@ -46,24 +73,6 @@ Then run the API with this command:
 ```bash
 ./start.sh
 ```
-
-### Configure DNS and SSL
-
-Add these domains to your hosts file to configure DNS:
-
-```text
-127.0.0.1 localhost api.authsamples-dev.com login.authsamples-dev.com
-```
-
-Then call an endpoint over port 446:
-
-```bash
-curl -k https://api.authsamples-dev.com:446/investments/companies
-```
-
-By default, SSL trust is managed by setting a `NODE_EXTRA_CA_CERTS` environment variable.\
-Alternatively you can configure [Node.js SSL trust](
-https://github.com/gary-archer/oauth.blog/tree/master/public/posts/developer-ssl-setup.mdx#trusting-a-root-certificate-in-nodejs-apis) for the root CA at `./certs/authsamples-dev.ca.crt`.
 
 ### Test the API
 
