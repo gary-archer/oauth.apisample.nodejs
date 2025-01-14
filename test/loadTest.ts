@@ -1,5 +1,5 @@
 import color from '@colors/colors';
-import {Guid} from 'guid-typescript';
+import {randomUUID} from 'crypto';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
 import {ApiResponse} from './utils/apiResponse.js';
@@ -22,7 +22,7 @@ export class LoadTest {
         const useProxy = false;
         this.authorizationServer = new MockAuthorizationServer(useProxy);
         const apiBaseUrl = 'https://api.authsamples-dev.com:446';
-        this.sessionId = Guid.create().toString();
+        this.sessionId = randomUUID();
         this.apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this.sessionId, useProxy);
         this.totalCount = 0;
         this.errorCount = 0;

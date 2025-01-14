@@ -1,5 +1,5 @@
+import {randomUUID} from 'crypto';
 import {Request, Response} from 'express';
-import {Guid} from 'guid-typescript';
 import {injectable} from 'inversify';
 import os from 'os';
 import {Logger} from 'winston';
@@ -52,7 +52,7 @@ export class LogEntryImpl implements LogEntry {
 
         // Use the correlation id from request headers or create one
         const correlationId = request.header('x-authsamples-correlation-id');
-        this.data.correlationId = correlationId ? correlationId : Guid.create().toString();
+        this.data.correlationId = correlationId ? correlationId : randomUUID();
 
         // Log an optional session id if supplied
         const sessionId = request.header('x-authsamples-session-id');

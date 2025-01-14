@@ -1,5 +1,5 @@
 import assert from 'assert';
-import {Guid} from 'guid-typescript';
+import {randomUUID} from 'crypto';
 import {generateKeyPair} from 'jose';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
@@ -15,7 +15,7 @@ describe('OAuth API Tests', () => {
     const authorizationServer = new MockAuthorizationServer(useProxy);
 
     const apiBaseUrl = 'https://api.authsamples-dev.com:446';
-    const sessionId = Guid.create().toString();
+    const sessionId = randomUUID();
     const apiClient = new ApiClient(apiBaseUrl, 'IntegrationTests', sessionId, useProxy);
 
     /*

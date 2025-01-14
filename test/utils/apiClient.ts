@@ -1,5 +1,5 @@
 import axios, {AxiosRequestConfig} from 'axios';
-import {Guid} from 'guid-typescript';
+import {randomUUID} from 'crypto';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy.js';
 import {ApiRequestOptions} from './apiRequestOptions.js';
 import {ApiResponse} from './apiResponse.js';
@@ -61,7 +61,7 @@ export class ApiClient {
     private async callApi(requestOptions: ApiRequestOptions, metrics: ApiResponseMetrics): Promise<ApiResponse> {
 
         metrics.startTime = new Date();
-        metrics.correlationId = Guid.create().toString();
+        metrics.correlationId = randomUUID();
         const hrtimeStart = process.hrtime();
 
         const headers: any = {
