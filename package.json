@@ -26,7 +26,7 @@
     "jose": "^5.9.6",
     "node-cache": "^5.1.2",
     "reflect-metadata": "^0.2.1",
-    "routing-controllers": "^0.10.4",
+    "routing-controllers": "^0.11.1",
     "winston": "^3.14.2",
     "winston-daily-rotate-file": "^5.0.0",
     "winston-transport": "^4.7.1"
@@ -43,10 +43,5 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
-  },
-  "overrides": {
-    "routing-controllers": {
-      "cookie": "^1.0.2"
-    }
   }
 }
