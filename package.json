@@ -1,7 +1,7 @@
 {
   "name": "finalapi",
   "version": "3.0.0",
-  "description": "A Node.js version of the Final OAuth secured API",
+  "description": "A Node.js version of the final OAuth secured API",
   "author": "Gary Archer",
   "license": "MIT",
   "type": "module",

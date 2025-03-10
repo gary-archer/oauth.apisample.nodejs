@@ -7,7 +7,7 @@
     "proxyUrl": "http://host.docker.internal:8888"
   },
   "logging": {
-    "apiName": "FinalApi",
+    "apiName": "investments",
     "production": {
       "level": "info",
       "performanceThresholdMilliseconds": 500,

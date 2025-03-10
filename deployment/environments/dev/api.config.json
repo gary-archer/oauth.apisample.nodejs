@@ -7,7 +7,7 @@
     "proxyUrl": "http://127.0.0.1:8888"
   },
   "logging": {
-    "apiName": "FinalApi",
+    "apiName": "investments",
     "production": {
       "level": "info",
       "performanceThresholdMilliseconds": 500,
@@ -18,7 +18,7 @@
       },
       {
         "type": "file",
-        "filePrefix": "api",
+        "filePrefix": "investments",
         "dirname": "./logs",
         "maxSize": "10m",
         "maxFiles": "7d"
