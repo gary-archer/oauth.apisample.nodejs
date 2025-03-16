@@ -114,8 +114,8 @@ describe('OAuth API Tests', () => {
         // Set the access token values
         const jwtOptions = new MockTokenOptions();
         jwtOptions.useStandardUser();
-        const maliciousJwk = await generateKeyPair('ES256');
-        const accessToken = await authorizationServer.issueAccessToken(jwtOptions, maliciousJwk);
+        const maliciousKeypair = await generateKeyPair('ES256');
+        const accessToken = await authorizationServer.issueAccessToken(jwtOptions, maliciousKeypair);
 
         // Call the API
         const options = new ApiRequestOptions(accessToken);
