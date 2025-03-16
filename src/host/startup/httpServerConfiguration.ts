@@ -71,7 +71,7 @@ export class HttpServerConfiguration {
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
         // Next ask the routing-controller library to create the API's routes from annotations
-        useContainer(new InversifyAdapter(this.container));
+        useContainer(new InversifyAdapter());
         useExpressServer(this.expressApp, {
             defaultErrorHandler: false,
             routePrefix: apiBasePath,

@@ -1,3 +1,4 @@
+import {AxiosError} from 'axios';
 import {inject, injectable} from 'inversify';
 import {JWTPayload, JWTVerifyOptions, jwtVerify} from 'jose';
 import {ClaimsReader} from '../claims/claimsReader.js';
@@ -57,7 +58,7 @@ export class AccessTokenValidator {
             } catch (e: any) {
 
                 // JWKS URI connection failures return a 500
-                if (e.code === 'ERR_JOSE_GENERIC' || e.code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+                if (e instanceof AxiosError || e.code === 'ERR_JOSE_GENERIC') {
                     throw ErrorUtils.fromSigningKeyDownloadError(e, this.configuration.jwksEndpoint);
                 }
 

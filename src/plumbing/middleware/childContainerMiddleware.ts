@@ -6,16 +6,16 @@ import {Container} from 'inversify';
  */
 export class ChildContainerMiddleware {
 
-    private readonly container: Container;
+    private readonly parentCntainer: Container;
 
-    public constructor(container: Container) {
-        this.container = container;
+    public constructor(parentCntainer: Container) {
+        this.parentCntainer = parentCntainer;
         this.setupCallbacks();
     }
 
     public execute(request: Request, response: Response, next: NextFunction): void {
 
-        response.locals.container = this.container.createChild();
+        response.locals.container = new Container({ parent: this.parentCntainer });
         response.on('finish', () => {
             delete response.locals.container;
         });
