@@ -1,11 +1,9 @@
 import {Container} from 'inversify';
 import {ClaimsCache} from '../claims/claimsCache.js';
-import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ExtraClaimsProvider} from '../claims/extraClaimsProvider.js';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
-import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
 import {UnhandledExceptionHandler} from '../middleware/unhandledExceptionHandler.js';
 import {AccessTokenValidator} from '../oauth/accessTokenValidator.js';
@@ -102,10 +100,6 @@ export class BaseCompositionRoot {
             .toConstantValue(this.loggingConfiguration!);
         this.container.bind<HttpProxy>(BASETYPES.HttpProxy)
             .toConstantValue(this.httpProxy!);
-
-        // Register a per request dummy value that is overridden by the logger middleware later
-        this.container.bind<LogEntry>(BASETYPES.LogEntry)
-            .toConstantValue({} as any);
     }
 
     /*
@@ -146,9 +140,5 @@ export class BaseCompositionRoot {
         // Register the extra claims provider
         this.container.bind<ExtraClaimsProvider>(BASETYPES.ExtraClaimsProvider)
             .toConstantValue(this.extraClaimsProvider!);
-
-        // Register dummy per request claims that are overridden later by the authorizer middleware
-        this.container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal)
-            .toConstantValue({} as any);
     }
 }
