@@ -12,10 +12,6 @@ import {OAuthFilter} from '../oauth/oauthFilter.js';
  */
 export class AuthorizerMiddleware {
 
-    public constructor() {
-        this.setupCallbacks();
-    }
-
     /*
      * The entry point for implementing authorization
      */
@@ -47,12 +43,5 @@ export class AuthorizerMiddleware {
                 BASETYPES.UnhandledExceptionHandler);
             exceptionHandler.execute(e, request, response, next);
         }
-    }
-
-    /*
-     * Plumbing to ensure the this parameter is available
-     */
-    private setupCallbacks(): void {
-        this.execute = this.execute.bind(this);
     }
 }

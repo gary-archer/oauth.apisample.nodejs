@@ -17,7 +17,7 @@ import {HttpProxy} from '../utilities/httpProxy.js';
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class BaseCompositionRoot {
 
-    private readonly container: Container;
+    private readonly parentContainer: Container;
     private oauthConfiguration?: OAuthConfiguration;
     private extraClaimsProvider?: ExtraClaimsProvider;
     private loggingConfiguration?: LoggingConfiguration;
@@ -25,8 +25,8 @@ export class BaseCompositionRoot {
     private exceptionHandler?: UnhandledExceptionHandler;
     private httpProxy?: HttpProxy;
 
-    public constructor(container: Container) {
-        this.container = container;
+    public constructor(parentContainer: Container) {
+        this.parentContainer = parentContainer;
     }
 
     /*
@@ -92,13 +92,13 @@ export class BaseCompositionRoot {
     private registerBaseDependencies(): void {
 
         // Singletons
-        this.container.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
+        this.parentContainer.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
             .toConstantValue(this.exceptionHandler!);
-        this.container.bind<LoggerFactory>(BASETYPES.LoggerFactory)
+        this.parentContainer.bind<LoggerFactory>(BASETYPES.LoggerFactory)
             .toConstantValue(this.loggerFactory!);
-        this.container.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
+        this.parentContainer.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
             .toConstantValue(this.loggingConfiguration!);
-        this.container.bind<HttpProxy>(BASETYPES.HttpProxy)
+        this.parentContainer.bind<HttpProxy>(BASETYPES.HttpProxy)
             .toConstantValue(this.httpProxy!);
     }
 
@@ -108,19 +108,19 @@ export class BaseCompositionRoot {
     private registerOAuthDependencies(): void {
 
         // Make the configuration injectable
-        this.container.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
+        this.parentContainer.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
             .toConstantValue(this.oauthConfiguration!);
 
         // A class to validate JWT access tokens
-        this.container.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
+        this.parentContainer.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
             .to(AccessTokenValidator).inRequestScope();
 
         // The filter deals with finalizing the claims principal
-        this.container.bind<OAuthFilter>(BASETYPES.OAuthFilter)
+        this.parentContainer.bind<OAuthFilter>(BASETYPES.OAuthFilter)
             .to(OAuthFilter).inRequestScope();
 
         // Also register a singleton to cache token signing public keys
-        this.container.bind<JwksRetriever>(BASETYPES.JwksRetriever)
+        this.parentContainer.bind<JwksRetriever>(BASETYPES.JwksRetriever)
             .toConstantValue(new JwksRetriever(this.oauthConfiguration!, this.httpProxy!));
     }
 
@@ -134,11 +134,11 @@ export class BaseCompositionRoot {
             this.oauthConfiguration!.claimsCacheTimeToLiveMinutes,
             this.extraClaimsProvider!,
             this.loggerFactory!);
-        this.container.bind<ClaimsCache>(BASETYPES.ClaimsCache)
+        this.parentContainer.bind<ClaimsCache>(BASETYPES.ClaimsCache)
             .toConstantValue(claimsCache);
 
         // Register the extra claims provider
-        this.container.bind<ExtraClaimsProvider>(BASETYPES.ExtraClaimsProvider)
+        this.parentContainer.bind<ExtraClaimsProvider>(BASETYPES.ExtraClaimsProvider)
             .toConstantValue(this.extraClaimsProvider!);
     }
 }

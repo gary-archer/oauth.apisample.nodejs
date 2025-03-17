@@ -24,13 +24,13 @@ import {CompositionRoot} from '../dependencies/compositionRoot.js';
 export class HttpServerConfiguration {
 
     private readonly configuration: Configuration;
-    private readonly container: Container;
+    private readonly parentContainer: Container;
     private readonly loggerFactory: LoggerFactory;
     private readonly expressApp: express.Application;
 
-    public constructor(configuration: Configuration, container: Container, loggerFactory: LoggerFactory) {
+    public constructor(configuration: Configuration, parentContainer: Container, loggerFactory: LoggerFactory) {
         this.configuration = configuration;
-        this.container = container;
+        this.parentContainer = parentContainer;
         this.loggerFactory = loggerFactory;
         this.expressApp = express();
     }
@@ -45,14 +45,14 @@ export class HttpServerConfiguration {
         const allRoutes = `${apiBasePath}*_`;
 
         // Create Express middleware
-        const childContainerMiddleware = new ChildContainerMiddleware(this.container);
+        const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
         const loggerMiddleware = new LoggerMiddleware(this.loggerFactory);
         const authorizerMiddleware = new AuthorizerMiddleware();
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging);
 
         // Register base dependencies
-        new BaseCompositionRoot(this.container)
+        new BaseCompositionRoot(this.parentContainer)
             .useOAuth(this.configuration.oauth)
             .withExtraClaimsProvider(new SampleExtraClaimsProvider())
             .withLogging(this.configuration.logging, this.loggerFactory)
@@ -61,7 +61,7 @@ export class HttpServerConfiguration {
             .register();
 
         // Register the API's own dependencies
-        CompositionRoot.registerDependencies(this.container);
+        CompositionRoot.registerDependencies(this.parentContainer);
 
         // Configure cross cutting concerns
         this.expressApp.set('etag', false);
