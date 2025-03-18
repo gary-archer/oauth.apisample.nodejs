@@ -1,8 +1,8 @@
 import {createHash} from 'crypto';
 import {Request, Response} from 'express';
 import {inject, injectable} from 'inversify';
-import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ClaimsCache} from '../claims/claimsCache.js';
+import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ExtraClaimsProvider} from '../claims/extraClaimsProvider.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ErrorFactory} from '../errors/errorFactory.js';
@@ -47,7 +47,7 @@ export class OAuthFilter {
         const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
         let extraClaims = this.cache.getExtraUserClaims(accessTokenHash);
         if (extraClaims) {
-            this.extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims);
+            return new ClaimsPrincipal(jwtClaims, extraClaims);
         }
 
         // Look up extra claims not in the JWT access token when it is first received
@@ -57,6 +57,6 @@ export class OAuthFilter {
         this.cache.setExtraUserClaims(accessTokenHash, extraClaims, jwtClaims.exp || 0);
 
         // Return the final claims
-        return this.extraClaimsProvider.createClaimsPrincipal(jwtClaims, extraClaims);
+        return new ClaimsPrincipal(jwtClaims, extraClaims);
     }
 }

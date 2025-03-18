@@ -91,7 +91,6 @@ export class BaseCompositionRoot {
      */
     private registerBaseDependencies(): void {
 
-        // Singletons
         this.parentContainer.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
             .toConstantValue(this.exceptionHandler!);
         this.parentContainer.bind<LoggerFactory>(BASETYPES.LoggerFactory)
@@ -111,7 +110,7 @@ export class BaseCompositionRoot {
         this.parentContainer.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
             .toConstantValue(this.oauthConfiguration!);
 
-        // A class to validate JWT access tokens
+        // Register an object to validate JWT access tokens
         this.parentContainer.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
             .to(AccessTokenValidator).inRequestScope();
 

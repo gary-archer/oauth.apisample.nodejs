@@ -57,7 +57,7 @@ export class AccessTokenValidator {
 
             } catch (e: any) {
 
-                // JWKS URI connection failures return a 500
+                // Handle failures downloading or deserializing token signing public keys
                 if (e instanceof AxiosError || e.code === 'ERR_JOSE_GENERIC') {
                     throw ErrorUtils.fromSigningKeyDownloadError(e, this.configuration.jwksEndpoint);
                 }

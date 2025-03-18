@@ -1,7 +1,6 @@
 import {JWTPayload} from 'jose';
 import {Response} from 'express';
 import {Container} from 'inversify';
-import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
 import {ExtraClaims} from '../../plumbing/claims/extraClaims.js';
 import {ExtraClaimsProvider} from '../../plumbing/claims/extraClaimsProvider.js';
@@ -27,13 +26,6 @@ export class SampleExtraClaimsProvider extends ExtraClaimsProvider {
         // The manager ID is a business user identity from which other claims can be looked up
         const managerId = ClaimsReader.getStringClaim(jwtClaims, CustomClaimNames.managerId);
         return userRepository.getClaimsForManagerId(managerId);
-    }
-
-    /*
-     * Create a claims principal containing both token claims and extra claims
-     */
-    public createClaimsPrincipal(jwtClaims: JWTPayload, extraClaims: ExtraClaims): ClaimsPrincipal {
-        return new ClaimsPrincipal(jwtClaims, extraClaims);
     }
 
     /*

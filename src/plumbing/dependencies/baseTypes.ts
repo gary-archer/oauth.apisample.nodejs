@@ -3,8 +3,8 @@
  */
 export const BASETYPES = {
     AccessTokenValidator: Symbol.for('AccessTokenValidator'),
-    ClaimsPrincipal: Symbol.for('ClaimsPrincipal'),
     ClaimsCache: Symbol.for('ClaimsCache'),
+    ClaimsPrincipal: Symbol.for('ClaimsPrincipal'),
     ExtraClaimsProvider: Symbol.for('ExtraClaimsProvider'),
     HttpProxy: Symbol.for('HttpProxy'),
     JwksRetriever: Symbol.for('JwksRetriever'),
