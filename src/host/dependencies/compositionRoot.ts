@@ -14,15 +14,14 @@ export class CompositionRoot {
 
     /*
      * Register this API's dependencies, most of which will be recreated for each API request
-     * Note that Inversify instantiates each per request object at application startup to create a dependency graph
      */
     public static registerDependencies(container: Container): void {
 
-        // Controller classes have a REST based request scope
-        container.bind<UserInfoController>(SAMPLETYPES.UserInfoController).to(UserInfoController).inRequestScope();
-        container.bind<CompanyController>(SAMPLETYPES.CompanyController).to(CompanyController).inRequestScope();
+        // Controller classes
+        container.bind<UserInfoController>(SAMPLETYPES.UserInfoController).to(UserInfoController).inTransientScope();
+        container.bind<CompanyController>(SAMPLETYPES.CompanyController).to(CompanyController).inTransientScope();
 
-        // Business logic classes use a non REST based transient scope
+        // Business logic classes
         container.bind<CompanyService>(SAMPLETYPES.CompanyService).to(CompanyService).inTransientScope();
         container.bind<CompanyRepository>(SAMPLETYPES.CompanyRepository).to(CompanyRepository).inTransientScope();
         container.bind<UserRepository>(SAMPLETYPES.UserRepository).to(UserRepository).inTransientScope();
