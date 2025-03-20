@@ -1,4 +1,4 @@
-import {inject, injectable} from 'inversify';
+import {inject} from 'inversify';
 import {Controller, Get, Param} from 'routing-controllers';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {Company} from '../../logic/entities/company.js';
@@ -10,7 +10,6 @@ import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
 /*
  * Our API controller runs after claims handling has completed
  */
-@injectable()
 @Controller('/companies')
 export class CompanyController {
 

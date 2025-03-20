@@ -1,4 +1,4 @@
-import {inject, injectable} from 'inversify';
+import {inject} from 'inversify';
 import {Controller, Get} from 'routing-controllers';
 import {SampleExtraClaims} from '../../logic/claims/sampleExtraClaims.js';
 import {ClientUserInfo} from '../../logic/entities/clientUserInfo.js';
@@ -9,7 +9,6 @@ import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
  * Return user info from the business data to the client
  * These values are separate to the core identity data returned from the OAuth user info endpoint
  */
-@injectable()
 @Controller('/userinfo')
 export class UserInfoController {
 
