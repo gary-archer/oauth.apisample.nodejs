@@ -7,7 +7,7 @@ import {HttpServerConfiguration} from './httpServerConfiguration.js';
 
 // Create initial objects
 const loggerFactory = LoggerFactoryBuilder.create();
-const container = new Container();
+const parentContainer = new Container();
 
 try {
 
@@ -17,7 +17,7 @@ try {
     loggerFactory.configure(configuration.logging);
 
     // Configure the API behaviour at startup
-    const httpServer = new HttpServerConfiguration(configuration, container, loggerFactory);
+    const httpServer = new HttpServerConfiguration(configuration, parentContainer, loggerFactory);
     await httpServer.configure();
     httpServer.start();
 

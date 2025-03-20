@@ -15,16 +15,18 @@ export class CompositionRoot {
     /*
      * Register this API's dependencies, most of which will be recreated for each API request
      */
-    public static registerDependencies(container: Container): void {
+    public static registerDependencies(parentContainer: Container): void {
 
         // Controller classes
-        container.bind<UserInfoController>(SAMPLETYPES.UserInfoController).to(UserInfoController).inTransientScope();
-        container.bind<CompanyController>(SAMPLETYPES.CompanyController).to(CompanyController).inTransientScope();
+        parentContainer.bind<UserInfoController>(SAMPLETYPES.UserInfoController)
+            .to(UserInfoController).inTransientScope();
+        parentContainer.bind<CompanyController>(SAMPLETYPES.CompanyController)
+            .to(CompanyController).inTransientScope();
 
         // Business logic classes
-        container.bind<CompanyService>(SAMPLETYPES.CompanyService).to(CompanyService).inTransientScope();
-        container.bind<CompanyRepository>(SAMPLETYPES.CompanyRepository).to(CompanyRepository).inTransientScope();
-        container.bind<UserRepository>(SAMPLETYPES.UserRepository).to(UserRepository).inTransientScope();
-        container.bind<JsonFileReader>(SAMPLETYPES.JsonFileReader).to(JsonFileReader).inTransientScope();
+        parentContainer.bind<CompanyService>(SAMPLETYPES.CompanyService).to(CompanyService).inTransientScope();
+        parentContainer.bind<CompanyRepository>(SAMPLETYPES.CompanyRepository).to(CompanyRepository).inTransientScope();
+        parentContainer.bind<UserRepository>(SAMPLETYPES.UserRepository).to(UserRepository).inTransientScope();
+        parentContainer.bind<JsonFileReader>(SAMPLETYPES.JsonFileReader).to(JsonFileReader).inTransientScope();
     }
 }
