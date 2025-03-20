@@ -112,11 +112,11 @@ export class BaseCompositionRoot {
 
         // Register an object to validate JWT access tokens
         this.parentContainer.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
-            .to(AccessTokenValidator).inRequestScope();
+            .to(AccessTokenValidator).inTransientScope();
 
         // The filter deals with finalizing the claims principal
         this.parentContainer.bind<OAuthFilter>(BASETYPES.OAuthFilter)
-            .to(OAuthFilter).inRequestScope();
+            .to(OAuthFilter).inTransientScope();
 
         // Also register a singleton to cache token signing public keys
         this.parentContainer.bind<JwksRetriever>(BASETYPES.JwksRetriever)
