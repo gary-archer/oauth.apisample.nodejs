@@ -18,14 +18,10 @@ fi
 #
 # Install dependencies
 #
-if [ ! -d 'node_modules' ]; then
-  
-  rm -rf node_modules
-  npm install
-  if [ $? -ne 0 ]; then
-    echo "Problem encountered installing dependencies"
-    exit
-  fi
+npm install
+if [ $? -ne 0 ]; then
+  echo "Problem encountered installing dependencies"
+  exit
 fi
 
 #
