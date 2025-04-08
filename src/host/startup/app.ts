@@ -12,8 +12,8 @@ const parentContainer = new Container();
 try {
 
     // Load our JSON configuration and configure logging
-    const configurationBuffer = await fs.readFile('api.config.json');
-    const configuration = JSON.parse(configurationBuffer.toString()) as Configuration;
+    const configurationJson = await fs.readFile('api.config.json', 'utf8');
+    const configuration = JSON.parse(configurationJson) as Configuration;
     loggerFactory.configure(configuration.logging);
 
     // Configure the API behaviour at startup
