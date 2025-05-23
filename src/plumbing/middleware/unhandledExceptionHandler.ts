@@ -46,7 +46,7 @@ export class UnhandledExceptionHandler {
             clientError = error;
         }
 
-        // Throw an error in the format that the routing controllers library expects
+        // Return the error response
         response.setHeader('content-type', 'application/json');
         response.status(clientError.getStatusCode()).send(JSON.stringify(clientError.toResponseFormat()));
     }

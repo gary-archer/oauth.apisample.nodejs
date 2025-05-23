@@ -8,7 +8,6 @@ import {ServerError} from '../errors/serverError.js';
 import {LogEntry} from './logEntry.js';
 import {LogEntryData} from './logEntryData.js';
 import {PerformanceBreakdown} from './performanceBreakdown.js';
-import {RouteMetadata} from './routeMetadata.js';
 
 /*
  * The full implementation class is private to the framework and excluded from the index.ts file
@@ -37,7 +36,7 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Start collecting data before calling the API's business logic
      */
-    public start(request: Request, routeMetadata: RouteMetadata | null): void {
+    public start(request: Request): void {
 
         // Read request details
         this.data.performance.start();
@@ -58,12 +57,6 @@ export class LogEntryImpl implements LogEntry {
         const sessionId = request.header('x-authsamples-session-id');
         if (sessionId) {
             this.data.sessionId = sessionId;
-        }
-
-        // Record route metadata if available
-        if (routeMetadata) {
-            this.data.operationName = routeMetadata.operationName;
-            this.data.resourceId = routeMetadata.resourceIds.join('/');
         }
     }
 

@@ -4,7 +4,6 @@ import {BASETYPES} from '../dependencies/baseTypes.js';
 import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
 import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl.js';
-import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
 
 /*
  * A class to log API requests as JSON objects so that we get structured logging output
@@ -12,18 +11,10 @@ import {RouteMetadataHandler} from '../logging/routeMetadataHandler.js';
 export class LoggerMiddleware {
 
     private readonly loggerFactory: LoggerFactoryImpl;
-    private routeMetadataHandler!: RouteMetadataHandler;
 
     public constructor(loggerFactory: LoggerFactory) {
         this.loggerFactory = loggerFactory as LoggerFactoryImpl;
         this.setupCallbacks();
-    }
-
-    /*
-     * Set metadata details needed to log particular request fields
-     */
-    public setRouteMetadataHandler(routeMetadataHandler: RouteMetadataHandler): void {
-        this.routeMetadataHandler = routeMetadataHandler;
     }
 
     /*
@@ -39,8 +30,7 @@ export class LoggerMiddleware {
         container.bind<LogEntry>(BASETYPES.LogEntry).toConstantValue(logEntry);
 
         // Start the log entry for this API request
-        const routeMetadata = this.routeMetadataHandler.getOperationRouteInfo(request);
-        logEntry.start(request, routeMetadata);
+        logEntry.start(request);
 
         // Write the log entry when the finish event fires
         response.on('finish', () => {

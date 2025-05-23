@@ -1,5 +1,4 @@
 import {inject} from 'inversify';
-import {Controller, Get, Param} from 'routing-controllers';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {Company} from '../../logic/entities/company.js';
 import {CompanyTransactions} from '../../logic/entities/companyTransactions.js';
@@ -10,7 +9,7 @@ import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
 /*
  * Our API controller runs after claims handling has completed
  */
-@Controller('/companies')
+// @Controller('/companies')
 export class CompanyController {
 
     private readonly service: CompanyService;
@@ -23,7 +22,7 @@ export class CompanyController {
     /*
      * Return a list of companies
      */
-    @Get('')
+    // @Get('')
     public async getCompanyList(): Promise<Company[]> {
         return this.service.getCompanyList();
     }
@@ -31,8 +30,8 @@ export class CompanyController {
     /*
      * Return a composite object containing company transactions
      */
-    @Get('/:id/transactions')
-    public async getCompanyTransactions(@Param('id') id: string): Promise<CompanyTransactions> {
+    // @Get('/:id/transactions')
+    public async getCompanyTransactions(/*@Param('id')*/ id: string): Promise<CompanyTransactions> {
 
         // Parse the ID and throw a 400 error if it is invalid
         const companyId = parseInt(id, 10);

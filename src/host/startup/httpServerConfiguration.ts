@@ -2,20 +2,15 @@ import express from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {getMetadataArgsStorage, useContainer, useExpressServer} from 'routing-controllers';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
-import {InversifyAdapter} from '../../plumbing/dependencies/inversifyAdapter.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
-import {RouteMetadataHandler} from '../../plumbing/logging/routeMetadataHandler.js';
 import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
 import {Configuration} from '../configuration/configuration.js';
-import {CompanyController} from '../controllers/companyController.js';
-import {UserInfoController} from '../controllers/userInfoController.js';
 import {CompositionRoot} from '../dependencies/compositionRoot.js';
 
 /*
@@ -70,17 +65,7 @@ export class HttpServerConfiguration {
         this.expressApp.use(allRoutes, authorizerMiddleware.execute);
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
-        // Next ask the routing-controller library to create the API's routes from annotations
-        useContainer(new InversifyAdapter());
-        useExpressServer(this.expressApp, {
-            defaultErrorHandler: false,
-            routePrefix: apiBasePath,
-            controllers: [CompanyController, UserInfoController],
-        });
-
-        // Also give the logger middleware access to metadata about routing controllers
-        const routeMetadataHandler = new RouteMetadataHandler(apiBasePath, getMetadataArgsStorage());
-        loggerMiddleware.setRouteMetadataHandler(routeMetadataHandler);
+        // TODO: routes here
 
         // Configure Express error middleware once routes have been created
         this.expressApp.use(allRoutes, exceptionHandler.execute);
