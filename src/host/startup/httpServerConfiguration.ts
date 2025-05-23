@@ -1,18 +1,20 @@
-import express from 'express';
+import express, {Request, Response} from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
+import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
-/*import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
+import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
-import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';*/
+import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
+import {UserInfoController} from '../controllers/userInfoController.js';
+import {CompanyController} from '../controllers/companyController.js';
 import {Configuration} from '../configuration/configuration.js';
 import {CompositionRoot} from '../dependencies/compositionRoot.js';
-import {router} from '../routes/controllerDecorator.js';
 
 /*
  * Configure HTTP behaviour at application startup
@@ -41,10 +43,10 @@ export class HttpServerConfiguration {
         const allRoutes = `${apiBasePath}*_`;
 
         // Create Express middleware
-        /*const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
+        const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
         const loggerMiddleware = new LoggerMiddleware(this.loggerFactory);
         const authorizerMiddleware = new AuthorizerMiddleware();
-        const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);*/
+        const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging);
 
         // Register base dependencies
@@ -61,14 +63,33 @@ export class HttpServerConfiguration {
 
         // Configure cross cutting concerns
         this.expressApp.set('etag', false);
-        /*this.expressApp.use(allRoutes, childContainerMiddleware.execute);
+        this.expressApp.use(allRoutes, childContainerMiddleware.execute);
         this.expressApp.use(allRoutes, loggerMiddleware.execute);
         this.expressApp.use(allRoutes, authorizerMiddleware.execute);
-        this.expressApp.use(allRoutes, customHeaderMiddleware.execute);*/
+        this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
-        // Add decorator based routes
-        console.log('*** USING ROUTES');
-        this.expressApp.use(router);
+        // Handle application routes
+        this.expressApp.get('/investments/userinfo', (request: Request, response: Response) => {
+
+            const container = response.locals.container as Container;
+            container.get<UserInfoController>(SAMPLETYPES.UserInfoController)
+                .getUserInfo(request, response);
+
+        });
+
+        this.expressApp.get('/investments/companies', async (request: Request, response: Response) => {
+
+            const container = response.locals.container as Container;
+            await container.get<CompanyController>(SAMPLETYPES.CompanyController)
+                .getCompanyList(request, response);
+        });
+
+        this.expressApp.get('/investments/companies/:id/transactions', async (request: Request, response: Response) => {
+
+            const container = response.locals.container as Container;
+            await container.get<CompanyController>(SAMPLETYPES.CompanyController)
+                .getCompanyTransactions(request, response);
+        });
 
         // Configure Express error middleware once routes have been created
         this.expressApp.use(allRoutes, exceptionHandler.execute);

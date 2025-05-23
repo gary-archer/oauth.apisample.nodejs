@@ -6,6 +6,7 @@ import {ClientError} from '../errors/clientError.js';
 import {ErrorUtils} from '../errors/errorUtils.js';
 import {ServerError} from '../errors/serverError.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
+import {ResponseWriter} from '../utilities/responseWriter.js';
 
 /*
  * The entry point for catching exceptions during API calls
@@ -47,8 +48,7 @@ export class UnhandledExceptionHandler {
         }
 
         // Return the error response
-        response.setHeader('content-type', 'application/json');
-        response.status(clientError.getStatusCode()).send(JSON.stringify(clientError.toResponseFormat()));
+        ResponseWriter.writeErrorResponse(response, clientError);
     }
 
     /*

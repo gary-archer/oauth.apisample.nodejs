@@ -1,17 +1,14 @@
+import {Request, Response} from 'express';
 import {inject} from 'inversify';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
-import {Company} from '../../logic/entities/company.js';
-import {CompanyTransactions} from '../../logic/entities/companyTransactions.js';
 import {ErrorCodes} from '../../logic/errors/errorCodes.js';
 import {CompanyService} from '../../logic/services/companyService.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
-import {Controller} from '../routes/controllerDecorator.js';
-import {Get} from '../routes/routerDecorator.js';
+import {ResponseWriter} from '../../plumbing/utilities/responseWriter.js';
 
 /*
  * Our API controller runs after claims handling has completed
  */
-@Controller('/investments/companies')
 export class CompanyController {
 
     private readonly service: CompanyService;
@@ -24,19 +21,19 @@ export class CompanyController {
     /*
      * Return a list of companies
      */
-    @Get('')
-    public async getCompanyList(): Promise<Company[]> {
-        return this.service.getCompanyList();
+    public async getCompanyList(request: Request, response: Response): Promise<void> {
+
+        const result = this.service.getCompanyList();
+        ResponseWriter.writeSuccessResponse(response, 200, result);
     }
 
     /*
      * Return a composite object containing company transactions
      */
-    @Get('/:id/transactions')
-    public async getCompanyTransactions(/*@Param('id')*/ id: string): Promise<CompanyTransactions> {
+    public async getCompanyTransactions(request: Request, response: Response): Promise<void> {
 
         // Parse the ID and throw a 400 error if it is invalid
-        const companyId = parseInt(id, 10);
+        const companyId = parseInt(request.params.id, 10);
         if (isNaN(companyId) || companyId <= 0) {
 
             throw ErrorFactory.createClientError(
@@ -46,7 +43,8 @@ export class CompanyController {
         }
 
         // Next authorize access based on claims
-        return this.service.getCompanyTransactions(companyId);
+        const result = this.service.getCompanyTransactions(companyId);
+        ResponseWriter.writeSuccessResponse(response, 200, result);
     }
 
     /*
