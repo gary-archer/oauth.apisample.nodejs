@@ -23,7 +23,7 @@ export class CompanyController {
      */
     public async getCompanyList(request: Request, response: Response): Promise<void> {
 
-        const result = this.service.getCompanyList();
+        const result = await this.service.getCompanyList();
         ResponseWriter.writeSuccessResponse(response, 200, result);
     }
 
@@ -43,7 +43,7 @@ export class CompanyController {
         }
 
         // Next authorize access based on claims
-        const result = this.service.getCompanyTransactions(companyId);
+        const result = await this.service.getCompanyTransactions(companyId);
         ResponseWriter.writeSuccessResponse(response, 200, result);
     }
 
