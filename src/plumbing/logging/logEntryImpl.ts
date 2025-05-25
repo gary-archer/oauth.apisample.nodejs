@@ -5,6 +5,7 @@ import os from 'os';
 import {Logger} from 'winston';
 import {ClientError} from '../errors/clientError.js';
 import {ServerError} from '../errors/serverError.js';
+import {RouteMetadata} from '../utilities/routeMetadata.js';
 import {LogEntry} from './logEntry.js';
 import {LogEntryData} from './logEntryData.js';
 import {PerformanceBreakdown} from './performanceBreakdown.js';
@@ -36,7 +37,7 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Start collecting data before calling the API's business logic
      */
-    public start(request: Request): void {
+    public start(request: Request, routes: RouteMetadata[]): void {
 
         // Read request details
         this.data.performance.start();
@@ -57,6 +58,13 @@ export class LogEntryImpl implements LogEntry {
         const sessionId = request.header('x-authsamples-session-id');
         if (sessionId) {
             this.data.sessionId = sessionId;
+        }
+
+        const found = routes.find((r) =>
+            r.path.toLowerCase() === this.data.path.toLowerCase() &&
+            r.method.toLowerCase() === this.data.method.toLowerCase());
+        if (found) {
+            console.log('*** FOUND IT ***');
         }
     }
 

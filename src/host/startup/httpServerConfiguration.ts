@@ -39,13 +39,14 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Initialize routes
+        // Initialize routes data
         const apiBasePath = '/investments';
-        const allRoutes = `${apiBasePath}*_`;
+        const allRoutes = `${apiBasePath}/*_`;
+        const routesMetadata = this.getApplicationRoutesMetadata(apiBasePath);
 
         // Create Express middleware
         const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
-        const loggerMiddleware = new LoggerMiddleware(this.loggerFactory);
+        const loggerMiddleware = new LoggerMiddleware(this.loggerFactory, routesMetadata);
         const authorizerMiddleware = new AuthorizerMiddleware();
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging);
@@ -69,29 +70,8 @@ export class HttpServerConfiguration {
         this.expressApp.use(allRoutes, authorizerMiddleware.execute);
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
-        // Create route metadata and use it to add application routes
-        const routes: RouteMetadata[] = [
-            {
-                method: 'get',
-                path: '/investments/userinfo',
-                controller: SAMPLETYPES.UserInfoController,
-                action: (c: UserInfoController) => c.getUserInfo,
-            },
-            {
-                method: 'get',
-                path: '/investments/companies',
-                controller: SAMPLETYPES.CompanyController,
-                action: (c: CompanyController) => c.getCompanyList,
-            },
-            {
-                method: 'get',
-                path: '/investments/companies/:id/transactions',
-                controller: SAMPLETYPES.CompanyController,
-                action: (c: CompanyController) => c.getCompanyTransactions,
-            },
-        ];
-        loggerMiddleware.setRouteMetadata(routes);
-        this.expressApp.use(this.createApplicationRoutes(routes));
+        // Create application routes from the routes metadata
+        this.expressApp.use(this.createApplicationRoutes(routesMetadata));
 
         // Configure Express error middleware once routes have been created
         this.expressApp.use(allRoutes, exceptionHandler.execute);
@@ -125,6 +105,33 @@ export class HttpServerConfiguration {
                 console.log(`API is listening on HTTP port ${port}`);
             });
         }
+    }
+
+    /*
+     * Declare data about application routes, also used for request logging
+     */
+    private getApplicationRoutesMetadata(apiBasePath: string): RouteMetadata[] {
+
+        return [
+            {
+                method: 'get',
+                path: `${apiBasePath}/userinfo`,
+                controller: SAMPLETYPES.UserInfoController,
+                action: (c: UserInfoController) => c.getUserInfo,
+            },
+            {
+                method: 'get',
+                path: `${apiBasePath}/companies`,
+                controller: SAMPLETYPES.CompanyController,
+                action: (c: CompanyController) => c.getCompanyList,
+            },
+            {
+                method: 'get',
+                path: `${apiBasePath}/companies/:id/transactions`,
+                controller: SAMPLETYPES.CompanyController,
+                action: (c: CompanyController) => c.getCompanyTransactions,
+            },
+        ];
     }
 
     /*

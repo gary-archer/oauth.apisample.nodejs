@@ -12,19 +12,12 @@ import {RouteMetadata} from '../utilities/routeMetadata.js';
 export class LoggerMiddleware {
 
     private readonly loggerFactory: LoggerFactoryImpl;
-    private routes: RouteMetadata[];
+    private readonly routes: RouteMetadata[];
 
-    public constructor(loggerFactory: LoggerFactory) {
+    public constructor(loggerFactory: LoggerFactory, routes: RouteMetadata[]) {
         this.loggerFactory = loggerFactory as LoggerFactoryImpl;
-        this.routes = [];
-        this.setupCallbacks();
-    }
-
-    /*
-     * Set metadata details needed to log particular request fields
-     */
-    public setRouteMetadata(routes: RouteMetadata[]): void {
         this.routes = routes;
+        this.setupCallbacks();
     }
 
     /*
@@ -40,7 +33,7 @@ export class LoggerMiddleware {
         container.bind<LogEntry>(BASETYPES.LogEntry).toConstantValue(logEntry);
 
         // Start the log entry for this API request
-        logEntry.start(request);
+        logEntry.start(request, this.routes);
 
         // Write the log entry when the finish event fires
         response.on('finish', () => {
