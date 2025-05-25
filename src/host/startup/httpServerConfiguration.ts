@@ -11,7 +11,7 @@ import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainer
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
-import {RouteMetadata} from '../../plumbing/utilities/routeMetadata.js';
+import {RouteMetadata} from '../../plumbing/routes/routeMetadata.js';
 import {UserInfoController} from '../controllers/userInfoController.js';
 import {CompanyController} from '../controllers/companyController.js';
 import {Configuration} from '../configuration/configuration.js';
@@ -145,11 +145,15 @@ export class HttpServerConfiguration {
 
             router[r.method](r.path, async (request: Request, response: Response) => {
 
+                // Get the per-request container, which has access to reuqest-scoped objects that middleware creates
                 const container = response.locals.container as Container;
+
+                // Resolve the controller and its dependencies, which include the LogEntry and ClaimsPrincipal
                 const instance = container.get(r.controller);
 
-                const route = r.action(instance);
-                await route(request, response);
+                // Then get the route handler method and run it
+                const handler = r.action(instance);
+                await handler(request, response);
             });
         });
 
