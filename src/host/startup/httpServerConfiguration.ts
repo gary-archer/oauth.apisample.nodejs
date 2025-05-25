@@ -1,4 +1,4 @@
-import express, {Request, Response} from 'express';
+import express, {Request, Response, Router} from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
@@ -11,6 +11,7 @@ import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainer
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
+import {RouteMetadata} from '../../plumbing/utilities/routeMetadata.js';
 import {UserInfoController} from '../controllers/userInfoController.js';
 import {CompanyController} from '../controllers/companyController.js';
 import {Configuration} from '../configuration/configuration.js';
@@ -68,28 +69,29 @@ export class HttpServerConfiguration {
         this.expressApp.use(allRoutes, authorizerMiddleware.execute);
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
-        // Handle application routes
-        this.expressApp.get('/investments/userinfo', (request: Request, response: Response) => {
-
-            const container = response.locals.container as Container;
-            container.get<UserInfoController>(SAMPLETYPES.UserInfoController)
-                .getUserInfo(request, response);
-
-        });
-
-        this.expressApp.get('/investments/companies', async (request: Request, response: Response) => {
-
-            const container = response.locals.container as Container;
-            await container.get<CompanyController>(SAMPLETYPES.CompanyController)
-                .getCompanyList(request, response);
-        });
-
-        this.expressApp.get('/investments/companies/:id/transactions', async (request: Request, response: Response) => {
-
-            const container = response.locals.container as Container;
-            await container.get<CompanyController>(SAMPLETYPES.CompanyController)
-                .getCompanyTransactions(request, response);
-        });
+        // Create route metadata and use it to add application routes
+        const routes: RouteMetadata[] = [
+            {
+                method: 'get',
+                path: '/investments/userinfo',
+                controller: SAMPLETYPES.UserInfoController,
+                action: (c: UserInfoController) => c.getUserInfo,
+            },
+            {
+                method: 'get',
+                path: '/investments/companies',
+                controller: SAMPLETYPES.CompanyController,
+                action: (c: CompanyController) => c.getCompanyList,
+            },
+            {
+                method: 'get',
+                path: '/investments/companies/:id/transactions',
+                controller: SAMPLETYPES.CompanyController,
+                action: (c: CompanyController) => c.getCompanyTransactions,
+            },
+        ];
+        loggerMiddleware.setRouteMetadata(routes);
+        this.expressApp.use(this.createApplicationRoutes(routes));
 
         // Configure Express error middleware once routes have been created
         this.expressApp.use(allRoutes, exceptionHandler.execute);
@@ -123,5 +125,27 @@ export class HttpServerConfiguration {
                 console.log(`API is listening on HTTP port ${port}`);
             });
         }
+    }
+
+    /*
+     * Create an Express router with routes from route metadata
+     */
+    private createApplicationRoutes(routes: RouteMetadata[]): Router {
+
+        const router = Router();
+
+        routes.forEach((r) => {
+
+            router[r.method](r.path, async (request: Request, response: Response) => {
+
+                const container = response.locals.container as Container;
+                const instance = container.get(r.controller);
+
+                const route = r.action(instance);
+                await route(request, response);
+            });
+        });
+
+        return router;
     }
 }

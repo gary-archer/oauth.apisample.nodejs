@@ -4,6 +4,7 @@ import {BASETYPES} from '../dependencies/baseTypes.js';
 import {LogEntry} from '../logging/logEntry.js';
 import {LoggerFactory} from '../logging/loggerFactory.js';
 import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl.js';
+import {RouteMetadata} from '../utilities/routeMetadata.js';
 
 /*
  * A class to log API requests as JSON objects so that we get structured logging output
@@ -11,10 +12,19 @@ import {LoggerFactoryImpl} from '../logging/loggerFactoryImpl.js';
 export class LoggerMiddleware {
 
     private readonly loggerFactory: LoggerFactoryImpl;
+    private routes: RouteMetadata[];
 
     public constructor(loggerFactory: LoggerFactory) {
         this.loggerFactory = loggerFactory as LoggerFactoryImpl;
+        this.routes = [];
         this.setupCallbacks();
+    }
+
+    /*
+     * Set metadata details needed to log particular request fields
+     */
+    public setRouteMetadata(routes: RouteMetadata[]): void {
+        this.routes = routes;
     }
 
     /*

@@ -21,7 +21,7 @@ export class UserInfoController {
     /*
      * Return user attributes that are not stored in the authorization server that the UI needs
      */
-    public getUserInfo(request: Request, response: Response): void {
+    public async getUserInfo(request: Request, response: Response): Promise<void> {
 
         const result = {
             title: this.claims.getTitle(),
