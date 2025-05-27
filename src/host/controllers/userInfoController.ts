@@ -1,15 +1,14 @@
+import {Request, Response} from 'express';
 import {inject} from 'inversify';
-import {Controller, Get} from 'routing-controllers';
 import {SampleExtraClaims} from '../../logic/claims/sampleExtraClaims.js';
-import {ClientUserInfo} from '../../logic/entities/clientUserInfo.js';
 import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
+import {ResponseWriter} from '../../plumbing/utilities/responseWriter.js';
 
 /*
  * Return user info from the business data to the client
  * These values are separate to the core identity data returned from the OAuth user info endpoint
  */
-@Controller('/userinfo')
 export class UserInfoController {
 
     private readonly claims: SampleExtraClaims;
@@ -22,13 +21,13 @@ export class UserInfoController {
     /*
      * Return user attributes that are not stored in the authorization server that the UI needs
      */
-    @Get('')
-    public getUserInfo(): ClientUserInfo {
+    public async getUserInfo(request: Request, response: Response): Promise<void> {
 
-        return {
+        const result = {
             title: this.claims.getTitle(),
             regions: this.claims.getRegions(),
         };
+        ResponseWriter.writeSuccessResponse(response, 200, result);
     }
 
     /*

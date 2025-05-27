@@ -45,6 +45,18 @@ export class ErrorUtils {
     }
 
     /*
+     * Indicate route not found
+     */
+    public static fromRouteNotFound(): ClientError {
+
+        return ErrorFactory.createClientError(
+            404,
+            BaseErrorCodes.routeNotFound,
+            'Route was not found',
+        );
+    }
+
+    /*
      * Handle the error for key identifier lookups
      */
     public static fromSigningKeyDownloadError(responseError: any, url: string): ServerError {

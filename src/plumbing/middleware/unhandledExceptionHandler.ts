@@ -6,6 +6,7 @@ import {ClientError} from '../errors/clientError.js';
 import {ErrorUtils} from '../errors/errorUtils.js';
 import {ServerError} from '../errors/serverError.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
+import {ResponseWriter} from '../utilities/responseWriter.js';
 
 /*
  * The entry point for catching exceptions during API calls
@@ -24,7 +25,7 @@ export class UnhandledExceptionHandler {
      * Process any thrown exceptions
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public execute(exception: any, request: Request, response: Response, next: NextFunction): void {
+    public onException(exception: any, request: Request, response: Response, next: NextFunction): void {
 
         // Get the log entry for this API request
         const container = response.locals.container as Container;
@@ -46,15 +47,31 @@ export class UnhandledExceptionHandler {
             clientError = error;
         }
 
-        // Throw an error in the format that the routing controllers library expects
-        response.setHeader('content-type', 'application/json');
-        response.status(clientError.getStatusCode()).send(JSON.stringify(clientError.toResponseFormat()));
+        // Return the error response
+        ResponseWriter.writeErrorResponse(response, clientError);
+    }
+
+    /*
+     * Process any not found routes
+     */
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    public onNotFound(request: Request, response: Response, next: NextFunction): void {
+
+        // Get the log entry for this API request
+        const container = response.locals.container as Container;
+        const logEntry = container.get<LogEntryImpl>(BASETYPES.LogEntry);
+
+        // Log and convert to the client error
+        const clientError = ErrorUtils.fromRouteNotFound();
+        logEntry.setClientError(clientError);
+        ResponseWriter.writeErrorResponse(response, clientError);
     }
 
     /*
      * Plumbing to ensure the this parameter is available
      */
     private setupCallbacks(): void {
-        this.execute = this.execute.bind(this);
+        this.onException = this.onException.bind(this);
+        this.onNotFound = this.onNotFound.bind(this);
     }
 }

@@ -1,21 +1,20 @@
-import express from 'express';
+import express, {Request, Response, Router} from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {getMetadataArgsStorage, useContainer, useExpressServer} from 'routing-controllers';
 import {SampleExtraClaimsProvider} from '../../logic/claims/sampleExtraClaimsProvider.js';
+import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
-import {InversifyAdapter} from '../../plumbing/dependencies/inversifyAdapter.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
-import {RouteMetadataHandler} from '../../plumbing/logging/routeMetadataHandler.js';
 import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
 import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
-import {Configuration} from '../configuration/configuration.js';
-import {CompanyController} from '../controllers/companyController.js';
+import {RouteMetadata} from '../../plumbing/routes/routeMetadata.js';
 import {UserInfoController} from '../controllers/userInfoController.js';
+import {CompanyController} from '../controllers/companyController.js';
+import {Configuration} from '../configuration/configuration.js';
 import {CompositionRoot} from '../dependencies/compositionRoot.js';
 
 /*
@@ -40,13 +39,14 @@ export class HttpServerConfiguration {
      */
     public async configure(): Promise<void> {
 
-        // Initialize routes
+        // Initialize routes data
         const apiBasePath = '/investments';
-        const allRoutes = `${apiBasePath}*_`;
+        const allRoutes = `${apiBasePath}/*_`;
+        const routesMetadata = this.getApplicationRoutesMetadata(apiBasePath);
 
         // Create Express middleware
         const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
-        const loggerMiddleware = new LoggerMiddleware(this.loggerFactory);
+        const loggerMiddleware = new LoggerMiddleware(this.loggerFactory, routesMetadata);
         const authorizerMiddleware = new AuthorizerMiddleware();
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging);
@@ -70,20 +70,12 @@ export class HttpServerConfiguration {
         this.expressApp.use(allRoutes, authorizerMiddleware.execute);
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
-        // Next ask the routing-controller library to create the API's routes from annotations
-        useContainer(new InversifyAdapter());
-        useExpressServer(this.expressApp, {
-            defaultErrorHandler: false,
-            routePrefix: apiBasePath,
-            controllers: [CompanyController, UserInfoController],
-        });
-
-        // Also give the logger middleware access to metadata about routing controllers
-        const routeMetadataHandler = new RouteMetadataHandler(apiBasePath, getMetadataArgsStorage());
-        loggerMiddleware.setRouteMetadataHandler(routeMetadataHandler);
+        // Create application routes from the routes metadata
+        this.expressApp.use(this.createApplicationRoutes(routesMetadata));
 
         // Configure Express error middleware once routes have been created
-        this.expressApp.use(allRoutes, exceptionHandler.execute);
+        this.expressApp.use(allRoutes, exceptionHandler.onNotFound);
+        this.expressApp.use(allRoutes, exceptionHandler.onException);
     }
 
     /*
@@ -114,5 +106,58 @@ export class HttpServerConfiguration {
                 console.log(`API is listening on HTTP port ${port}`);
             });
         }
+    }
+
+    /*
+     * Declare data about application routes, also used for request logging
+     */
+    private getApplicationRoutesMetadata(apiBasePath: string): RouteMetadata[] {
+
+        return [
+            {
+                method: 'get',
+                path: `${apiBasePath}/userinfo`,
+                controller: SAMPLETYPES.UserInfoController,
+                action: (c: UserInfoController) => c.getUserInfo,
+            },
+            {
+                method: 'get',
+                path: `${apiBasePath}/companies`,
+                controller: SAMPLETYPES.CompanyController,
+                action: (c: CompanyController) => c.getCompanyList,
+            },
+            {
+                method: 'get',
+                path: `${apiBasePath}/companies/:id/transactions`,
+                controller: SAMPLETYPES.CompanyController,
+                action: (c: CompanyController) => c.getCompanyTransactions,
+            },
+        ];
+    }
+
+    /*
+     * Create an Express router with routes from route metadata
+     */
+    private createApplicationRoutes(routes: RouteMetadata[]): Router {
+
+        const router = Router();
+
+        routes.forEach((r) => {
+
+            router[r.method](r.path, async (request: Request, response: Response) => {
+
+                // Get the per-request container, which has access to reuqest-scoped objects that middleware creates
+                const container = response.locals.container as Container;
+
+                // Resolve the controller and its dependencies, which include the LogEntry and ClaimsPrincipal
+                const instance = container.get(r.controller);
+
+                // Then get the route handler method and run it
+                const handler = r.action(instance);
+                await handler(request, response);
+            });
+        });
+
+        return router;
     }
 }

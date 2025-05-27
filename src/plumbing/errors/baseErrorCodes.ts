@@ -3,6 +3,8 @@
  */
 export class BaseErrorCodes {
 
+    public static readonly routeNotFound = 'route_not_found';
+
     public static readonly serverError = 'server_error';
 
     public static readonly invalidToken = 'invalid_token';

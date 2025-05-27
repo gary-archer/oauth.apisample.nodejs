@@ -5,10 +5,10 @@ import os from 'os';
 import {Logger} from 'winston';
 import {ClientError} from '../errors/clientError.js';
 import {ServerError} from '../errors/serverError.js';
+import {RouteLogInfoHandler} from '../routes/routeLogInfoHandler.js';
 import {LogEntry} from './logEntry.js';
 import {LogEntryData} from './logEntryData.js';
 import {PerformanceBreakdown} from './performanceBreakdown.js';
-import {RouteMetadata} from './routeMetadata.js';
 
 /*
  * The full implementation class is private to the framework and excluded from the index.ts file
@@ -37,7 +37,7 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Start collecting data before calling the API's business logic
      */
-    public start(request: Request, routeMetadata: RouteMetadata | null): void {
+    public start(request: Request, routeLogInfoHandler: RouteLogInfoHandler): void {
 
         // Read request details
         this.data.performance.start();
@@ -60,10 +60,11 @@ export class LogEntryImpl implements LogEntry {
             this.data.sessionId = sessionId;
         }
 
-        // Record route metadata if available
-        if (routeMetadata) {
-            this.data.operationName = routeMetadata.operationName;
-            this.data.resourceId = routeMetadata.resourceIds.join('/');
+        // Also include route information in logs
+        const routeLogInfo = routeLogInfoHandler.getLogInfo(request);
+        if (routeLogInfo) {
+            this.data.operationName = routeLogInfo.operationName;
+            this.data.resourceId = routeLogInfo.resourceIds.join('/');
         }
     }
 

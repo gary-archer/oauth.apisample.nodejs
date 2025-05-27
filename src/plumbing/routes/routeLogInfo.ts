@@ -1,7 +1,7 @@
 /*
  * Information about an API request for logging
  */
-export interface RouteMetadata {
+export interface RouteLogInfo {
     operationName: string;
     resourceIds: string [];
 }
