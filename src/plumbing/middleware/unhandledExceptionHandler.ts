@@ -25,7 +25,7 @@ export class UnhandledExceptionHandler {
      * Process any thrown exceptions
      */
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    public execute(exception: any, request: Request, response: Response, next: NextFunction): void {
+    public onException(exception: any, request: Request, response: Response, next: NextFunction): void {
 
         // Get the log entry for this API request
         const container = response.locals.container as Container;
@@ -52,9 +52,26 @@ export class UnhandledExceptionHandler {
     }
 
     /*
+     * Process any not found routes
+     */
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    public onNotFound(request: Request, response: Response, next: NextFunction): void {
+
+        // Get the log entry for this API request
+        const container = response.locals.container as Container;
+        const logEntry = container.get<LogEntryImpl>(BASETYPES.LogEntry);
+
+        // Log and convert to the client error
+        const clientError = ErrorUtils.fromRouteNotFound();
+        logEntry.setClientError(clientError);
+        ResponseWriter.writeErrorResponse(response, clientError);
+    }
+
+    /*
      * Plumbing to ensure the this parameter is available
      */
     private setupCallbacks(): void {
-        this.execute = this.execute.bind(this);
+        this.onException = this.onException.bind(this);
+        this.onNotFound = this.onNotFound.bind(this);
     }
 }

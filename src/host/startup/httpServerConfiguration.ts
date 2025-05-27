@@ -74,7 +74,8 @@ export class HttpServerConfiguration {
         this.expressApp.use(this.createApplicationRoutes(routesMetadata));
 
         // Configure Express error middleware once routes have been created
-        this.expressApp.use(allRoutes, exceptionHandler.execute);
+        this.expressApp.use(allRoutes, exceptionHandler.onNotFound);
+        this.expressApp.use(allRoutes, exceptionHandler.onException);
     }
 
     /*
