@@ -46,18 +46,6 @@ export class ApiClient {
         return this.callApi(options, metrics);
     }
 
-    public async getCompanyList2(options: ApiRequestOptions): Promise<ApiResponse> {
-
-        options.setHttpMethod('GET');
-        options.setApiPath('/investments/companies2');
-
-        const metrics = {
-            operation: 'getCompanyList',
-        } as ApiResponseMetrics;
-
-        return this.callApi(options, metrics);
-    }
-
     public async getCompanyTransactions(options: ApiRequestOptions, companyId: number): Promise<ApiResponse> {
 
         options.setHttpMethod('GET');
