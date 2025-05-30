@@ -32,7 +32,6 @@ export class OAuthFilter {
     /*
      * Validate the OAuth access token and then look up other claims
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
     public async execute(request: Request, response: Response): Promise<ClaimsPrincipal> {
 
         // First read the access token
@@ -46,16 +45,16 @@ export class OAuthFilter {
 
         // If cached results already exist for this token then return them immediately
         const accessTokenHash = createHash('sha256').update(accessToken).digest('hex');
-        const extraClaimsText = this.cache.getExtraUserClaims(accessTokenHash);
-        if (extraClaimsText) {
-            return new ClaimsPrincipal(jwtClaims, JSON.parse(extraClaimsText));
+        let extraClaims = this.cache.getExtraUserClaims(accessTokenHash);
+        if (extraClaims) {
+            return new ClaimsPrincipal(jwtClaims, extraClaims);
         }
 
         // Look up extra claims not in the JWT access token
-        const extraClaims = await this.extraClaimsProvider.lookupExtraClaims(jwtClaims);
+        extraClaims = await this.extraClaimsProvider.lookupExtraClaims(jwtClaims, response);
 
         // Cache the extra claims for subsequent requests with the same access token
-        this.cache.setExtraUserClaims(accessTokenHash, JSON.stringify(extraClaims), jwtClaims.exp || 0);
+        this.cache.setExtraUserClaims(accessTokenHash, extraClaims, jwtClaims.exp || 0);
 
         // Return the final claims
         return new ClaimsPrincipal(jwtClaims, extraClaims);

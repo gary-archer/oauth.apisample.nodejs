@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
 import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
-import {UserRepository} from '../../logic/repositories/userRepository.js';
+import {ExtraClaimsProviderImpl} from '../../logic/claims/extraClaimsProviderImpl.js';
 import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
 import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
@@ -54,7 +54,7 @@ export class HttpServerConfiguration {
         // Register base dependencies
         new BaseCompositionRoot(this.parentContainer)
             .useOAuth(this.configuration.oauth)
-            .withExtraClaimsProvider(new UserRepository())
+            .withExtraClaimsProvider(new ExtraClaimsProviderImpl())
             .withLogging(this.configuration.logging, this.loggerFactory)
             .withExceptionHandler(exceptionHandler)
             .withProxyConfiguration(this.configuration.api.useProxy, this.configuration.api.proxyUrl)

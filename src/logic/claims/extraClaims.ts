@@ -7,8 +7,22 @@ export class ExtraClaims {
     public title: string;
     public regions: string[];
 
-    public constructor(title: string, regions: string[]) {
-        this.title = title;
-        this.regions = regions;
+    /*
+     * The default constructor
+     */
+    public constructor() {
+        this.title = '';
+        this.regions = [];
+    }
+
+    /*
+     * A static method for parameterized construction
+     */
+    public static create(title: string, regions: string[]): ExtraClaims {
+
+        const claims = new ExtraClaims();
+        claims.title = title;
+        claims.regions = regions;
+        return claims;
     }
 }
