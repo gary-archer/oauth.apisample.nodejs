@@ -2,8 +2,6 @@ import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
 import {LoggerFactory} from '../logging/loggerFactory.js';
-import {ExtraClaims} from './extraClaims.js';
-import {ExtraClaimsProvider} from './extraClaimsProvider.js';
 
 /*
  * A simple in memory claims cache for our API
@@ -13,18 +11,13 @@ export class ClaimsCache {
 
     private readonly cache: NodeCache;
     private readonly defaultTimeToLiveSeconds: number;
-    private readonly extraClaimsProvider: ExtraClaimsProvider;
     private readonly traceLogger: Logger;
 
     /*
      * Create the cache at application startup
      */
-    public constructor(
-        timeToLiveMinutes: number,
-        extraClaimsProvider: ExtraClaimsProvider,
-        loggerFactory: LoggerFactory) {
+    public constructor(timeToLiveMinutes: number, loggerFactory: LoggerFactory) {
 
-        this.extraClaimsProvider = extraClaimsProvider;
         this.traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
 
         // Create the cache and set a maximum time to live in seconds
@@ -41,12 +34,9 @@ export class ClaimsCache {
     }
 
     /*
-     * Add claims to the cache until the token's time to live
+     * Add serialized claims to the cache until the token's time to live
      */
-    public setExtraUserClaims(accessTokenHash: string, claims: ExtraClaims, exp: number): void {
-
-        // Get the data in way that handles private property names
-        const dataAsJson = claims.exportData();
+    public setExtraUserClaims(accessTokenHash: string, serializedClaims: string, exp: number): void {
 
         // Use the exp field to work out the token expiry time
         const epochSeconds = Math.floor((new Date().getTime()) / 1000);
@@ -65,15 +55,14 @@ export class ClaimsCache {
             // Cache the claims until the above time
             this.traceLogger.debug(
                 `Adding token to claims cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
-            const claimsText = JSON.stringify(dataAsJson);
-            this.cache.set(accessTokenHash, claimsText, secondsToCache);
+            this.cache.set(accessTokenHash, serializedClaims, secondsToCache);
         }
     }
 
     /*
-     * Get claims from the cache or return null if not found
+     * Get serialized claims from the cache or return null if not found
      */
-    public getExtraUserClaims(accessTokenHash: string): ExtraClaims | null {
+    public getExtraUserClaims(accessTokenHash: string): string | null {
 
         // Get the token hash and see if it exists in the cache
         const claimsText = this.cache.get<string>(accessTokenHash);
@@ -86,9 +75,6 @@ export class ClaimsCache {
 
         // Otherwise return cached claims
         this.traceLogger.debug(`Found existing token in claims cache (hash: ${accessTokenHash})`);
-
-        // Get the data in way that handles private property names
-        const dataAsJson = JSON.parse(claimsText);
-        return this.extraClaimsProvider.deserializeFromCache(dataAsJson);
+        return claimsText;
     }
 }

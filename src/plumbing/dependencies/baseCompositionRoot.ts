@@ -131,7 +131,6 @@ export class BaseCompositionRoot {
         // Register the singleton cache
         const claimsCache = new ClaimsCache(
             this.oauthConfiguration!.claimsCacheTimeToLiveMinutes,
-            this.extraClaimsProvider!,
             this.loggerFactory!);
         this.parentContainer.bind<ClaimsCache>(BASETYPES.ClaimsCache)
             .toConstantValue(claimsCache);
