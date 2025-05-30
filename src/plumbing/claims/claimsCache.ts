@@ -2,7 +2,7 @@ import {injectable} from 'inversify';
 import NodeCache from 'node-cache';
 import {Logger} from 'winston';
 import {LoggerFactory} from '../logging/loggerFactory.js';
-import { ExtraClaimsProvider } from './extraClaimsProvider.js';
+import {ExtraClaimsProvider} from './extraClaimsProvider.js';
 
 /*
  * A simple in memory claims cache for our API
