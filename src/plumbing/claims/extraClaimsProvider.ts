@@ -1,26 +1,18 @@
-import {Response} from 'express';
-import {injectable} from 'inversify';
 import {JWTPayload} from 'jose';
-import {ExtraClaims} from './extraClaims.js';
+import {Response} from 'express';
 
 /*
  * Add extra claims that you cannot, or do not want to, manage in the authorization server
  */
-@injectable()
-export class ExtraClaimsProvider {
+export interface ExtraClaimsProvider {
 
     /*
-     * Get additional claims from the API's own database
+     * Get extra claims from the API's own data
      */
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    public async lookupExtraClaims(jwtClaims: JWTPayload, response: Response): Promise<ExtraClaims> {
-        return new ExtraClaims();
-    }
+    lookupExtraClaims(jwtClaims: JWTPayload, response: Response): Promise<any>;
 
     /*
-     * Deserialize extra claims after they have been read from the cache
+     * Get extra claims from the cache
      */
-    public deserializeFromCache(data: any): ExtraClaims {
-        return ExtraClaims.importData(data);
-    }
+    deserializeFromCache(json: string): any;
 }

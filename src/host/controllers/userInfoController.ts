@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {inject} from 'inversify';
-import {SampleExtraClaims} from '../../logic/claims/sampleExtraClaims.js';
+import {ExtraClaims} from '../../logic/claims/extraClaims.js';
 import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ResponseWriter} from '../../plumbing/utilities/responseWriter.js';
@@ -11,10 +11,10 @@ import {ResponseWriter} from '../../plumbing/utilities/responseWriter.js';
  */
 export class UserInfoController {
 
-    private readonly claims: SampleExtraClaims;
+    private readonly claims: ExtraClaims;
 
     public constructor(@inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
-        this.claims = claims.getExtra() as SampleExtraClaims;
+        this.claims = claims.getExtra() as ExtraClaims;
         this.setupCallbacks();
     }
 
@@ -24,8 +24,8 @@ export class UserInfoController {
     public async getUserInfo(request: Request, response: Response): Promise<void> {
 
         const result = {
-            title: this.claims.getTitle(),
-            regions: this.claims.getRegions(),
+            title: this.claims.title,
+            regions: this.claims.regions,
         };
         ResponseWriter.writeSuccessResponse(response, 200, result);
     }

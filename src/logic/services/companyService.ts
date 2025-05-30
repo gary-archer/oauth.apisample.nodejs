@@ -5,7 +5,7 @@ import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ClientError} from '../../plumbing/errors/clientError.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
 import {CustomClaimNames} from '../claims/customClaimNames.js';
-import {SampleExtraClaims} from '../claims/sampleExtraClaims.js';
+import {ExtraClaims} from '../claims/extraClaims.js';
 import {SAMPLETYPES} from '../dependencies/sampleTypes.js';
 import {Company} from '../entities/company.js';
 import {CompanyTransactions} from '../entities/companyTransactions.js';
@@ -74,8 +74,8 @@ export class CompanyService {
         }
 
         // For the user role, authorize based on a business rule that links the user to regional data
-        const extraClaims = this.claims.getExtra() as SampleExtraClaims;
-        const found = extraClaims.getRegions().find((c) => c === company.region);
+        const extraClaims = this.claims.getExtra() as ExtraClaims;
+        const found = extraClaims.regions.find((c) => c === company.region);
         return !!found;
     }
 
