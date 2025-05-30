@@ -32,6 +32,7 @@ export class OAuthFilter {
     /*
      * Validate the OAuth access token and then look up other claims
      */
+    /* eslint-disable @typescript-eslint/no-unused-vars */
     public async execute(request: Request, response: Response): Promise<ClaimsPrincipal> {
 
         // First read the access token
@@ -51,7 +52,7 @@ export class OAuthFilter {
         }
 
         // Look up extra claims not in the JWT access token
-        const extraClaims = await this.extraClaimsProvider.lookupExtraClaims(jwtClaims, response);
+        const extraClaims = await this.extraClaimsProvider.lookupExtraClaims(jwtClaims);
 
         // Cache the extra claims for subsequent requests with the same access token
         this.cache.setExtraUserClaims(accessTokenHash, JSON.stringify(extraClaims), jwtClaims.exp || 0);
