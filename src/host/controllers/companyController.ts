@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {inject} from 'inversify';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
+import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {ErrorCodes} from '../../logic/errors/errorCodes.js';
 import {CompanyService} from '../../logic/services/companyService.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
@@ -13,7 +13,7 @@ export class CompanyController {
 
     private readonly service: CompanyService;
 
-    public constructor(@inject(SAMPLETYPES.CompanyService) service: CompanyService) {
+    public constructor(@inject(APPLICATIONTYPES.CompanyService) service: CompanyService) {
         this.service = service;
         this.setupCallbacks();
     }

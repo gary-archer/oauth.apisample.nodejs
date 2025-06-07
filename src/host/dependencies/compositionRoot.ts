@@ -1,34 +1,175 @@
 import {Container} from 'inversify';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
+import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {CompanyRepository} from '../../logic/repositories/companyRepository.js';
 import {UserRepository} from '../../logic/repositories/userRepository.js';
 import {CompanyService} from '../../logic/services/companyService.js';
 import {JsonFileReader} from '../../logic/utilities/jsonFileReader.js';
-import { CompanyController } from '../controllers/companyController.js';
-import { UserInfoController } from '../controllers/userInfoController.js';
+import {ClaimsCache} from '../../plumbing/claims/claimsCache.js';
+import {ExtraClaimsProvider} from '../../plumbing/claims/extraClaimsProvider.js';
+import {LoggingConfiguration} from '../../plumbing/configuration/loggingConfiguration.js';
+import {OAuthConfiguration} from '../../plumbing/configuration/oauthConfiguration.js';
+import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
+import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
+import {UnhandledExceptionHandler} from '../../plumbing/middleware/unhandledExceptionHandler.js';
+import {AccessTokenValidator} from '../../plumbing/oauth/accessTokenValidator.js';
+import {JwksRetriever} from '../../plumbing/oauth/jwksRetriever.js';
+import {OAuthFilter} from '../../plumbing/oauth/oauthFilter.js';
+import {HttpProxy} from '../../plumbing/utilities/httpProxy.js';
+import {Configuration} from '../configuration/configuration.js';
+import {CompanyController} from '../controllers/companyController.js';
+import {UserInfoController} from '../controllers/userInfoController.js';
 
 /*
- * Compose the application's business dependencies
+ * Dependency injection composition
  */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export class CompositionRoot {
 
-    /*
-     * Register this API's logic dependencies
-     */
-    public static registerDependencies(parentContainer: Container): void {
+    private readonly parentContainer: Container;
+    private configuration?: Configuration;
+    private extraClaimsProvider?: ExtraClaimsProvider;
+    private loggingConfiguration?: LoggingConfiguration;
+    private loggerFactory?: LoggerFactory;
+    private exceptionHandler?: UnhandledExceptionHandler;
+    private httpProxy?: HttpProxy;
 
-        parentContainer.bind<CompanyController>(SAMPLETYPES.CompanyController)
+    /*
+     * Receive the DI container
+     */
+    public constructor(parentContainer: Container) {
+        this.parentContainer = parentContainer;
+    }
+
+    /*
+     * Receive configuration
+     */
+    public addConfiguration(configuration: Configuration): CompositionRoot {
+        this.configuration = configuration;
+        return this;
+    }
+
+    /*
+     * Receive an object that customizes the claims principal
+     */
+    public addExtraClaimsProvider(extraClaimsProvider: ExtraClaimsProvider): CompositionRoot {
+        this.extraClaimsProvider = extraClaimsProvider;
+        return this;
+    }
+
+    /*
+     * Receive the logging configuration
+     */
+    public addLogging(
+        loggingConfiguration: LoggingConfiguration,
+        loggerFactory: LoggerFactory): CompositionRoot {
+
+        this.loggingConfiguration = loggingConfiguration;
+        this.loggerFactory = loggerFactory;
+        return this;
+    }
+
+    /*
+     * Receive the unhandled exception handler
+     */
+    public addExceptionHandler(exceptionHandler: UnhandledExceptionHandler): CompositionRoot {
+
+        this.exceptionHandler = exceptionHandler;
+        return this;
+    }
+
+    /*
+     * Store an object to manage HTTP debugging
+     */
+    public addProxyConfiguration(useProxy: boolean, proxyUrl: string): CompositionRoot {
+
+        this.httpProxy = new HttpProxy(useProxy, proxyUrl);
+        return this;
+    }
+
+    /*
+     * Do the main builder work of registering dependencies
+     */
+    public register(): CompositionRoot {
+
+        this.registerBaseDependencies();
+        this.registerOAuthDependencies();
+        this.registerClaimsDependencies();
+        this.registerApplicationDependencies();
+        return this;
+    }
+
+    /*
+     * Register dependencies for logging, error handling and an HTTP proxy library
+     */
+    private registerBaseDependencies(): void {
+
+        this.parentContainer.bind<UnhandledExceptionHandler>(BASETYPES.UnhandledExceptionHandler)
+            .toConstantValue(this.exceptionHandler!);
+        this.parentContainer.bind<LoggerFactory>(BASETYPES.LoggerFactory)
+            .toConstantValue(this.loggerFactory!);
+        this.parentContainer.bind<LoggingConfiguration>(BASETYPES.LoggingConfiguration)
+            .toConstantValue(this.loggingConfiguration!);
+        this.parentContainer.bind<HttpProxy>(BASETYPES.HttpProxy)
+            .toConstantValue(this.httpProxy!);
+    }
+
+    /*
+     * Register OAuth depencencies
+     */
+    private registerOAuthDependencies(): void {
+
+        // Make the configuration injectable
+        this.parentContainer.bind<OAuthConfiguration>(BASETYPES.OAuthConfiguration)
+            .toConstantValue(this.configuration!.oauth);
+
+        // Register an object to validate JWT access tokens
+        this.parentContainer.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
+            .to(AccessTokenValidator).inTransientScope();
+
+        // The filter deals with finalizing the claims principal
+        this.parentContainer.bind<OAuthFilter>(BASETYPES.OAuthFilter)
+            .to(OAuthFilter).inTransientScope();
+
+        // Also register a singleton to cache token signing public keys
+        this.parentContainer.bind<JwksRetriever>(BASETYPES.JwksRetriever)
+            .toConstantValue(new JwksRetriever(this.configuration!.oauth, this.httpProxy!));
+    }
+
+    /*
+     * Register claims related depencencies
+     */
+    private registerClaimsDependencies(): void {
+
+        // Register the singleton cache
+        const claimsCache = new ClaimsCache(
+            this.extraClaimsProvider!,
+            this.configuration!.oauth.claimsCacheTimeToLiveMinutes,
+            this.loggerFactory!);
+        this.parentContainer.bind<ClaimsCache>(BASETYPES.ClaimsCache)
+            .toConstantValue(claimsCache);
+
+        // Register the extra claims provider
+        this.parentContainer.bind<ExtraClaimsProvider>(BASETYPES.ExtraClaimsProvider)
+            .toConstantValue(this.extraClaimsProvider!);
+    }
+
+    /*
+     * Register objects used by application logic
+     */
+    public registerApplicationDependencies(): void {
+
+        this.parentContainer.bind<CompanyController>(APPLICATIONTYPES.CompanyController)
             .to(CompanyController).inRequestScope();
-        parentContainer.bind<UserInfoController>(SAMPLETYPES.UserInfoController)
+        this.parentContainer.bind<UserInfoController>(APPLICATIONTYPES.UserInfoController)
             .to(UserInfoController).inRequestScope();
 
-        parentContainer.bind<CompanyService>(SAMPLETYPES.CompanyService)
+        this.parentContainer.bind<CompanyService>(APPLICATIONTYPES.CompanyService)
             .to(CompanyService).inTransientScope();
-        parentContainer.bind<CompanyRepository>(SAMPLETYPES.CompanyRepository)
+        this.parentContainer.bind<CompanyRepository>(APPLICATIONTYPES.CompanyRepository)
             .to(CompanyRepository).inTransientScope();
-        parentContainer.bind<UserRepository>(SAMPLETYPES.UserRepository)
+        this.parentContainer.bind<UserRepository>(APPLICATIONTYPES.UserRepository)
             .to(UserRepository).inTransientScope();
-        parentContainer.bind<JsonFileReader>(SAMPLETYPES.JsonFileReader)
+        this.parentContainer.bind<JsonFileReader>(APPLICATIONTYPES.JsonFileReader)
             .to(JsonFileReader).inTransientScope();
     }
 }

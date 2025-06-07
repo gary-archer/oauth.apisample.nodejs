@@ -2,9 +2,8 @@ import express, {Request, Response, Router} from 'express';
 import fs from 'fs-extra';
 import https from 'https';
 import {Container} from 'inversify';
-import {SAMPLETYPES} from '../../logic/dependencies/sampleTypes.js';
+import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {ExtraClaimsProviderImpl} from '../../logic/claims/extraClaimsProviderImpl.js';
-import {BaseCompositionRoot} from '../../plumbing/dependencies/baseCompositionRoot.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
 import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
@@ -51,17 +50,14 @@ export class HttpServerConfiguration {
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging);
 
-        // Register base dependencies
-        new BaseCompositionRoot(this.parentContainer)
-            .useOAuth(this.configuration.oauth)
-            .withExtraClaimsProvider(new ExtraClaimsProviderImpl())
-            .withLogging(this.configuration.logging, this.loggerFactory)
-            .withExceptionHandler(exceptionHandler)
-            .withProxyConfiguration(this.configuration.api.useProxy, this.configuration.api.proxyUrl)
+        // Register dependencies with the container
+        new CompositionRoot(this.parentContainer)
+            .addConfiguration(this.configuration)
+            .addExtraClaimsProvider(new ExtraClaimsProviderImpl())
+            .addLogging(this.configuration.logging, this.loggerFactory)
+            .addExceptionHandler(exceptionHandler)
+            .addProxyConfiguration(this.configuration.api.useProxy, this.configuration.api.proxyUrl)
             .register();
-
-        // Register the API's own dependencies
-        CompositionRoot.registerDependencies(this.parentContainer);
 
         // Configure cross cutting concerns
         this.expressApp.set('etag', false);
@@ -117,19 +113,19 @@ export class HttpServerConfiguration {
             {
                 method: 'get',
                 path: `${apiBasePath}/userinfo`,
-                controller: SAMPLETYPES.UserInfoController,
+                controller: APPLICATIONTYPES.UserInfoController,
                 action: (c: UserInfoController) => c.getUserInfo,
             },
             {
                 method: 'get',
                 path: `${apiBasePath}/companies`,
-                controller: SAMPLETYPES.CompanyController,
+                controller: APPLICATIONTYPES.CompanyController,
                 action: (c: CompanyController) => c.getCompanyList,
             },
             {
                 method: 'get',
                 path: `${apiBasePath}/companies/:id/transactions`,
-                controller: SAMPLETYPES.CompanyController,
+                controller: APPLICATIONTYPES.CompanyController,
                 action: (c: CompanyController) => c.getCompanyTransactions,
             },
         ];
