@@ -131,15 +131,15 @@ export class LoggerFactoryImpl implements LoggerFactory {
     }
 
     /*
-     * Get a named debug logger
+     * Get a named debug logger or default to the root debug logger
      */
-    public getDebugLogger(name: string): winston.Logger | null {
+    public getDebugLogger(name: string): winston.Logger {
 
         if (winston.loggers.has(name)) {
             return winston.loggers.get(name);
         }
 
-        return null;
+        return winston.loggers.get('root');
     }
 
     /*
