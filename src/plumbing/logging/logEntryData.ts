@@ -37,10 +37,10 @@ export class LogEntryData {
     public userId: string;
 
     // The scope string from the access token
-    public scope: string;
+    public scope: string[];
 
     // The claims from the access token
-    public claims: any;
+    public claims: null;
 
     // The status code returned
     public statusCode: number;
@@ -88,8 +88,8 @@ export class LogEntryData {
         this.path = '';
         this.clientName = '';
         this.userId = '';
-        this.scope = '';
-        this.claims = {};
+        this.scope = [];
+        this.claims = null;
         this.statusCode = 0;
         this.millisecondsTaken = 0;
         this.performanceThresholdMilliseconds = 0;
@@ -112,12 +112,13 @@ export class LogEntryData {
     }
 
     /*
-     * Produce a request log record
+     * Output technical support details for troubleshooting but without sensitive data
      */
     public toRequestLog(): void {
 
         // Output fields used as top level queryable columns
         const output: any = {};
+        output.type = 'request';
         this.outputString((x) => output.id = x, this.id);
         this.outputString((x) => output.utcTime = x, this.utcTime.toISOString());
         this.outputString((x) => output.apiName = x, this.apiName);
@@ -143,21 +144,37 @@ export class LogEntryData {
     }
 
     /*
-     * Produce an audit log record
+     * Output audit logs for security visibility but without troubleshooting data
      */
     public toAuditLog(): void {
 
         const output: any = {};
+        output.type = 'audit';
         this.outputString((x) => output.id = x, this.id);
         this.outputString((x) => output.utcTime = x, this.utcTime.toISOString());
         this.outputString((x) => output.apiName = x, this.apiName);
         this.outputString((x) => output.operationName = x, this.operationName);
+        this.outputString((x) => output.hostName = x, this.hostName);
+        this.outputString((x) => output.method = x, this.method);
+        this.outputString((x) => output.path = x, this.path);
         this.outputString((x) => output.resourceId = x, this.resourceId);
         this.outputString((x) => output.clientName = x, this.clientName);
         this.outputString((x) => output.userId = x, this.userId);
+        this.outputNumber((x) => output.statusCode = x, this.statusCode);
+        this.outputString((x) => output.errorCode = x, this.errorCode);
         this.outputString((x) => output.sessionId = x, this.sessionId);
-        this.outputString((x) => output.scope = x, this.scope);
-        output.claims = this.claims;
+
+        output.isAuthenticated = !!this.userId;
+        output.isAuthorized = (this.statusCode >=200 && this.statusCode <= 299);
+
+        if (this.scope.length > 0) {
+            output.scope = this.scope;
+        }
+
+        if (this.claims) {
+            output.claims = this.claims;
+        }
+
         return output;
     }
 

@@ -43,14 +43,10 @@ export class LoggerMiddleware {
             logEntry.end(response);
 
             // Write request logs for technical support purposes
-            const requestLog = logEntry.getRequestLog();
-            this.loggerFactory.getRequestLogger()?.info(requestLog);
+            this.loggerFactory.getRequestLogger()?.info(logEntry.getRequestLog());
 
             // Write audit logs for security purposes
-            const auditLog = logEntry.getAuditLog();
-            if (auditLog) {
-                this.loggerFactory.getAuditLogger()?.info(auditLog);
-            }
+            this.loggerFactory.getAuditLogger()?.info(logEntry.getAuditLog());
         });
 
         next();

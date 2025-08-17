@@ -65,7 +65,7 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Audit identity details
      */
-    public setIdentity(userId: string, scope: string, claims: any): void {
+    public setIdentity(userId: string, scope: string[], claims: any): void {
         this.data.userId = userId;
         this.data.scope = scope;
         this.data.claims = claims;
@@ -135,11 +135,6 @@ export class LogEntryImpl implements LogEntry {
      * Get the audit data for authenticated requests
      */
     public getAuditLog(): any {
-
-        if (this.data.userId) {
-            return this.data.toAuditLog();
-        }
-
-        return null;
+        return this.data.toAuditLog();
     }
 }

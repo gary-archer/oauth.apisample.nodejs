@@ -32,7 +32,7 @@ export class AuthorizerMiddleware {
             managerId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.managerId),
             role: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.role),
         };
-        logEntry.setIdentity(userId, scope, claims);
+        logEntry.setIdentity(userId, scope.split(' '), claims);
 
         // Bind claims to this requests's child container so that they are injectable into business logic
         container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);
