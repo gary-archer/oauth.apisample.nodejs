@@ -1,8 +1,7 @@
 import {PerformanceBreakdown} from './performanceBreakdown.js';
 
 /*
- * Each API request writes a structured log entry containing fields we will query by
- * These operations are exported and this interface can be injected into business logic
+ * A log entry collects data during an API request and outputs it at the end
  */
 export interface LogEntry {
 

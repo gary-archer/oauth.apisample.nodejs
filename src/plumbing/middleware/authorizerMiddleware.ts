@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {Container} from 'inversify';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ClaimsReader} from '../claims/claimsReader.js';
+import {CustomClaimNames} from '../claims/customClaimNames.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {LogEntryImpl} from '../logging/logEntryImpl.js';
 import {OAuthFilter} from '../oauth/oauthFilter.js';
@@ -21,9 +22,17 @@ export class AuthorizerMiddleware {
         const filter =  container.get<OAuthFilter>(BASETYPES.OAuthFilter);
         const logEntry = container.get<LogEntryImpl>(BASETYPES.LogEntry);
 
-        // Run the authorizer then log identity details
+        // Run the authorizer
         const claimsPrincipal = await filter.execute(request, response);
-        logEntry.setIdentity(ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'sub'));
+
+        // Include identity details in logs
+        const userId = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'sub');
+        const scope = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'scope');
+        const claims = {
+            managerId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.managerId),
+            role: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.role),
+        }
+        logEntry.setIdentity(userId, scope, claims);
 
         // Bind claims to this requests's child container so that they are injectable into business logic
         container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);

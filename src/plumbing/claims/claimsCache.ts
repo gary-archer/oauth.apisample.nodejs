@@ -12,14 +12,14 @@ export class ClaimsCache {
 
     private readonly cache: NodeCache;
     private readonly defaultTimeToLiveSeconds: number;
-    private readonly traceLogger: Logger;
+    private readonly debugLogger: Logger | null;
 
     /*
      * Create the cache at application startup
      */
     public constructor(timeToLiveMinutes: number, loggerFactory: LoggerFactory) {
 
-        this.traceLogger = loggerFactory.getDevelopmentLogger(ClaimsCache.name);
+        this.debugLogger = loggerFactory.getDebugLogger(ClaimsCache.name);
 
         this.defaultTimeToLiveSeconds = timeToLiveMinutes * 60;
         this.cache = new NodeCache({
@@ -28,7 +28,7 @@ export class ClaimsCache {
 
         /* eslint-disable @typescript-eslint/no-unused-vars */
         this.cache.on('expired', (key: string, claims: ExtraClaims) => {
-            this.traceLogger.debug(`Expired item has been removed from the cache (hash: ${key})`);
+            this.debugLogger?.debug(`Expired item has been removed from the cache (hash: ${key})`);
         });
     }
 
@@ -45,7 +45,7 @@ export class ClaimsCache {
                 secondsToCache = this.defaultTimeToLiveSeconds;
             }
 
-            this.traceLogger.debug(
+            this.debugLogger?.debug(
                 `Adding item to cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
             this.cache.set(accessTokenHash, claims, secondsToCache);
         }
@@ -61,7 +61,7 @@ export class ClaimsCache {
             return null;
         }
 
-        this.traceLogger.debug(`Found existing item in cache (hash: ${accessTokenHash})`);
+        this.debugLogger?.debug(`Found existing item in cache (hash: ${accessTokenHash})`);
         return claims;
     }
 }

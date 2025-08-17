@@ -2,12 +2,11 @@ import {randomUUID} from 'crypto';
 import {PerformanceBreakdownImpl} from './performanceBreakdownImpl.js';
 
 /*
- * Each API request writes a structured log entry containing fields we will query by
- * It also writes JSON blobs whose fields are not designed to be queried
+ * Data collected during the lifetime of an API request
  */
 export class LogEntryData {
 
-    // A unique generated client side id, which becomes the unique id in the aggregated logs database
+    // The API generates a unique UUID for each API request
     public id: string;
 
     // The time when the API received the request
@@ -34,8 +33,14 @@ export class LogEntryData {
     // The calling application name
     public clientName: string;
 
-    // The anonymous subject claim from the OAuth 2.0 access token
+    // The anonymous subject claim from the access token
     public userId: string;
+
+    // The scope string from the access token
+    public scope: string;
+
+    // The claims from the access token
+    public claims: any;
 
     // The status code returned
     public statusCode: number;
@@ -83,6 +88,8 @@ export class LogEntryData {
         this.path = '';
         this.clientName = '';
         this.userId = '';
+        this.scope = ''
+        this.claims = {};
         this.statusCode = 0;
         this.millisecondsTaken = 0;
         this.performanceThresholdMilliseconds = 0;
@@ -105,9 +112,9 @@ export class LogEntryData {
     }
 
     /*
-     * Produce the output format
+     * Produce a request log record
      */
-    public toLogFormat(): void {
+    public toRequestLog(): void {
 
         // Output fields used as top level queryable columns
         const output: any = {};
@@ -132,6 +139,22 @@ export class LogEntryData {
         this.outputPerformance(output);
         this.outputError(output);
         this.outputInfo(output);
+        return output;
+    }
+
+    /*
+     * Produce an audit log record
+     */
+    public toAuditLog(): void {
+
+        const output: any = {};
+        this.outputString((x) => output.id = x, this.id);
+        this.outputString((x) => output.utcTime = x, this.utcTime.toISOString());
+        this.outputString((x) => output.apiName = x, this.apiName);
+        this.outputString((x) => output.operationName = x, this.operationName);
+        this.outputString((x) => output.resourceId = x, this.resourceId);
+        this.outputString((x) => output.clientName = x, this.clientName);
+        this.outputString((x) => output.sessionId = x, this.sessionId);
         return output;
     }
 

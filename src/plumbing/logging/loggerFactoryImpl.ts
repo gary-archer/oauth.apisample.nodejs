@@ -1,4 +1,4 @@
-import winston, {LoggerOptions} from 'winston';
+import winston, {Logform, LoggerOptions} from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import Transport from 'winston-transport';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
@@ -7,29 +7,36 @@ import {LogEntryImpl} from './logEntryImpl.js';
 import {LoggerFactory} from './loggerFactory.js';
 
 /*
- * Technical logger names
- */
-const ROOT_DEVELOPMENT_LOGGER_NAME = 'root';
-const PRODUCTION_LOGGER_NAME = 'production';
-
-/*
- * The logger factory implementation to manage winston and creating log entries
+ * The logger factory adapts the logger framework to implement preferred logging
  */
 export class LoggerFactoryImpl implements LoggerFactory {
 
     private apiName: string;
     private performanceThresholdMilliseconds: number;
+    private prettyJsonFormatter: Logform.Format;
+    private bareJsonFormatter: Logform.Format;
 
     /*
-     * We create the logger factory before reading configuration, since we need to log problems loading configuration
+     * Create the logger factory before reading configuration
      */
     public constructor() {
 
-        // Initialise logging fields
         this.apiName = '';
         this.performanceThresholdMilliseconds = 1000;
 
-        // Initialise console colours
+        // Create a pretty JSON formatter for local output of structured logs
+        this.prettyJsonFormatter = winston.format.combine(
+            winston.format.printf((logData: any) => {
+                return JSON.stringify(logData.message, null, 2);
+            }));
+
+        // Create a bare JSON formatter with a log entry per line, for log shippers
+        this.bareJsonFormatter = winston.format.combine(
+            winston.format.printf((logData: any) => {
+                return JSON.stringify(logData.message);
+            }));
+
+        // Colours for debug logging
         winston.addColors({
             error: 'red',
             warn: 'yellow',
@@ -39,21 +46,30 @@ export class LoggerFactoryImpl implements LoggerFactory {
     }
 
     /*
-     * Configure at application startup from a dynamic object
+     * At application startup, create loggers from the configuration file settings
      */
     public configure(configuration: LoggingConfiguration): void {
 
-        // Initialise behaviour
         this.apiName = configuration.apiName;
-        this.performanceThresholdMilliseconds = configuration.production.performanceThresholdMilliseconds;
 
-        // Create the production logger
-        const productionLogConfig = configuration.production;
-        this.createProductionLogger(productionLogConfig.level, productionLogConfig.transports);
+        // Create the fixed request logger
+        const requestLogConfig = configuration.loggers.find((l: any) => l.type === 'request');
+        if (requestLogConfig) {
+            this.performanceThresholdMilliseconds = requestLogConfig.performanceThresholdMilliseconds;
+            this.createRequestLogger(requestLogConfig);
+        }
 
-        // Create development loggers
-        const developmentLogConfig = configuration.development;
-        this.createDevelopmentLoggers(developmentLogConfig);
+        // Create the fixed audit logger
+        const auditLogConfig = configuration.loggers.find((l: any) => l.type === 'audit');
+        if (auditLogConfig) {
+            this.createAuditLogger(auditLogConfig);
+        }
+
+        // Create othed debug loggers
+        const debugLogConfig = configuration.loggers.find((l: any) => l.type === 'debug');
+        if (debugLogConfig) {
+            this.createDebugLoggers(debugLogConfig);
+        }
     }
 
     /*
@@ -61,143 +77,130 @@ export class LoggerFactoryImpl implements LoggerFactory {
      */
     public logStartupError(exception: any): void {
 
-        // Create a default production logger if configuration is not loaded yet
-        if (!winston.loggers.has(PRODUCTION_LOGGER_NAME)) {
-            this.createProductionLogger('info', [{type: 'console'}]);
+        if (!winston.loggers.has('request')) {
+            
+            // Create a default request logger
+            const defaultConfig = {
+                type: 'request',
+                transports: [{
+                    type: 'console',
+                }],
+            };
+            this.createRequestLogger(defaultConfig);
         }
 
         // Get the error into a loggable format
         const error = ErrorUtils.createServerError(exception);
 
         // Create a log entry and set error details
-        const logEntry = new LogEntryImpl(
-            this.apiName,
-            this.getProductionLogger(),
-            this.performanceThresholdMilliseconds);
-
+        const logEntry = new LogEntryImpl(this.apiName, this.performanceThresholdMilliseconds);
         logEntry.setOperationName('startup');
         logEntry.setServerError(error);
-        logEntry.write();
+        this.getRequestLogger()?.write(logEntry.getRequestLog());
     }
 
     /*
-     * Return the requested 'logger per class' or the default logger if not found
+     * Create a log entry at the start of an API request
      */
-    public getDevelopmentLogger(name: string): winston.Logger {
+    public createLogEntry(): LogEntryImpl {
+        return new LogEntryImpl(this.apiName, this.performanceThresholdMilliseconds);
+    }
+
+    /*
+     * Return the request logger
+     */
+    public getRequestLogger(): winston.Logger | null {
+
+        if (winston.loggers.has('request')) {
+            return winston.loggers.get('request');
+        }
+
+        return null;
+    }
+
+    /*
+     * Return the audit logger
+     */
+    public getAuditLogger(): winston.Logger | null {
+
+        if (winston.loggers.has('audit')) {
+            return winston.loggers.get('audit');
+        }
+
+        return null;
+    }
+
+    /*
+     * Get a named debug logger
+     */
+    public getDebugLogger(name: string): winston.Logger | null {
 
         if (winston.loggers.has(name)) {
             return winston.loggers.get(name);
         }
 
-        return (winston as any);
+        return null;
     }
 
     /*
-     * Create a log entry at the start of an API request
-     * Also set performance threshold details, which can be customised for specific operations
+     * Add an always on request logger for technical support details
      */
-    public createLogEntry(): LogEntryImpl {
+    private createRequestLogger(config: any): void {
 
-        return new LogEntryImpl(this.apiName, this.getProductionLogger(), this.performanceThresholdMilliseconds);
+        const loggerOptions = {
+            level: 'info',
+            transports: this.getTransports(config.transports),
+        } as LoggerOptions;
+
+        winston.loggers.add('request', loggerOptions);
     }
 
     /*
-     * There is a single production logger which writes a structured and queryable log entry for each API request
-     * It should be configured to be always on in all environments
+     * Add an always on audit logger request logger for technical support details
      */
-    private createProductionLogger(level: string, transportsConfig: any[]): void {
+    private createAuditLogger(config: any): void {
+
+        const loggerOptions = {
+            level: 'info',
+            transports: this.getTransports(config.transports),
+        } as LoggerOptions;
+
+        winston.loggers.add('audit', loggerOptions);
+    }
+
+    /*
+     * Get Winston transports for a logger
+     */
+    private getTransports(transportsConfig: any): any[] {
 
         const transports = [];
 
-        // Create a pretty print formatter for productivity
-        const prettyPrintFormatter = winston.format.combine(
-            winston.format.printf((logEntry: any) => {
-                return JSON.stringify(logEntry.message, null, 2);
-            }));
-
-        // Create a bare JSON formatter with a log entry per line, for log shippers
-        const bareJsonFormatter = winston.format.combine(
-            winston.format.printf((logEntry: any) => {
-                return JSON.stringify(logEntry.message);
-            }));
-
-        // Create the console transport, which is used for log shipping in Kubernetes
+        // The console transport is used for log shipping in Kubernetes
         const consoleTransportConfig = transportsConfig.find((a: any) => a.type === 'console');
         if (consoleTransportConfig) {
             const consoleTransport = new winston.transports.Console();
             if (consoleTransport) {
                 consoleTransport.format =
-                    consoleTransportConfig.prettyPrint ? prettyPrintFormatter : bareJsonFormatter;
+                    consoleTransportConfig.prettyPrint ? this.prettyJsonFormatter : this.bareJsonFormatter;
                 transports.push(consoleTransport);
             }
         }
 
-        // Create the file transport, which is used for log shipping from a developer PC
+        // The file transport is used for log shipping from a developer PC
         const fileTransportConfig = transportsConfig.find((a: any) => a.type === 'file');
         if (fileTransportConfig) {
             const fileTransport = this.createFileTransport(fileTransportConfig);
             if (fileTransport) {
-                fileTransport.format = bareJsonFormatter;
+                fileTransport.format = this.bareJsonFormatter;
                 transports.push(fileTransport);
             }
         }
 
-        const loggerOptions = {
-            level,
-            transports,
-        } as LoggerOptions;
-
-        winston.loggers.add(PRODUCTION_LOGGER_NAME, loggerOptions);
+        return transports;
     }
 
     /*
-     * Return the production logger, which logs every request as a JSON object
-     */
-    private getProductionLogger(): winston.Logger {
-        return winston.loggers.get(PRODUCTION_LOGGER_NAME);
-    }
-
-    /*
-     * Development loggers run only on a developer PC and should be used sparingly
-     * The output is not useful in production since it has insufficient context and is not queryable
-     */
-    private createDevelopmentLoggers(developmentLogConfig: any): void {
-
-        // Create the root logger
-        this.createDevelopmentLogger(ROOT_DEVELOPMENT_LOGGER_NAME, developmentLogConfig.level);
-
-        // Add extra loggers per class if configured
-        if (developmentLogConfig.overrideLevels) {
-            for (const name in developmentLogConfig.overrideLevels) {
-                if (name) {
-
-                    const level = developmentLogConfig.overrideLevels[name];
-                    this.createDevelopmentLogger(name, level);
-                }
-            }
-        }
-    }
-
-    /*
-     * Create a single development logger
-     * Development loggers intentionally only support a console logger
-     */
-    private createDevelopmentLogger(name: string, level: string): void {
-
-        const transports = [];
-        transports.push(new winston.transports.Console());
-
-        const options = {
-            transports,
-            format: this.createDevelopmentFormatter(name),
-            level,
-        } as LoggerOptions;
-
-        winston.loggers.add(name, options);
-    }
-
-    /*
-     * A utility method to create the file transport consistently
+     * Create a file transport from configuration settings
      */
     private createFileTransport(transportConfig: any): Transport {
 
@@ -213,9 +216,47 @@ export class LoggerFactoryImpl implements LoggerFactory {
     }
 
     /*
-     * Create the formatter for development text output in a parameterised manner
+     * Add debug loggers
      */
-    private createDevelopmentFormatter(loggerName: string): any {
+    private createDebugLoggers(config: any): void {
+
+        // Create the root logger
+        this.createDebugLogger('root', config.level);
+
+        // Add extra loggers per class if configured
+        if (config.overrideLevels) {
+            for (const name in config.overrideLevels) {
+                if (name) {
+
+                    const level = config.overrideLevels[name];
+                    this.createDebugLogger(name, level);
+                }
+            }
+        }
+    }
+
+    /*
+     * Add a single debug logger
+     */
+    private createDebugLogger(name: string, level: string): void {
+
+        const transports = [];
+        transports.push(new winston.transports.Console());
+
+        const options = {
+            level,
+            transports,
+            format: this.createDebugFormatter(name),
+            
+        } as LoggerOptions;
+
+        winston.loggers.add(name, options);
+    }
+
+    /*
+     * Create a formatter for debug messages
+     */
+    private createDebugFormatter(loggerName: string): any {
 
         return winston.format.combine(
             winston.format.colorize(),

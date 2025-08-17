@@ -8,28 +8,48 @@
   },
   "logging": {
     "apiName": "FinalApi",
-    "production": {
-      "level": "info",
-      "performanceThresholdMilliseconds": 500,
-      "transports": [
+    "loggers": [
       {
-        "type": "console",
-        "prettyPrint": true
+        "type": "request",
+        "performanceThresholdMilliseconds": 500,
+        "transports": [
+          {
+            "type": "console",
+            "prettyPrint": true
+          },
+          {
+            "type": "file",
+            "filePrefix": "request",
+            "dirname": "./logs",
+            "maxSize": "10m",
+            "maxFiles": "7d"
+          }
+        ]
       },
       {
-        "type": "file",
-        "filePrefix": "api-final",
-        "dirname": "./logs",
-        "maxSize": "10m",
-        "maxFiles": "7d"
-      }]
-    },
-    "development": {
-      "level": "info",
-      "overrideLevels": {
-        "ClaimsCache": "info"
+        "type": "audit",
+        "transports": [
+          {
+            "type": "console",
+            "prettyPrint": true
+          },
+          {
+            "type": "file",
+            "filePrefix": "audit",
+            "dirname": "./logs",
+            "maxSize": "10m",
+            "maxFiles": "7d"
+          }
+        ]
+      },
+      {
+        "type": "debug",
+        "level": "info",
+        "overrideLevels": {
+          "ClaimsCache": "info"
+        }
       }
-    }
+    ]
   },
   "oauth": {
     "issuer":                       "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_CuhLeqiE9",
