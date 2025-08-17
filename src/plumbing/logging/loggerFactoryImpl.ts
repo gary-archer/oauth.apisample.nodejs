@@ -77,9 +77,9 @@ export class LoggerFactoryImpl implements LoggerFactory {
      */
     public logStartupError(exception: any): void {
 
+        // Create a default request logger
         if (!winston.loggers.has('request')) {
 
-            // Create a default request logger
             const defaultConfig = {
                 type: 'request',
                 transports: [{
@@ -96,7 +96,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
         const logEntry = new LogEntryImpl(this.apiName, this.performanceThresholdMilliseconds);
         logEntry.setOperationName('startup');
         logEntry.setServerError(error);
-        this.getRequestLogger()?.write(logEntry.getRequestLog());
+        this.getRequestLogger()?.info(logEntry.getRequestLog());
     }
 
     /*

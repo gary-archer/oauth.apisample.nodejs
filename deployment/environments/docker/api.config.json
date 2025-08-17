@@ -16,13 +16,6 @@
           {
             "type": "console",
             "prettyPrint": false
-          },
-          {
-            "type": "file",
-            "filePrefix": "request",
-            "dirname": "./logs",
-            "maxSize": "10m",
-            "maxFiles": "7d"
           }
         ]
       },
@@ -32,13 +25,6 @@
           {
             "type": "console",
             "prettyPrint": false
-          },
-          {
-            "type": "file",
-            "filePrefix": "audit",
-            "dirname": "./logs",
-            "maxSize": "10m",
-            "maxFiles": "7d"
           }
         ]
       },

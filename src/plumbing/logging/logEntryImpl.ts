@@ -125,16 +125,21 @@ export class LogEntryImpl implements LogEntry {
     }
 
     /*
-     * Get the request data
+     * Get the request data for all requests
      */
     public getRequestLog(): any {
         return this.data.toRequestLog();
     }
 
     /*
-     * Get the audit data
+     * Get the audit data for authenticated requests
      */
     public getAuditLog(): any {
-        return this.data.toAuditLog();
+
+        if (this.data.userId) {
+            return this.data.toAuditLog();
+        }
+
+        return null;
     }
 }

@@ -154,15 +154,11 @@ export class LogEntryData {
         this.outputString((x) => output.operationName = x, this.operationName);
         this.outputString((x) => output.resourceId = x, this.resourceId);
         this.outputString((x) => output.clientName = x, this.clientName);
+        this.outputString((x) => output.userId = x, this.userId);
         this.outputString((x) => output.sessionId = x, this.sessionId);
+        this.outputString((x) => output.scope = x, this.scope);
+        output.claims = this.claims;
         return output;
-    }
-
-    /*
-     * Indicate whether an error entry
-     */
-    public isError(): boolean {
-        return this.errorData !== null;
     }
 
     /*
