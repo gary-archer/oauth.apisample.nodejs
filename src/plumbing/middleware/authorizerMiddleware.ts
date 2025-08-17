@@ -31,7 +31,7 @@ export class AuthorizerMiddleware {
         const claims = {
             managerId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.managerId),
             role: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.role),
-        }
+        };
         logEntry.setIdentity(userId, scope, claims);
 
         // Bind claims to this requests's child container so that they are injectable into business logic

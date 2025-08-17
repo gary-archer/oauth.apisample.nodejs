@@ -39,7 +39,6 @@ export class LoggerMiddleware {
 
         // Output log data when the finish event fires
         response.on('finish', () => {
-            
             logEntry.end(response);
             this.loggerFactory.getRequestLogger()?.info(logEntry.getRequestLog());
             this.loggerFactory.getAuditLogger()?.info(logEntry.getAuditLog());

@@ -78,7 +78,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
     public logStartupError(exception: any): void {
 
         if (!winston.loggers.has('request')) {
-            
+
             // Create a default request logger
             const defaultConfig = {
                 type: 'request',
@@ -247,7 +247,6 @@ export class LoggerFactoryImpl implements LoggerFactory {
             level,
             transports,
             format: this.createDebugFormatter(name),
-            
         } as LoggerOptions;
 
         winston.loggers.add(name, options);

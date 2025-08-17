@@ -88,7 +88,7 @@ export class LogEntryData {
         this.path = '';
         this.clientName = '';
         this.userId = '';
-        this.scope = ''
+        this.scope = '';
         this.claims = {};
         this.statusCode = 0;
         this.millisecondsTaken = 0;
