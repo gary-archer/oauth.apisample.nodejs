@@ -39,13 +39,13 @@ export class LoggerMiddleware {
 
         response.on('finish', () => {
 
-            // End logging
+            // Add response details to logs
             logEntry.end(response);
 
-            // Write request logs for technical support purposes
+            // Output request logs for technical support purposes
             this.loggerFactory.getRequestLogger()?.info(logEntry.getRequestLog());
 
-            // Write audit logs for security purposes
+            // Output audit logs for security purposes
             this.loggerFactory.getAuditLogger()?.info(logEntry.getAuditLog());
         });
 

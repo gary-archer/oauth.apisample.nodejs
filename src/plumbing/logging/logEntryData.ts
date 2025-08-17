@@ -2,7 +2,7 @@ import {randomUUID} from 'crypto';
 import {PerformanceBreakdownImpl} from './performanceBreakdownImpl.js';
 
 /*
- * Data collected during the lifetime of an API request
+ * Log data collected during the lifetime of an API request
  */
 export class LogEntryData {
 

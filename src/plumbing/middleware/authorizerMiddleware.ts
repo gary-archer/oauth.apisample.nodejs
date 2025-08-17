@@ -25,7 +25,7 @@ export class AuthorizerMiddleware {
         // Run the authorizer
         const claimsPrincipal = await filter.execute(request, response);
 
-        // Include identity details in logs
+        // Include token details in audit logs
         const userId = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'sub');
         const scope = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'scope');
         const claims = {
