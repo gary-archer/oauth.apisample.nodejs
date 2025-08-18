@@ -36,12 +36,6 @@ export class LogEntryData {
     // The anonymous subject claim from the access token
     public userId: string;
 
-    // The scope string from the access token
-    public scope: string[];
-
-    // The claims from the access token
-    public claims: null;
-
     // The status code returned
     public statusCode: number;
 
@@ -72,8 +66,14 @@ export class LogEntryData {
     // Can be populated in scenarios when extra text is useful
     public infoData: any[];
 
+    // The scope string from the access token
+    public scope: string[];
+
+    // The claims from the access token
+    public claims: any;
+
     /*
-     * Give fields default values
+     * Initialize data with default values
      */
     public constructor() {
 
@@ -88,8 +88,6 @@ export class LogEntryData {
         this.path = '';
         this.clientName = '';
         this.userId = '';
-        this.scope = [];
-        this.claims = null;
         this.statusCode = 0;
         this.millisecondsTaken = 0;
         this.performanceThresholdMilliseconds = 0;
@@ -102,6 +100,8 @@ export class LogEntryData {
         this.performance = new PerformanceBreakdownImpl('total');
         this.errorData = null;
         this.infoData = [];
+        this.scope = [];
+        this.claims = null;
     }
 
     /*
@@ -165,7 +165,7 @@ export class LogEntryData {
         this.outputString((x) => output.sessionId = x, this.sessionId);
 
         output.isAuthenticated = !!this.userId;
-        output.isAuthorized = (this.statusCode >=200 && this.statusCode <= 299);
+        output.isAuthorized = output.isAuthenticated && (this.statusCode !== 403 && this.statusCode !== 404);
 
         if (this.scope.length > 0) {
             output.scope = this.scope;

@@ -1,7 +1,7 @@
 services:
 
   finalapi:
-    image: finalnodejsapi:1.0
+    image: finalnodejsapi:latest
     hostname: api.authsamples-dev.com
     ports:
       - 446:8000

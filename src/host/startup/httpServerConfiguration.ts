@@ -46,7 +46,7 @@ export class HttpServerConfiguration {
         // Create Express middleware
         const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
         const loggerMiddleware = new LoggerMiddleware(this.loggerFactory, routesMetadata);
-        const authorizerMiddleware = new AuthorizerMiddleware();
+        const authorizerMiddleware = new AuthorizerMiddleware(this.configuration.oauth.scope);
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging.apiName);
 
