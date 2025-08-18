@@ -2,32 +2,26 @@ import {randomUUID} from 'crypto';
 import {Request, Response} from 'express';
 import {injectable} from 'inversify';
 import os from 'os';
-import {Logger} from 'winston';
 import {ClientError} from '../errors/clientError.js';
 import {ServerError} from '../errors/serverError.js';
 import {RouteLogInfoHandler} from '../routes/routeLogInfoHandler.js';
-import {LogEntry} from './logEntry.js';
 import {LogEntryData} from './logEntryData.js';
+import {LogEntry} from './logEntry.js';
 import {PerformanceBreakdown} from './performanceBreakdown.js';
 
 /*
- * The full implementation class is private to the framework and excluded from the index.ts file
+ * A log entry collects data during an API request and outputs it at the end
  */
 @injectable()
 export class LogEntryImpl implements LogEntry {
 
-    private readonly logger: Logger;
     private readonly data: LogEntryData;
 
     /*
-     * A log entry is created once per API request
+     * Initialize log data
      */
-    public constructor(apiName: string, logger: Logger, performanceThresholdMilliseconds: number) {
+    public constructor(apiName: string, performanceThresholdMilliseconds: number) {
 
-        // Record the logger details
-        this.logger = logger;
-
-        // Initialise data
         this.data = new LogEntryData();
         this.data.apiName = apiName;
         this.data.hostName = os.hostname();
@@ -69,10 +63,12 @@ export class LogEntryImpl implements LogEntry {
     }
 
     /*
-     * Add identity details for secured requests
+     * Audit identity details
      */
-    public setIdentity(subject: string): void {
-        this.data.userId = subject;
+    public setIdentity(userId: string, scope: string[], claims: any): void {
+        this.data.userId = userId;
+        this.data.scope = scope;
+        this.data.claims = claims;
     }
 
     /*
@@ -129,18 +125,16 @@ export class LogEntryImpl implements LogEntry {
     }
 
     /*
-     * Output our data
+     * Get the request data to output to logs for a support team
      */
-    public write(): void {
+    public getRequestLog(): any {
+        return this.data.toRequestLog();
+    }
 
-        // Get the object to log
-        const logData = this.data.toLogFormat();
-
-        // Output it
-        if (this.data.errorData) {
-            this.logger.error(logData);
-        } else {
-            this.logger.info(logData);
-        }
+    /*
+     * Get the audit data to output to logs for a security team
+     */
+    public getAuditLog(): any {
+        return this.data.toAuditLog();
     }
 }

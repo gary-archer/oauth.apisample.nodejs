@@ -2,12 +2,11 @@ import {randomUUID} from 'crypto';
 import {PerformanceBreakdownImpl} from './performanceBreakdownImpl.js';
 
 /*
- * Each API request writes a structured log entry containing fields we will query by
- * It also writes JSON blobs whose fields are not designed to be queried
+ * Log data collected during the lifetime of an API request
  */
 export class LogEntryData {
 
-    // A unique generated client side id, which becomes the unique id in the aggregated logs database
+    // The API generates a unique UUID for each API request
     public id: string;
 
     // The time when the API received the request
@@ -34,7 +33,7 @@ export class LogEntryData {
     // The calling application name
     public clientName: string;
 
-    // The anonymous subject claim from the OAuth 2.0 access token
+    // The anonymous subject claim from the access token
     public userId: string;
 
     // The status code returned
@@ -67,8 +66,14 @@ export class LogEntryData {
     // Can be populated in scenarios when extra text is useful
     public infoData: any[];
 
+    // The scope string from the access token
+    public scope: string[];
+
+    // The claims from the access token
+    public claims: any;
+
     /*
-     * Give fields default values
+     * Initialize data with default values
      */
     public constructor() {
 
@@ -95,6 +100,8 @@ export class LogEntryData {
         this.performance = new PerformanceBreakdownImpl('total');
         this.errorData = null;
         this.infoData = [];
+        this.scope = [];
+        this.claims = null;
     }
 
     /*
@@ -105,12 +112,13 @@ export class LogEntryData {
     }
 
     /*
-     * Produce the output format
+     * Output technical support details for troubleshooting but without sensitive data
      */
-    public toLogFormat(): void {
+    public toRequestLog(): void {
 
         // Output fields used as top level queryable columns
         const output: any = {};
+        output.type = 'request';
         this.outputString((x) => output.id = x, this.id);
         this.outputString((x) => output.utcTime = x, this.utcTime.toISOString());
         this.outputString((x) => output.apiName = x, this.apiName);
@@ -136,10 +144,38 @@ export class LogEntryData {
     }
 
     /*
-     * Indicate whether an error entry
+     * Output audit logs for security visibility but without troubleshooting data
      */
-    public isError(): boolean {
-        return this.errorData !== null;
+    public toAuditLog(): void {
+
+        const output: any = {};
+        output.type = 'audit';
+        this.outputString((x) => output.id = x, this.id);
+        this.outputString((x) => output.utcTime = x, this.utcTime.toISOString());
+        this.outputString((x) => output.apiName = x, this.apiName);
+        this.outputString((x) => output.operationName = x, this.operationName);
+        this.outputString((x) => output.hostName = x, this.hostName);
+        this.outputString((x) => output.method = x, this.method);
+        this.outputString((x) => output.path = x, this.path);
+        this.outputString((x) => output.resourceId = x, this.resourceId);
+        this.outputString((x) => output.clientName = x, this.clientName);
+        this.outputString((x) => output.userId = x, this.userId);
+        this.outputNumber((x) => output.statusCode = x, this.statusCode);
+        this.outputString((x) => output.errorCode = x, this.errorCode);
+        this.outputString((x) => output.sessionId = x, this.sessionId);
+
+        output.isAuthenticated = !!this.userId;
+        output.isAuthorized = output.isAuthenticated && (this.statusCode >= 200 && this.statusCode <= 299);
+
+        if (this.scope.length > 0) {
+            output.scope = this.scope;
+        }
+
+        if (this.claims) {
+            output.claims = this.claims;
+        }
+
+        return output;
     }
 
     /*

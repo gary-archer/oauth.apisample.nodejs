@@ -1,43 +1,52 @@
 {
-    "api": {
-      "port": 446,
-      "sslCertificateFileName": "./certs/authsamples-dev.ssl.p12",
-      "sslCertificatePassword": "Password1",
-      "useProxy": false,
-      "proxyUrl": "http://127.0.0.1:8888"
-    },
-    "logging": {
-      "apiName": "FinalApi",
-      "production": {
-        "level": "info",
+  "api": {
+    "port": 446,
+    "sslCertificateFileName": "./certs/authsamples-dev.ssl.p12",
+    "sslCertificatePassword": "Password1",
+    "useProxy": false,
+    "proxyUrl": "http://127.0.0.1:8888"
+  },
+  "logging": {
+    "apiName": "FinalApi",
+    "loggers": [
+      {
+        "type": "request",
         "performanceThresholdMilliseconds": 500,
         "transports": [
-        {
-          "type": "console",
-          "prettyPrint": true
-        },
-        {
-          "type": "file",
-          "filePrefix": "api-final",
-          "dirname": "./logs",
-          "maxSize": "10m",
-          "maxFiles": "7d"
-        }]
+          {
+            "type": "console",
+            "prettyPrint": true
+          },
+          {
+            "type": "file",
+            "filePrefix": "request",
+            "dirname": "./logs",
+            "maxSize": "10m",
+            "maxFiles": "7d"
+          }
+        ]
       },
-      "development": {
-        "level": "info",
-        "overrideLevels": {
-          "ClaimsCache": "info"
-        }
+      {
+        "type": "audit",
+        "transports": [
+          {
+            "type": "file",
+            "filePrefix": "audit",
+            "dirname": "./logs",
+            "maxSize": "10m",
+            "maxFiles": "7d"
+          }
+        ]
       }
-    },
-    "oauth": {
-      "issuer":                       "https://login.authsamples-dev.com",
-      "audience":                     "api.authsamples.com",
-      "algorithm":                    "ES256",
-      "scope":                        "investments",
-      "jwksEndpoint":                 "https://login.authsamples-dev.com:447/.well-known/jwks.json",
-      "jwksCooldownDuration":         0,
-      "claimsCacheTimeToLiveMinutes": 15
-    }
+    ]
+  },
+  "oauth": {
+    "issuer":                       "https://login.authsamples-dev.com",
+    "audience":                     "api.authsamples.com",
+    "algorithm":                    "ES256",
+    "scope":                        "investments",
+    "jwksEndpoint":                 "https://login.authsamples-dev.com:447/.well-known/jwks.json",
+    "jwksCooldownDuration":         0,
+    "claimsCacheTimeToLiveMinutes": 15
   }
+}

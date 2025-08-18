@@ -1,7 +1,7 @@
 import {PerformanceBreakdown} from './performanceBreakdown.js';
 
 /*
- * The full implementation class is private to the framework and excluded from the index.ts file
+ * Performs basic timing of expensive subtasks
  */
 export class PerformanceBreakdownImpl implements PerformanceBreakdown {
 
@@ -30,7 +30,6 @@ export class PerformanceBreakdownImpl implements PerformanceBreakdown {
 
     /*
      * Set details to associate with the performance breakdown
-     * One use case would be to log SQL with input parameters
      */
     public setDetails(value: any): void {
         this.details = value;

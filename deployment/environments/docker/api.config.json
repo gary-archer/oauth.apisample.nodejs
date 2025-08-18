@@ -8,20 +8,27 @@
   },
   "logging": {
     "apiName": "FinalApi",
-    "production": {
-      "level": "info",
-      "performanceThresholdMilliseconds": 500,
-      "transports": [{
-        "type": "console",
-        "prettyPrint": false
-      }]
-    },
-    "development": {
-      "level": "info",
-      "overrideLevels": {
-        "ClaimsCache": "info"
+    "loggers": [
+      {
+        "type": "request",
+        "performanceThresholdMilliseconds": 500,
+        "transports": [
+          {
+            "type": "console",
+            "prettyPrint": false
+          }
+        ]
+      },
+      {
+        "type": "audit",
+        "transports": [
+          {
+            "type": "console",
+            "prettyPrint": false
+          }
+        ]
       }
-    }
+    ]
   },
   "oauth": {
     "issuer":                       "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_CuhLeqiE9",

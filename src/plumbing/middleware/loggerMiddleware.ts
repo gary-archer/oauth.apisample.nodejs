@@ -37,10 +37,16 @@ export class LoggerMiddleware {
         // Start the log entry for this API request
         logEntry.start(request, this.routeLogInfoHandler);
 
-        // Write the log entry when the finish event fires
         response.on('finish', () => {
+
+            // Add response details to logs
             logEntry.end(response);
-            logEntry.write();
+
+            // Output request logs for technical support purposes
+            this.loggerFactory.getRequestLogger()?.info(logEntry.getRequestLog());
+
+            // Output audit logs for security purposes
+            this.loggerFactory.getAuditLogger()?.info(logEntry.getAuditLog());
         });
 
         next();
