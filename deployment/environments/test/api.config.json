@@ -37,13 +37,6 @@
             "maxFiles": "7d"
           }
         ]
-      },
-      {
-        "type": "debug",
-        "level": "info",
-        "overrideLevels": {
-          "ClaimsCache": "info"
-        }
       }
     ]
   },

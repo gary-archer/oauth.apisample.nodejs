@@ -27,13 +27,6 @@
             "prettyPrint": false
           }
         ]
-      },
-      {
-        "type": "debug",
-        "level": "info",
-        "overrideLevels": {
-          "ClaimsCache": "info"
-        }
       }
     ]
   },
