@@ -5,9 +5,9 @@ import {PerformanceBreakdown} from './performanceBreakdown.js';
  */
 export interface LogEntry {
 
-    // Create a performance breakdown for business logic
+    // Create a performance breakdown
     createPerformanceBreakdown(name: string): PerformanceBreakdown;
 
-    // Add text logging from business logic (not recommended)
+    // Add text logging
     addInfo(info: any): void;
 }

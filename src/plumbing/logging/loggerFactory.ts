@@ -2,7 +2,7 @@ import {Logger} from 'winston';
 import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
 
 /*
- * An interface to create logger objects
+ * An interface to create and get logger objects
  */
 export interface LoggerFactory {
 

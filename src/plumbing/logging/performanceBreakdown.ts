@@ -9,5 +9,5 @@ export interface PerformanceBreakdown extends Disposable {
     setDetails(value: any): void;
 
     // Create a child breakdown for an inner timing
-    createChild(name: string): PerformanceBreakdown
+    createChild(name: string): PerformanceBreakdown;
 }
