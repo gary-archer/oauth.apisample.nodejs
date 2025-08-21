@@ -12,8 +12,8 @@ export class ClaimsCache {
 
     private readonly cache: NodeCache;
     private readonly defaultTimeToLiveSeconds: number;
-    private readonly debugLogger: Logger;
-
+    private readonly debugLogger: Logger | null;
+ 
     /*
      * Create the cache at application startup
      */
