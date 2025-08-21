@@ -133,13 +133,17 @@ export class LoggerFactoryImpl implements LoggerFactory {
     /*
      * Get a named debug logger or default to the root debug logger
      */
-    public getDebugLogger(name: string): winston.Logger {
+    public getDebugLogger(name: string): winston.Logger | null {
 
         if (winston.loggers.has(name)) {
             return winston.loggers.get(name);
         }
 
-        return winston.loggers.get('root');
+        if (winston.loggers.has('debug')) {
+            return winston.loggers.get('debug');
+        }
+
+        return null;
     }
 
     /*
@@ -221,7 +225,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
     private createDebugLoggers(config: any): void {
 
         // Create the root logger
-        this.createDebugLogger('root', config.level);
+        this.createDebugLogger('debug', config.level);
 
         // Add extra loggers per class if configured
         if (config.overrideLevels) {

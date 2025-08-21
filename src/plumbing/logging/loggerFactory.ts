@@ -19,5 +19,5 @@ export interface LoggerFactory {
     getAuditLogger(): Logger | null;
 
     // Get a named debug logger
-    getDebugLogger(name: string): Logger;
+    getDebugLogger(name: string): Logger | null;
 }
