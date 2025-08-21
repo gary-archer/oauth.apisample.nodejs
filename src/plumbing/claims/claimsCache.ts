@@ -13,7 +13,7 @@ export class ClaimsCache {
     private readonly cache: NodeCache;
     private readonly defaultTimeToLiveSeconds: number;
     private readonly debugLogger: Logger | null;
- 
+
     /*
      * Create the cache at application startup
      */
@@ -45,7 +45,7 @@ export class ClaimsCache {
                 secondsToCache = this.defaultTimeToLiveSeconds;
             }
 
-            this.debugLogger.debug(
+            this.debugLogger?.debug(
                 `Adding item to cache for ${secondsToCache} seconds (hash: ${accessTokenHash})`);
             this.cache.set(accessTokenHash, claims, secondsToCache);
         }
@@ -61,7 +61,7 @@ export class ClaimsCache {
             return null;
         }
 
-        this.debugLogger.debug(`Found existing item in cache (hash: ${accessTokenHash})`);
+        this.debugLogger?.debug(`Found existing item in cache (hash: ${accessTokenHash})`);
         return claims;
     }
 }
