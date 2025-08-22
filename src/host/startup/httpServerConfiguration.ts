@@ -5,7 +5,7 @@ import {Container} from 'inversify';
 import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {ExtraClaimsProviderImpl} from '../../logic/claims/extraClaimsProviderImpl.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
-import {AuthorizerMiddleware} from '../../plumbing/middleware/authorizerMiddleware.js';
+import {AuthenticationMiddleware} from '../../plumbing/middleware/authenticationMiddleware.js';
 import {ChildContainerMiddleware} from '../../plumbing/middleware/childContainerMiddleware.js';
 import {CustomHeaderMiddleware} from '../../plumbing/middleware/customHeaderMiddleware.js';
 import {LoggerMiddleware} from '../../plumbing/middleware/loggerMiddleware.js';
@@ -46,7 +46,7 @@ export class HttpServerConfiguration {
         // Create Express middleware
         const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
         const loggerMiddleware = new LoggerMiddleware(this.loggerFactory, routesMetadata);
-        const authorizerMiddleware = new AuthorizerMiddleware(this.configuration.oauth.scope);
+        const authenticationMiddleware = new AuthenticationMiddleware(this.configuration.oauth.scope);
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging.apiName);
 
@@ -62,7 +62,7 @@ export class HttpServerConfiguration {
         this.expressApp.set('etag', false);
         this.expressApp.use(allRoutes, childContainerMiddleware.execute);
         this.expressApp.use(allRoutes, loggerMiddleware.execute);
-        this.expressApp.use(allRoutes, authorizerMiddleware.execute);
+        this.expressApp.use(allRoutes, authenticationMiddleware.execute);
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
         // Create application routes from the routes metadata

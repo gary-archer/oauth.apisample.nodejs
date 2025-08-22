@@ -10,9 +10,9 @@ import {LogEntryImpl} from '../logging/logEntryImpl.js';
 import {OAuthFilter} from '../oauth/oauthFilter.js';
 
 /*
- * A middleware class as the entry point for OAuth authorization
+ * A custom authentication filter to take finer control over processing of tokens and claims
  */
-export class AuthorizerMiddleware {
+export class AuthenticationMiddleware {
 
     private readonly requiredScope: string;
 
@@ -22,7 +22,7 @@ export class AuthorizerMiddleware {
     }
 
     /*
-     * The entry point for implementing authorization
+     * Do the main work to process tokens, claims and log identity details
      */
     public async execute(request: Request, response: Response, next: NextFunction): Promise<void> {
 
@@ -31,7 +31,7 @@ export class AuthorizerMiddleware {
         const filter =  container.get<OAuthFilter>(BASETYPES.OAuthFilter);
         const logEntry = container.get<LogEntryImpl>(BASETYPES.LogEntry);
 
-        // Run the authorizer and get the claims principal
+        // Run the filter and get the claims principal
         const claimsPrincipal = await filter.execute(request, response);
 
         // Include selected token details in audit logs
