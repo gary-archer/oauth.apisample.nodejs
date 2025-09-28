@@ -20,7 +20,7 @@ export class CustomHeaderMiddleware {
      */
     public execute(request: Request, response: Response, next: NextFunction): void {
 
-        const apiToBreak = request.header('x-authsamples-test-exception');
+        const apiToBreak = request.header('authsamples-test-exception');
         if (apiToBreak) {
             if (apiToBreak.toLowerCase() === this.apiName.toLowerCase()) {
 
