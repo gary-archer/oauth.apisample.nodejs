@@ -115,7 +115,7 @@ export class LogEntryImpl implements LogEntry {
     public end(response: Response): void {
 
         // Finish performance measurements
-        this.data.performance.dispose();
+        this.data.performance[Symbol.dispose]();
 
         // Record response details
         this.data.statusCode = response.statusCode;
