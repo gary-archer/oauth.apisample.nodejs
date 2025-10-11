@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'node:fs/promises';
 import {Container} from 'inversify';
 import 'reflect-metadata';
 import {LoggerFactoryBuilder} from '../../plumbing/logging/loggerFactoryBuilder.js';
@@ -12,7 +12,7 @@ const parentContainer = new Container();
 try {
 
     // Load our JSON configuration and configure logging
-    const configurationJson = await fs.readFile('api.config.json', 'utf8');
+    const configurationJson = await fs.readFile('api.config.json', 'utf-8');
     const configuration = JSON.parse(configurationJson) as Configuration;
     loggerFactory.configure(configuration.logging);
 
