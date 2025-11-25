@@ -48,7 +48,7 @@ export class HttpServerConfiguration {
         const loggerMiddleware = new LoggerMiddleware(this.loggerFactory, routesMetadata);
         const authenticationMiddleware = new AuthenticationMiddleware(this.configuration.oauth.scope);
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
-        const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging.apiName);
+        const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging, this.configuration.oauth);
 
         // Register dependencies with the container
         new CompositionRoot(this.parentContainer)

@@ -1,5 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {Container} from 'inversify';
+import {LoggingConfiguration} from '../configuration/loggingConfiguration.js';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ClientError} from '../errors/clientError.js';
 import {ErrorUtils} from '../errors/errorUtils.js';
@@ -12,11 +14,13 @@ import {ResponseWriter} from '../utilities/responseWriter.js';
  */
 export class UnhandledExceptionHandler {
 
-    private readonly apiName: string;
+    private readonly loggingConfiguration: LoggingConfiguration;
+    private readonly oauthConfiguration: OAuthConfiguration;
 
-    public constructor(apiName: string) {
+    public constructor(loggingConfiguration: LoggingConfiguration, oauthConfiguration: OAuthConfiguration) {
 
-        this.apiName = apiName;
+        this.loggingConfiguration = loggingConfiguration;
+        this.oauthConfiguration = oauthConfiguration;
         this.setupCallbacks();
     }
 
@@ -38,7 +42,7 @@ export class UnhandledExceptionHandler {
         if (error instanceof ServerError) {
 
             logEntry.setServerError(error);
-            clientError = error.toClientError(this.apiName);
+            clientError = error.toClientError(this.loggingConfiguration.apiName);
 
         } else {
 
@@ -47,7 +51,7 @@ export class UnhandledExceptionHandler {
         }
 
         // Return the error response
-        ResponseWriter.writeErrorResponse(response, clientError);
+        ResponseWriter.writeErrorResponse(response, clientError, this.oauthConfiguration.scope);
     }
 
     /*
@@ -63,7 +67,7 @@ export class UnhandledExceptionHandler {
         // Log and convert to the client error
         const clientError = ErrorUtils.fromRouteNotFound();
         logEntry.setClientError(clientError);
-        ResponseWriter.writeErrorResponse(response, clientError);
+        ResponseWriter.writeErrorResponse(response, clientError, this.oauthConfiguration.scope);
     }
 
     /*
