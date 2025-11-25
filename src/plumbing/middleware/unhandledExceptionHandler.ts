@@ -67,7 +67,7 @@ export class UnhandledExceptionHandler {
         // Log and convert to the client error
         const clientError = ErrorUtils.fromRouteNotFound();
         logEntry.setClientError(clientError);
-        ResponseWriter.writeErrorResponse(response, clientError, this.oauthConfiguration.scope);
+        ResponseWriter.writeNotFoundErrorResponse(response, clientError);
     }
 
     /*
