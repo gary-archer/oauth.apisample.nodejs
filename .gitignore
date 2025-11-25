@@ -3,5 +3,3 @@ node_modules
 dist
 resources
 logs
-certs/*.p12
-certs/*.crt
