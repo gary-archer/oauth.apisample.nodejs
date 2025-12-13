@@ -30,7 +30,6 @@
     "winston-transport": "^4.9.0"
   },
   "devDependencies": {
-    "@colors/colors": "^1.6.0",
     "@eslint/js": "^9.39.2",
     "@types/express": "^5.0.6",
     "@types/mocha": "^10.0.10",
