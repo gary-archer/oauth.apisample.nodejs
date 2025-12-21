@@ -1,15 +1,15 @@
 import {AxiosError} from 'axios';
 import {inject, injectable} from 'inversify';
 import {JWTPayload, JWTVerifyOptions, decodeJwt, jwtVerify} from 'jose';
+import {ClaimsReader} from '../claims/claimsReader.js';
+import {CustomClaimNames} from '../claims/customClaimNames.js';
 import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {ErrorFactory} from '../errors/errorFactory.js';
 import {ErrorUtils} from '../errors/errorUtils.js';
 import {JwksRetriever} from './jwksRetriever.js';
+import {IdentityLogData} from '../logging/identityLogData.js';
 import {LogEntry} from '../logging/logEntry.js';
-import { ClaimsReader } from '../claims/claimsReader.js';
-import { CustomClaimNames } from '../claims/customClaimNames.js';
-import { IdentityLogData } from '../logging/identityLogData.js';
 
 /*
  * A class to deal with OAuth JWT access token validation
