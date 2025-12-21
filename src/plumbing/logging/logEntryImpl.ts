@@ -5,6 +5,7 @@ import os from 'os';
 import {ClientError} from '../errors/clientError.js';
 import {ServerError} from '../errors/serverError.js';
 import {RouteLogInfoHandler} from '../routes/routeLogInfoHandler.js';
+import {TextValidator} from '../utilities/textValidator.js';
 import {IdentityLogData} from './identityLogData.js';
 import {LogEntryData} from './logEntryData.js';
 import {LogEntry} from './logEntry.js';
@@ -40,7 +41,10 @@ export class LogEntryImpl implements LogEntry {
         this.data.path = request.originalUrl;
 
         // Use the correlation id from request headers or create one
-        const correlationId = request.header('correlation-id');
+        let correlationId = request.header('correlation-id');
+        if (correlationId) {
+            correlationId = TextValidator.sanitize(correlationId);
+        }
         this.data.correlationId = correlationId ? correlationId : randomUUID();
 
         // Also include route information in logs
