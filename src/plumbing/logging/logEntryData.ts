@@ -30,8 +30,8 @@ export class LogEntryData {
     // The runtime id(s) in the URL path segments
     public resourceId: string;
 
-    // The calling application name
-    public clientName: string;
+    // The calling application
+    public clientId: string;
 
     // The anonymous subject claim from the access token
     public userId: string;
@@ -67,7 +67,7 @@ export class LogEntryData {
     public infoData: any[];
 
     // The scope string from the access token
-    public scope: string[];
+    public scope: string;
 
     // The claims from the access token
     public claims: any;
@@ -86,7 +86,7 @@ export class LogEntryData {
         this.method = '';
         this.resourceId = '';
         this.path = '';
-        this.clientName = '';
+        this.clientId = '';
         this.userId = '';
         this.statusCode = 0;
         this.millisecondsTaken = 0;
@@ -100,7 +100,7 @@ export class LogEntryData {
         this.performance = new PerformanceBreakdownImpl('total');
         this.errorData = null;
         this.infoData = [];
-        this.scope = [];
+        this.scope = '';
         this.claims = null;
     }
 
@@ -127,7 +127,7 @@ export class LogEntryData {
         this.outputString((x) => output.method = x, this.method);
         this.outputString((x) => output.path = x, this.path);
         this.outputString((x) => output.resourceId = x, this.resourceId);
-        this.outputString((x) => output.clientName = x, this.clientName);
+        this.outputString((x) => output.clientId = x, this.clientId);
         this.outputString((x) => output.userId = x, this.userId);
         this.outputNumber((x) => output.statusCode = x, this.statusCode);
         this.outputString((x) => output.errorCode = x, this.errorCode);
@@ -158,7 +158,7 @@ export class LogEntryData {
         this.outputString((x) => output.method = x, this.method);
         this.outputString((x) => output.path = x, this.path);
         this.outputString((x) => output.resourceId = x, this.resourceId);
-        this.outputString((x) => output.clientName = x, this.clientName);
+        this.outputString((x) => output.clientId = x, this.clientId);
         this.outputString((x) => output.userId = x, this.userId);
         this.outputNumber((x) => output.statusCode = x, this.statusCode);
         this.outputString((x) => output.errorCode = x, this.errorCode);

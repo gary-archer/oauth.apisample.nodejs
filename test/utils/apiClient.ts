@@ -11,14 +11,10 @@ import {ApiResponseMetrics} from './apiResponseMetrics.js';
 export class ApiClient {
 
     private readonly baseUrl: string;
-    private readonly clientName: string;
-    private readonly sessionId: string;
     private readonly httpProxy: HttpProxy;
 
-    public constructor(baseUrl: string, clientName: string, sessionId: string, useProxy: boolean) {
+    public constructor(baseUrl: string, useProxy: boolean) {
         this.baseUrl = baseUrl;
-        this.clientName = clientName;
-        this.sessionId = sessionId;
         this.httpProxy = new HttpProxy(useProxy, 'http://127.0.0.1:8888');
     }
 
@@ -66,9 +62,7 @@ export class ApiClient {
 
         const headers: any = {
             authorization: `Bearer ${requestOptions.getAccessToken()}`,
-            'authsamples-api-client': this.clientName,
-            'authsamples-session-id': this.sessionId,
-            'authsamples-correlation-id': metrics.correlationId,
+            'correlation-id': metrics.correlationId,
         };
 
         const options = {
@@ -79,16 +73,17 @@ export class ApiClient {
         } as AxiosRequestConfig;
 
         if (requestOptions.getRehearseException()) {
-            headers['authsamples-test-exception'] = 'FinalApi';
+            headers['exception-for'] = 'FinalApi';
         }
 
         try {
 
-            const axiosResponse = await axios(options);
+            const response = await axios(options);
+            metrics.sessionId = response.headers['session-id'];
 
             return {
-                statusCode: axiosResponse.status,
-                body: axiosResponse.data,
+                statusCode: response.status,
+                body: response.data,
                 metrics,
             };
 
@@ -97,6 +92,7 @@ export class ApiClient {
             if (e.response && e.response.status && e.response.data && typeof e.response.data === 'object') {
 
                 // Return JSON error responses
+                metrics.sessionId = e.response.headers['session-id'];
                 return {
                     statusCode: e.response.status,
                     body: e.response.data,

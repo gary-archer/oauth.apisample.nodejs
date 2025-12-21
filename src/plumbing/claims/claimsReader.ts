@@ -16,6 +16,6 @@ export class ClaimsReader {
             throw ErrorUtils.fromMissingClaim(name);
         }
 
-        return value as string;
+        return value as string || '';
     }
 }

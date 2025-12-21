@@ -12,7 +12,7 @@ export class LoadTest {
 
     private readonly authorizationServer: MockAuthorizationServer;
     private readonly apiClient: ApiClient;
-    private readonly sessionId: string;
+    private sessionId: string;
     private totalCount: number;
     private errorCount: number;
 
@@ -26,8 +26,8 @@ export class LoadTest {
         const useProxy = false;
         this.authorizationServer = new MockAuthorizationServer(useProxy);
         const apiBaseUrl = 'https://api.authsamples-dev.com:446';
+        this.apiClient = new ApiClient(apiBaseUrl, useProxy);
         this.sessionId = randomUUID();
-        this.apiClient = new ApiClient(apiBaseUrl, 'LoadTest', this.sessionId, useProxy);
         this.totalCount = 0;
         this.errorCount = 0;
     }
@@ -84,6 +84,7 @@ export class LoadTest {
 
             const jwtOptions = new MockTokenOptions();
             jwtOptions.useStandardUser();
+            jwtOptions.delegationId = this.sessionId;
             const accessToken = await this.authorizationServer.issueAccessToken(jwtOptions);
             accessTokens.push(accessToken);
         }
@@ -216,12 +217,12 @@ export class LoadTest {
                 if (response.statusCode >= 200 && response.statusCode <= 299) {
 
                     // Report successful requests
-                    this.outputMessage(this.colorGreen, this.formatMetrics(response));
+                    this.outputMessage(this.colorGreen, this.processMetrics(response));
 
                 } else {
 
                     // Report failed requests, some of which are expected
-                    this.outputMessage(this.colorRed, this.formatMetrics(response));
+                    this.outputMessage(this.colorRed, this.processMetrics(response));
                     this.errorCount++;
                 }
 
@@ -232,9 +233,9 @@ export class LoadTest {
     }
 
     /*
-     * Get metrics as a table row
+     * Process metrics and return a table row
      */
-    private formatMetrics(response: ApiResponse): string {
+    private processMetrics(response: ApiResponse): string {
 
         let errorCode = '';
         let errorId   = '';

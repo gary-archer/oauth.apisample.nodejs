@@ -3,6 +3,7 @@ import {Container} from 'inversify';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ClaimsReader} from '../claims/claimsReader.js';
 import {CustomClaimNames} from '../claims/customClaimNames.js';
+import {OAuthConfiguration} from '../configuration/oauthConfiguration.js';
 import {BASETYPES} from '../dependencies/baseTypes.js';
 import {BaseErrorCodes} from '../errors/baseErrorCodes.js';
 import {ErrorFactory} from '../errors/errorFactory.js';
@@ -14,10 +15,10 @@ import {OAuthFilter} from '../oauth/oauthFilter.js';
  */
 export class AuthenticationMiddleware {
 
-    private readonly requiredScope: string;
+    private readonly configuration: OAuthConfiguration;
 
-    public constructor(requiredScope: string) {
-        this.requiredScope = requiredScope;
+    public constructor(configuration: OAuthConfiguration) {
+        this.configuration = configuration;
         this.execute = this.execute.bind(this);
     }
 
@@ -34,14 +35,18 @@ export class AuthenticationMiddleware {
         // Run the filter and get the claims principal
         const claimsPrincipal = await filter.execute(request, response);
 
-        // Include selected token details in audit logs
-        const userId = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'sub');
-        const scope = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'scope');
-        const loggedClaims = {
-            managerId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.managerId),
-            role: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.role),
+        // Collect identity data to log
+        const identityData = {
+            userId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'sub'),
+            sessionId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), this.configuration.sessionIdClaimName),
+            clientId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'client_id'),
+            scope: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'scope'),
+            claims: {
+                managerId: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.managerId),
+                role: ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), CustomClaimNames.role),
+            },
         };
-        logEntry.setIdentity(userId, scope.split(' '), loggedClaims);
+        logEntry.setIdentity(identityData);
 
         // Bind claims to this requests's child container so that they are injectable into business logic
         container.bind<ClaimsPrincipal>(BASETYPES.ClaimsPrincipal).toConstantValue(claimsPrincipal);
@@ -49,7 +54,7 @@ export class AuthenticationMiddleware {
         // The sample API requires the same scope for all endpoints, so enforce it here
         // In AWS this is a URL value of the form https://api.authsamples.com/investments
         const scopes = ClaimsReader.getStringClaim(claimsPrincipal.getJwt(), 'scope').split(' ');
-        if (scopes.indexOf(this.requiredScope) === -1) {
+        if (scopes.indexOf(this.configuration.scope) === -1) {
 
             throw ErrorFactory.createClientError(
                 403,
