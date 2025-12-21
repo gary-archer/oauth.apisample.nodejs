@@ -73,13 +73,12 @@ export class ApiClient {
         } as AxiosRequestConfig;
 
         if (requestOptions.getRehearseException()) {
-            headers['exception-for'] = 'FinalApi';
+            headers['api-exception-simulation'] = 'FinalApi';
         }
 
         try {
 
             const response = await axios(options);
-            metrics.sessionId = response.headers['session-id'];
 
             return {
                 statusCode: response.status,
@@ -92,7 +91,6 @@ export class ApiClient {
             if (e.response && e.response.status && e.response.data && typeof e.response.data === 'object') {
 
                 // Return JSON error responses
-                metrics.sessionId = e.response.headers['session-id'];
                 return {
                     statusCode: e.response.status,
                     body: e.response.data,
