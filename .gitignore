@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 dist
-resources
+/api.config.json
 logs
 certs/*.p12
 certs/*.crt
