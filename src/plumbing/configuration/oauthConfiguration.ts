@@ -15,7 +15,7 @@ export interface OAuthConfiguration {
 
     jwksCooldownDuration?: number;
 
-    sessionIdClaimName: string;
+    delegationIdClaimName: string;
 
     claimsCacheTimeToLiveMinutes: number;
 }

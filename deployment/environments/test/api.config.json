@@ -47,7 +47,7 @@
     "scope":                        "investments",
     "jwksEndpoint":                 "https://login.authsamples-dev.com:447/.well-known/jwks.json",
     "jwksCooldownDuration":         0,
-    "sessionIdClaimName":           "delegation_id",
+    "delegationIdClaimName":        "delegation_id",
     "claimsCacheTimeToLiveMinutes": 15
   }
 }
