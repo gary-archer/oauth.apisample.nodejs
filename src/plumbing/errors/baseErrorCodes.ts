@@ -13,5 +13,7 @@ export class BaseErrorCodes {
 
     public static readonly insufficientScope = 'insufficient_scope';
 
+    public static readonly insufficientData = 'insufficient_data';
+
     public static readonly exceptionSimulation = 'exception_simulation';
 }

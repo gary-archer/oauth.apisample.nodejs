@@ -5,6 +5,8 @@ import os from 'os';
 import {ClientError} from '../errors/clientError.js';
 import {ServerError} from '../errors/serverError.js';
 import {RouteLogInfoHandler} from '../routes/routeLogInfoHandler.js';
+import {TextValidator} from '../utilities/textValidator.js';
+import {IdentityLogData} from './identityLogData.js';
 import {LogEntryData} from './logEntryData.js';
 import {LogEntry} from './logEntry.js';
 import {PerformanceBreakdown} from './performanceBreakdown.js';
@@ -38,21 +40,12 @@ export class LogEntryImpl implements LogEntry {
         this.data.method = request.method;
         this.data.path = request.originalUrl;
 
-        // Our callers can supply a custom header so that we can keep track of who is calling each API
-        const clientName = request.header('authsamples-api-client');
-        if (clientName) {
-            this.data.clientName = clientName;
-        }
-
         // Use the correlation id from request headers or create one
-        const correlationId = request.header('authsamples-correlation-id');
-        this.data.correlationId = correlationId ? correlationId : randomUUID();
-
-        // Log an optional session id if supplied
-        const sessionId = request.header('authsamples-session-id');
-        if (sessionId) {
-            this.data.sessionId = sessionId;
+        let correlationId = request.header('correlation-id');
+        if (correlationId) {
+            correlationId = TextValidator.sanitize(correlationId);
         }
+        this.data.correlationId = correlationId ? correlationId : randomUUID();
 
         // Also include route information in logs
         const routeLogInfo = routeLogInfoHandler.getLogInfo(request);
@@ -65,10 +58,19 @@ export class LogEntryImpl implements LogEntry {
     /*
      * Audit identity details
      */
-    public setIdentity(userId: string, scope: string[], claims: any): void {
-        this.data.userId = userId;
-        this.data.scope = scope;
-        this.data.claims = claims;
+    public setIdentityData(data: IdentityLogData): void {
+        this.data.userId = data.userId;
+        this.data.sessionId = data.sessionId;
+        this.data.clientId = data.clientId;
+        this.data.scope = data.scope;
+        this.data.claims = data.claims;
+    }
+
+    /*
+     * Allow the session ID to be passed back to the client in response headers
+     */
+    public getSessionId(): string {
+        return this.data.sessionId;
     }
 
     /*
