@@ -34,7 +34,7 @@ if [ ! -d './logs' ]; then
 fi
 
 #
-# Run the API and support debugging
+# Run the API and use --inspect to support attach to process
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
