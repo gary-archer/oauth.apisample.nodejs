@@ -14,7 +14,8 @@
            "type": "node",
            "request": "attach",
            "name": "Attach to API",
-           "processId": "${command:PickProcess}"
+           "processId": "${command:PickProcess}",
+           "skipFiles": ["<node_internals>/**"]
        }
     ]
 }
