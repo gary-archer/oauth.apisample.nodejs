@@ -34,11 +34,11 @@ if [ ! -d './logs' ]; then
 fi
 
 #
-# Run the API
+# Run the API and support debugging
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
-npx tsx --inspect-brk src/host/startup/app.ts
+npx tsx --inspect src/host/startup/app.ts
 if [ $? -ne 0 ]; then
   echo 'Problem encountered starting the API'
   read -n 1
