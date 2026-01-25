@@ -34,6 +34,13 @@ if [ ! -d './logs' ]; then
 fi
 
 #
+# Tell Node.js to trust the CA, or the user can add this CA to their own trust file
+#
+if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
+  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.crt'
+fi
+
+#
 # Run the API
 # On Linux ensure that you have first granted Node.js permissions to listen on port 446:
 # - sudo setcap 'cap_net_bind_service=+ep' $(which node)
