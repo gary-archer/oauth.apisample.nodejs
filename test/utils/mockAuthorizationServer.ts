@@ -1,6 +1,6 @@
-import axios, {AxiosRequestConfig} from 'axios';
 import {randomUUID} from 'crypto';
-import {generateKeyPair, exportJWK, SignJWT, GenerateKeyPairResult} from 'jose';
+import {generateKeyPair, exportJWK, SignJWT, GenerateKeyPairResult, JWTPayload} from 'jose';
+import {fetch, RequestInit} from 'undici';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy.js';
 import {MockTokenOptions} from './mockTokenOptions.js';
 
@@ -74,7 +74,8 @@ export class MockAuthorizationServer {
         keypair: GenerateKeyPairResult | null = null): Promise<string> {
 
         const keypairToUse = keypair || this.keypair;
-        return await new SignJWT( {
+
+        const payload: JWTPayload = {
             iss: options.issuer,
             aud: options.audience,
             scope: options.scope,
@@ -83,7 +84,9 @@ export class MockAuthorizationServer {
             sub: options.subject,
             manager_id: options.managerId,
             role: options.role,
-        })
+        };
+
+        return await new SignJWT(payload)
             .setProtectedHeader( { kid: this.keyId, alg: this.algorithm } )
             .setExpirationTime(options.expiryTime)
             .sign(keypairToUse.privateKey);
@@ -94,17 +97,16 @@ export class MockAuthorizationServer {
      */
     private async register(stubbedResponse: any): Promise<void> {
 
-        const options = {
-            url: this.baseUrl,
+        const options: RequestInit = {
             method: 'POST',
-            data: stubbedResponse,
+            body: JSON.stringify(stubbedResponse),
             headers: {
                 'content-type': 'application/json',
             },
-            httpsAgent: this.httpProxy.getAgent(),
-        } as AxiosRequestConfig;
+            dispatcher: this.httpProxy.getDispatcher() || undefined,
+        };
 
-        const response = await axios(options);
+        const response = await fetch(this.baseUrl, options);
         if (response.status !== 201) {
             throw new Error(`Failed to add Wiremock stub: status ${response.status}`);
         }
@@ -115,13 +117,12 @@ export class MockAuthorizationServer {
      */
     private async unregister(id: string): Promise<void> {
 
-        const options = {
-            url: `${this.baseUrl}/${id}`,
+        const options: RequestInit = {
             method: 'DELETE',
-            httpsAgent: this.httpProxy.getAgent(),
-        } as AxiosRequestConfig;
+            dispatcher: this.httpProxy.getDispatcher() || undefined,
+        };
 
-        const response = await axios(options);
+        const response = await fetch(`${this.baseUrl}/${id}`, options);
         if (response.status !== 200) {
             throw new Error(`Failed to delete Wiremock stub: status ${response.status}`);
         }
