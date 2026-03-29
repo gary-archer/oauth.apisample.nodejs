@@ -33,7 +33,8 @@ export class CompanyController {
     public async getCompanyTransactions(request: Request, response: Response): Promise<void> {
 
         // Parse the ID and throw a 400 error if it is invalid
-        const companyId = parseInt(request.params.id, 10);
+        const id = request.params.id as string;
+        const companyId = parseInt(id, 10);
         if (isNaN(companyId) || companyId <= 0) {
 
             throw ErrorFactory.createClientError(
