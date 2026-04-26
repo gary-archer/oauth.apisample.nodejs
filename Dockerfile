@@ -1,4 +1,4 @@
-FROM node:24-bookworm-slim
+FROM node:24-trixie-slim
 
 WORKDIR /usr/api
 COPY --chown=10001:10000 dist                /usr/api/dist
