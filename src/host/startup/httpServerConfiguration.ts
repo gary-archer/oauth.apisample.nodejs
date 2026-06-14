@@ -1,6 +1,6 @@
 import express, {Request, Response, Router} from 'express';
 import fs from 'node:fs/promises';
-import https from 'https';
+import https from 'node:https';
 import {Container} from 'inversify';
 import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {ExtraClaimsProviderImpl} from '../../logic/claims/extraClaimsProviderImpl.js';

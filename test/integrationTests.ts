@@ -1,6 +1,6 @@
 import assert from 'assert';
-import {randomUUID} from 'crypto';
 import {generateKeyPair} from 'jose';
+import {randomUUID} from 'node:crypto';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
 import {MockAuthorizationServer} from './utils/mockAuthorizationServer.js';

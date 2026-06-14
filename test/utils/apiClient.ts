@@ -1,4 +1,4 @@
-import {randomUUID} from 'crypto';
+import {randomUUID} from 'node:crypto';
 import {fetch, RequestInit} from 'undici';
 import {HttpProxy} from '../../src/plumbing/utilities/httpProxy.js';
 import {ApiRequestOptions} from './apiRequestOptions.js';

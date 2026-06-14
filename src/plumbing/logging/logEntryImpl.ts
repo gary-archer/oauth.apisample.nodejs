@@ -1,7 +1,7 @@
-import {randomUUID} from 'crypto';
 import {Request, Response} from 'express';
 import {injectable} from 'inversify';
-import os from 'os';
+import {randomUUID} from 'node:crypto';
+import os from 'node:os';
 import {ClientError} from '../errors/clientError.js';
 import {ServerError} from '../errors/serverError.js';
 import {RouteLogInfoHandler} from '../routes/routeLogInfoHandler.js';

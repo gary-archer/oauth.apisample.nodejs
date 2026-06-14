@@ -1,6 +1,6 @@
-import {createHash} from 'crypto';
 import {Request, Response} from 'express';
 import {inject, injectable} from 'inversify';
+import {createHash} from 'node:crypto';
 import {ClaimsCache} from '../claims/claimsCache.js';
 import {ClaimsPrincipal} from '../claims/claimsPrincipal.js';
 import {ExtraClaimsProvider} from '../claims/extraClaimsProvider.js';

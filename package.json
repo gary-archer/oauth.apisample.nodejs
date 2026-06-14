@@ -20,10 +20,10 @@
   "dependencies": {
     "express": "^5.2.1",
     "inversify": "^7.10.0",
-    "jose": "^6.2.2",
+    "jose": "^6.2.3",
     "node-cache": "^5.1.2",
     "reflect-metadata": "^0.2.1",
-    "undici": "^7.24.6",
+    "undici": "^8.4.1",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
     "winston-transport": "^4.9.0"
@@ -33,11 +33,11 @@
     "@types/express": "^5.0.6",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.10.3",
-    "eslint": "^10.1.0",
+    "eslint": "^10.5.0",
     "mocha": "^11.7.6",
-    "tsx": "^4.21.0",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.0"
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.0"
   },
   "overrides": {
     "mocha": {

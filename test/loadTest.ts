@@ -1,4 +1,4 @@
-import {randomUUID} from 'crypto';
+import {randomUUID} from 'node:crypto';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
 import {ApiResponse} from './utils/apiResponse.js';
