@@ -1,5 +1,6 @@
-import assert from 'assert';
 import {generateKeyPair} from 'jose';
+import {after, before, describe, it} from 'mocha';
+import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {ApiClient} from './utils/apiClient.js';
 import {ApiRequestOptions} from './utils/apiRequestOptions.js';
