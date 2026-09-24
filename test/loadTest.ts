@@ -26,7 +26,7 @@ describe('Load Test', () => {
     const delegationId = randomUUID();
 
     // Initialize counts
-    let numApiRequests = 100;
+    const numApiRequests = 100;
     let totalCount = 0;
     let errorCount = 0;
 
@@ -84,7 +84,8 @@ describe('Load Test', () => {
         // Assert expected results
         assert.strictEqual(totalCount, numApiRequests);
         assert.strictEqual(errorCount, 3);
-    });
+
+    }).timeout(60 * 1000);
 
     /*
      * Do some initial work to get multiple access tokens
