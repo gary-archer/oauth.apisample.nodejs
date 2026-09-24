@@ -11,9 +11,9 @@
   "scripts": {
     "lint": "eslint .",
     "start": "./start.sh",
-    "testsetup": "./test/scripts/testsetup.sh",
-    "test": "./test/scripts/test.sh",
-    "loadtest": "./test/scripts/loadtest.sh",
+    "testsetup": "./testsetup.sh",
+    "integrationtests": "./integration_tests.sh",
+    "loadtest": "./load_test.sh",
     "buildRelease": "rm -rf dist && tsc --sourceMap false",
     "startRelease": "node dist/host/startup/app.js"
   },

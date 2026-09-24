@@ -8,9 +8,9 @@ import {MockAuthorizationServer} from './utils/mockAuthorizationServer.js';
 import {MockTokenOptions} from './utils/mockTokenOptions.js';
 
 /*
- * Test the API in isolation, without any dependencies on real access tokens
+ * Integration tests to exercise authentication and authorization logic
  */
-describe('OAuth API Tests', () => {
+describe('Integration Tests', () => {
 
     // Use an HTTP proxy if required
     const useProxy = false;
