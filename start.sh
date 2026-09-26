@@ -22,6 +22,6 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Call a shared script to do the work
+# Call a shared script to run the API
 #
 ./run_api.sh
