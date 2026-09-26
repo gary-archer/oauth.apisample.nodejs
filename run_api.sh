@@ -12,7 +12,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 npm install
 if [ $? -ne 0 ]; then
   echo 'Problem encountered installing dependencies'
-  read -n 1
   exit 1
 fi
 
@@ -22,7 +21,6 @@ fi
 npm run lint
 if [ $? -ne 0 ]; then
   echo 'Code quality checks failed'
-  read -n 1
   exit 1
 fi
 
@@ -48,11 +46,5 @@ fi
 npx tsx src/host/startup/app.ts
 if [ $? -ne 0 ]; then
   echo 'Problem encountered starting the API'
-  read -n 1
   exit 1
 fi
-
-#
-# Prevent automatic terminal closure
-#
-read -n 1
