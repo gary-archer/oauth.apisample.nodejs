@@ -32,11 +32,6 @@ fi
 ./run_api.sh
 
 #
-# Restore the API configuration once the API is loaded
-#
-cp deployment/environments/dev/api.config.json ./api.config.json
-
-#
 # Indicate success
 #
 echo "Start tests via './integration_tests.sh' or './load_test.sh' ..."
