@@ -1,5 +1,4 @@
 import {Container} from 'inversify';
-import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {CompanyRepository} from '../../logic/repositories/companyRepository.js';
 import {UserRepository} from '../../logic/repositories/userRepository.js';
 import {CompanyService} from '../../logic/services/companyService.js';
@@ -85,7 +84,7 @@ export class CompositionRoot {
      */
     private registerBaseDependencies(): void {
 
-        this.parentContainer.bind<HttpProxy>(BASETYPES.HttpProxy)
+        this.parentContainer.bind(HttpProxy)
             .toConstantValue(this.httpProxy);
     }
 
@@ -99,15 +98,15 @@ export class CompositionRoot {
             .toConstantValue(this.configuration.oauth);
 
         // Register an object to validate JWT access tokens
-        this.parentContainer.bind<AccessTokenValidator>(BASETYPES.AccessTokenValidator)
+        this.parentContainer.bind(AccessTokenValidator)
             .to(AccessTokenValidator).inTransientScope();
 
         // The filter deals with finalizing the claims principal
-        this.parentContainer.bind<OAuthFilter>(BASETYPES.OAuthFilter)
+        this.parentContainer.bind(OAuthFilter)
             .to(OAuthFilter).inTransientScope();
 
         // Also register a singleton to cache token signing public keys
-        this.parentContainer.bind<JwksRetriever>(BASETYPES.JwksRetriever)
+        this.parentContainer.bind(JwksRetriever)
             .toConstantValue(new JwksRetriever(this.configuration.oauth, this.httpProxy));
     }
 
@@ -120,7 +119,7 @@ export class CompositionRoot {
         const claimsCache = new ClaimsCache(
             this.configuration.oauth.claimsCacheTimeToLiveMinutes,
             this.loggerFactory);
-        this.parentContainer.bind<ClaimsCache>(BASETYPES.ClaimsCache)
+        this.parentContainer.bind(ClaimsCache)
             .toConstantValue(claimsCache);
 
         // Register the extra claims provider
@@ -133,18 +132,18 @@ export class CompositionRoot {
      */
     private registerApplicationDependencies(): void {
 
-        this.parentContainer.bind<CompanyController>(APPLICATIONTYPES.CompanyController)
+        this.parentContainer.bind(CompanyController)
             .to(CompanyController).inRequestScope();
-        this.parentContainer.bind<UserInfoController>(APPLICATIONTYPES.UserInfoController)
+        this.parentContainer.bind(UserInfoController)
             .to(UserInfoController).inRequestScope();
 
-        this.parentContainer.bind<CompanyService>(APPLICATIONTYPES.CompanyService)
+        this.parentContainer.bind(CompanyService)
             .to(CompanyService).inTransientScope();
-        this.parentContainer.bind<CompanyRepository>(APPLICATIONTYPES.CompanyRepository)
+        this.parentContainer.bind(CompanyRepository)
             .to(CompanyRepository).inTransientScope();
-        this.parentContainer.bind<UserRepository>(APPLICATIONTYPES.UserRepository)
+        this.parentContainer.bind(UserRepository)
             .to(UserRepository).inTransientScope();
-        this.parentContainer.bind<JsonFileReader>(APPLICATIONTYPES.JsonFileReader)
+        this.parentContainer.bind(JsonFileReader)
             .to(JsonFileReader).inTransientScope();
     }
 }

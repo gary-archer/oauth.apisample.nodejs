@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
 import {inject} from 'inversify';
 import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ResponseWriter} from '../../plumbing/utilities/responseWriter.js';
 
 /*
@@ -11,7 +10,7 @@ export class UserInfoController {
 
     private readonly claims: ClaimsPrincipal;
 
-    public constructor(@inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
+    public constructor(@inject(ClaimsPrincipal) claims: ClaimsPrincipal) {
         this.claims = claims;
         this.setupCallbacks();
     }

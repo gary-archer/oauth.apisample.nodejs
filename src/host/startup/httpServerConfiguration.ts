@@ -2,7 +2,6 @@ import express, {Request, Response, Router} from 'express';
 import fs from 'node:fs/promises';
 import https from 'node:https';
 import {Container} from 'inversify';
-import {APPLICATIONTYPES} from '../../logic/dependencies/applicationTypes.js';
 import {ExtraClaimsProviderImpl} from '../../logic/claims/extraClaimsProviderImpl.js';
 import {LoggerFactory} from '../../plumbing/logging/loggerFactory.js';
 import {AuthenticationMiddleware} from '../../plumbing/middleware/authenticationMiddleware.js';
@@ -112,19 +111,19 @@ export class HttpServerConfiguration {
             {
                 method: 'get',
                 path: `${apiBasePath}/userinfo`,
-                controller: APPLICATIONTYPES.UserInfoController,
+                controller: UserInfoController,
                 action: (c: UserInfoController) => c.getUserInfo,
             },
             {
                 method: 'get',
                 path: `${apiBasePath}/companies`,
-                controller: APPLICATIONTYPES.CompanyController,
+                controller: CompanyController,
                 action: (c: CompanyController) => c.getCompanyList,
             },
             {
                 method: 'get',
                 path: `${apiBasePath}/companies/:id/transactions`,
-                controller: APPLICATIONTYPES.CompanyController,
+                controller: CompanyController,
                 action: (c: CompanyController) => c.getCompanyTransactions,
             },
         ];

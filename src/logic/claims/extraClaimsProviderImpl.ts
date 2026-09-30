@@ -5,7 +5,6 @@ import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
 import {CustomClaimNames} from '../../plumbing/claims/customClaimNames.js';
 import {ExtraClaims} from '../../plumbing/claims/extraClaims.js';
 import {ExtraClaimsProvider} from '../../plumbing/claims/extraClaimsProvider.js';
-import {APPLICATIONTYPES} from '../dependencies/applicationTypes.js';
 import {UserRepository} from '../repositories/userRepository.js';
 
 /*
@@ -20,7 +19,7 @@ export class ExtraClaimsProviderImpl implements ExtraClaimsProvider {
 
         // Get an object to look up user information
         const container = response.locals.container as Container;
-        const userRepository = container.get<UserRepository>(APPLICATIONTYPES.UserRepository);
+        const userRepository = container.get(UserRepository);
 
         // Look up values using the manager ID, a business user identity
         const managerId = ClaimsReader.getStringClaim(jwtClaims, CustomClaimNames.managerId);

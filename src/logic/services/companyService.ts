@@ -2,10 +2,8 @@ import {inject, injectable} from 'inversify';
 import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
 import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
 import {CustomClaimNames} from '../../plumbing/claims/customClaimNames.js';
-import {BASETYPES} from '../../plumbing/dependencies/baseTypes.js';
 import {ClientError} from '../../plumbing/errors/clientError.js';
 import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
-import {APPLICATIONTYPES} from '../dependencies/applicationTypes.js';
 import {Company} from '../entities/company.js';
 import {CompanyTransactions} from '../entities/companyTransactions.js';
 import {ErrorCodes} from '../errors/errorCodes.js';
@@ -21,8 +19,8 @@ export class CompanyService {
     private readonly claims: ClaimsPrincipal;
 
     public constructor(
-        @inject(APPLICATIONTYPES.CompanyRepository) repository: CompanyRepository,
-        @inject(BASETYPES.ClaimsPrincipal) claims: ClaimsPrincipal) {
+        @inject(CompanyRepository) repository: CompanyRepository,
+        @inject(ClaimsPrincipal) claims: ClaimsPrincipal) {
 
         this.repository = repository;
         this.claims = claims;
@@ -33,7 +31,7 @@ export class CompanyService {
      */
     public async getCompanyList(): Promise<Company[]> {
 
-        // Use a micro services approach of getting all data
+    // Use a micro services approach of getting all data
         const companies = await this.repository.getCompanyList();
 
         // We will then filter on only authorized companies

@@ -16,7 +16,7 @@ export class JwksRetriever {
 
     public constructor(
         @inject(BASETYPES.OAuthConfiguration) configuration: OAuthConfiguration,
-        @inject(BASETYPES.HttpProxy) httpProxy: HttpProxy) {
+        @inject(HttpProxy) httpProxy: HttpProxy) {
 
         this.httpProxy = httpProxy;
         this.setupCallbacks();
