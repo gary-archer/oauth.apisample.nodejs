@@ -99,11 +99,11 @@ export class CompositionRoot {
 
         // Register an object to validate JWT access tokens
         this.parentContainer.bind(AccessTokenValidator)
-            .to(AccessTokenValidator).inTransientScope();
+            .toSelf().inTransientScope();
 
         // The filter deals with finalizing the claims principal
         this.parentContainer.bind(OAuthFilter)
-            .to(OAuthFilter).inTransientScope();
+            .toSelf().inTransientScope();
 
         // Also register a singleton to cache token signing public keys
         this.parentContainer.bind(JwksRetriever)
@@ -133,17 +133,17 @@ export class CompositionRoot {
     private registerApplicationDependencies(): void {
 
         this.parentContainer.bind(CompanyController)
-            .to(CompanyController).inRequestScope();
+            .toSelf().inRequestScope();
         this.parentContainer.bind(UserInfoController)
-            .to(UserInfoController).inRequestScope();
+            .toSelf().inRequestScope();
 
         this.parentContainer.bind(CompanyService)
-            .to(CompanyService).inTransientScope();
+            .toSelf().inTransientScope();
         this.parentContainer.bind(CompanyRepository)
-            .to(CompanyRepository).inTransientScope();
+            .toSelf().inTransientScope();
         this.parentContainer.bind(UserRepository)
-            .to(UserRepository).inTransientScope();
+            .toSelf().inTransientScope();
         this.parentContainer.bind(JsonFileReader)
-            .to(JsonFileReader).inTransientScope();
+            .toSelf().inTransientScope();
     }
 }
