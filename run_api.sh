@@ -40,8 +40,6 @@ fi
 
 #
 # Run the API
-# On Linux ensure that you have first granted Node.js permissions to listen on port 446:
-# - sudo setcap 'cap_net_bind_service=+ep' $(which node)
 #
 npx tsx src/host/startup/app.ts
 if [ $? -ne 0 ]; then
