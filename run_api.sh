@@ -32,11 +32,9 @@ if [ ! -d './logs' ]; then
 fi
 
 #
-# Tell Node.js to trust the CA, or the user can add this CA to their own trust file
+# Tell Node.js to trust the development root CA
 #
-if [ "$NODE_EXTRA_CA_CERTS" == '' ]; then
-  export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.crt'
-fi
+export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.crt'
 
 #
 # Run the API
