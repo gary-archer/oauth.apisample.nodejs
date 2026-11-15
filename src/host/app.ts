@@ -1,0 +1,28 @@
+import fs from 'node:fs/promises';
+import {Container} from 'inversify';
+import 'reflect-metadata';
+import {Configuration} from '../configuration/configuration.js';
+import {LoggerFactoryBuilder} from '../middleware/logging/loggerFactoryBuilder.js';
+import {HttpServerConfiguration} from './httpServerConfiguration.js';
+
+// Create initial objects
+const loggerFactory = LoggerFactoryBuilder.create();
+const parentContainer = new Container();
+
+try {
+
+    // Load our JSON configuration and configure logging
+    const configurationJson = await fs.readFile('api.config.json', 'utf-8');
+    const configuration = JSON.parse(configurationJson) as Configuration;
+    loggerFactory.configure(configuration.logging);
+
+    // Configure the API behaviour at startup
+    const httpServer = new HttpServerConfiguration(configuration, parentContainer, loggerFactory);
+    await httpServer.configure();
+    httpServer.start();
+
+} catch (e) {
+
+    // Report startup errors
+    loggerFactory.logStartupError(e);
+}

@@ -1,12 +1,12 @@
 import {inject, injectable} from 'inversify';
-import {ClaimsPrincipal} from '../../plumbing/claims/claimsPrincipal.js';
-import {ClaimsReader} from '../../plumbing/claims/claimsReader.js';
-import {CustomClaimNames} from '../../plumbing/claims/customClaimNames.js';
-import {ClientError} from '../../plumbing/errors/clientError.js';
-import {ErrorFactory} from '../../plumbing/errors/errorFactory.js';
+import {ClaimsPrincipal} from '../../middleware/claims/claimsPrincipal.js';
+import {ClaimsReader} from '../../middleware/claims/claimsReader.js';
+import {CustomClaimNames} from '../../middleware/claims/customClaimNames.js';
+import {ClientError} from '../../middleware/errors/clientError.js';
+import {ErrorCodes} from '../../middleware/errors/errorCodes.js';
+import {ErrorFactory} from '../../middleware/errors/errorFactory.js';
 import {Company} from '../entities/company.js';
 import {CompanyTransactions} from '../entities/companyTransactions.js';
-import {ErrorCodes} from '../errors/errorCodes.js';
 import {CompanyRepository} from '../repositories/companyRepository.js';
 
 /*

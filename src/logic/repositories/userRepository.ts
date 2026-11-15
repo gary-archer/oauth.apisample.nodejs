@@ -1,4 +1,4 @@
-import {ExtraClaims} from '../../plumbing/claims/extraClaims.js';
+import {ExtraClaims} from '../../middleware/claims/extraClaims.js';
 
 /*
  * A repository that returns hard coded data, whereas a real implementation would use a database lookup

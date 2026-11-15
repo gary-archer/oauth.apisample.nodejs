@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {fetch, RequestInit} from 'undici';
-import {HttpProxy} from '../../src/plumbing/utilities/httpProxy.js';
+import {HttpProxy} from '../../src/utilities/httpProxy.js';
 import {ApiRequestOptions} from './apiRequestOptions.js';
 import {ApiResponse} from './apiResponse.js';
 import {ApiResponseMetrics} from './apiResponseMetrics.js';
