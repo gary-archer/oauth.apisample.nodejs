@@ -11,7 +11,7 @@ import {CustomHeaderMiddleware} from '../middleware/errors/customHeaderMiddlewar
 import {UnhandledExceptionHandler} from '../middleware/errors/unhandledExceptionHandler.js';
 import {LoggerFactory} from '../middleware/logging/loggerFactory.js';
 import {LoggerMiddleware} from '../middleware/logging/loggerMiddleware.js';
-import {AuthenticationMiddleware} from '../middleware/oauth/oauthMiddleware.js';
+import {OAuthMiddleware} from '../middleware/oauth/oauthMiddleware.js';
 import {RouteMetadata} from '../middleware/routes/routeMetadata.js';
 
 /*
@@ -44,7 +44,7 @@ export class HttpServerConfiguration {
         // Create Express middleware
         const childContainerMiddleware = new ChildContainerMiddleware(this.parentContainer);
         const loggerMiddleware = new LoggerMiddleware(this.loggerFactory, routesMetadata);
-        const authenticationMiddleware = new AuthenticationMiddleware(this.configuration.oauth);
+        const oauthMiddleware = new OAuthMiddleware(this.configuration.oauth);
         const customHeaderMiddleware = new CustomHeaderMiddleware(this.configuration.logging.apiName);
         const exceptionHandler = new UnhandledExceptionHandler(this.configuration.logging, this.configuration.oauth);
 
@@ -59,7 +59,7 @@ export class HttpServerConfiguration {
         this.expressApp.set('etag', false);
         this.expressApp.use(allRoutes, childContainerMiddleware.execute);
         this.expressApp.use(allRoutes, loggerMiddleware.execute);
-        this.expressApp.use(allRoutes, authenticationMiddleware.execute);
+        this.expressApp.use(allRoutes, oauthMiddleware.execute);
         this.expressApp.use(allRoutes, customHeaderMiddleware.execute);
 
         // Create application routes from the routes metadata

@@ -10,7 +10,7 @@ import {OAuthFilter} from '../oauth/oauthFilter.js';
 /*
  * The Node.js middleware for OAuth processing
  */
-export class AuthenticationMiddleware {
+export class OAuthMiddleware {
 
     private readonly configuration: OAuthConfiguration;
 
