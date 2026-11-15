@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "Launch API",
             "runtimeArgs": ["--import", "tsx"],
-            "args": ["src/host/startup/app.ts"],
+            "args": ["src/host/app.ts"],
             "outputCapture": "std",
             "skipFiles": ["<node_internals>/**"]
         }

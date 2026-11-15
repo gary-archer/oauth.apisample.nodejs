@@ -1,0 +1,27 @@
+import {JWTPayload} from 'jose';
+import {Response} from 'express';
+import {Container} from 'inversify';
+import {UserRepository} from '../../logic/repositories/userRepository.js';
+import {ClaimsReader} from './claimsReader.js';
+import {CustomClaimNames} from './customClaimNames.js';
+import {ExtraClaims} from './extraClaims.js';
+
+/*
+ * Add extra authorization values that you cannot, or do not want to, manage in the authorization server
+ */
+export class ExtraClaimsProvider {
+
+    /*
+     * Get extra values from the API's own data
+     */
+    public async lookupExtraClaims(jwtClaims: JWTPayload, response: Response): Promise<ExtraClaims> {
+
+        // Get an object to look up user information
+        const container = response.locals.container as Container;
+        const userRepository = container.get(UserRepository);
+
+        // Look up values using the manager ID, a business user identity
+        const managerId = ClaimsReader.getStringClaim(jwtClaims, CustomClaimNames.managerId);
+        return userRepository.getUserInfoForManagerId(managerId);
+    }
+}

@@ -39,7 +39,7 @@ export NODE_EXTRA_CA_CERTS='./certs/authsamples-dev.ca.crt'
 #
 # Run the API
 #
-npx tsx src/host/startup/app.ts
+npx tsx src/host/app.ts
 if [ $? -ne 0 ]; then
   echo 'Problem encountered starting the API'
   exit 1
