@@ -3,6 +3,5 @@ exclude_paths: [
     '*',    
     'data/**',
     'deployment/**',
-    'images/**',
-    'test/scripts/*'
+    'images/**'
 ]
